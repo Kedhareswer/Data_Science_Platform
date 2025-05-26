@@ -2,50 +2,85 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
-
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -54,147 +89,72 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
-  }
-
-  /* Improved focus styles for accessibility */
-  :focus-visible {
-    @apply outline-2 outline-offset-2 outline-primary;
+    @apply bg-background text-foreground antialiased;
   }
 }
 
-/* Modern UI components */
-.app-container {
-  @apply max-w-screen-2xl mx-auto px-4 sm:px-6;
+/* Layout and Spacing */
+.container {
+  @apply px-4 mx-auto max-w-7xl sm:px-6 lg:px-8;
 }
 
-.app-header {
-  @apply sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60;
+.section-spacing {
+  @apply py-8 md:py-12 lg:py-16;
 }
 
-.app-sidebar {
-  @apply fixed top-0 left-0 h-full w-64 bg-card border-r z-40 transition-transform duration-300 ease-in-out shadow-md;
-  transform: translateX(-100%);
+.content-spacing {
+  @apply space-y-6 md:space-y-8;
 }
 
-.app-sidebar.open {
-  transform: translateX(0);
+/* Navigation */
+.nav-item {
+  @apply px-3 py-2 text-sm font-medium transition-colors rounded-md hover:bg-accent;
 }
 
-.app-main {
-  @apply transition-all duration-300 ease-in-out;
+.nav-item-active {
+  @apply bg-accent text-accent-foreground;
 }
 
-.app-main.sidebar-open {
-  @apply ml-64;
+/* Cards and Components */
+.card {
+  @apply p-6 transition-shadow duration-200 rounded-lg border hover:shadow-md;
 }
 
-/* Card and component styling */
-.app-card {
-  @apply rounded-lg border bg-card shadow-sm transition-all duration-200 hover:shadow-md;
-}
-
-.app-cell {
-  @apply relative border rounded-lg bg-card shadow-sm transition-all duration-200;
-}
-
-.app-cell:hover {
-  @apply shadow-md;
-}
-
-.app-cell-header {
-  @apply flex items-center justify-between px-4 py-2 border-b bg-muted/50 rounded-t-lg;
-}
-
-.app-cell-content {
-  @apply p-4;
-}
-
-/* Data visualization elements */
-.chart-container {
-  @apply rounded-lg border p-4 bg-card;
-}
-
-.data-grid {
-  @apply rounded-lg border overflow-hidden;
-}
-
-.data-grid-header {
-  @apply bg-muted/70 font-medium;
-}
-
-/* Form elements */
 .form-group {
-  @apply space-y-2 mb-4;
+  @apply space-y-2;
 }
 
-.form-label {
-  @apply text-sm font-medium;
+.button-group {
+  @apply flex items-center gap-3;
 }
 
-.form-input {
-  @apply rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+/* Typography */
+.heading-1 {
+  @apply text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl;
 }
 
-/* Accessibility improvements */
-.sr-only {
-  @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+.heading-2 {
+  @apply text-2xl font-semibold tracking-tight sm:text-3xl;
 }
 
-.skip-link {
-  @apply absolute left-4 top-4 z-50 bg-background px-4 py-2 text-sm font-medium text-foreground shadow-md rounded-md -translate-y-20 focus:translate-y-0 transition-transform;
+.heading-3 {
+  @apply text-xl font-semibold tracking-tight sm:text-2xl;
 }
 
-/* Animation utilities */
-.fade-in {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* Responsive utilities */
+/* Responsive Design */
 .responsive-grid {
-  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4;
+  @apply grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3;
 }
 
 .responsive-flex {
-  @apply flex flex-col sm:flex-row;
+  @apply flex flex-col gap-4 sm:flex-row sm:items-center;
 }
 
-/* Status indicators */
-.status-badge {
-  @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+/* Accessibility */
+.focus-ring {
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
 }
 
-.status-badge-success {
-  @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300;
-}
-
-.status-badge-warning {
-  @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300;
-}
-
-.status-badge-error {
-  @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300;
-}
-
-.status-badge-info {
-  @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300;
-}
-
-/* Improved button styles */
-.btn-icon {
-  @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background;
-}
-
-/* Improved tooltip */
-.tooltip {
-  @apply absolute z-50 rounded-md bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2;
+.skip-link {
+  @apply sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-background focus:text-foreground focus:shadow-lg;
 }
