@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { createContext, useState, useEffect, type ReactNode, useContext } from "react"
 import Papa from "papaparse"
 import * as XLSX from "xlsx"
 
@@ -150,6 +150,7 @@ export type CellType =
   | "ml-trainer"
   | "ml-predictor"
   | "ml-insights"
+  | "missing-data"
 
 export interface NotebookCell {
   id: string
@@ -847,8 +848,8 @@ const prediction = model.predict(inputData)
           },
           {
             id: generateId(),
-            type: "exploration",
-            title: "Data Exploration",
+            type: "missing-data",
+            title: "Missing Data Analysis",
             createdAt: new Date(),
           },
         ])
@@ -1136,6 +1137,8 @@ const prediction = model.predict(inputData)
         return "Data Exploration"
       case "profile":
         return "Data Profile"
+      case "missing-data":
+        return "Missing Data Analysis"
       case "text":
         return "Notes"
       case "code":

@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Comic Sans MS", "Brush Script MT", "Lucida Handwriting", cursive;
 }
 
 @layer utilities {
@@ -90,7 +90,34 @@ body {
   }
   body {
     @apply bg-background text-foreground antialiased;
+    font-family: "Comic Sans MS", "Brush Script MT", "Lucida Handwriting", "Bradley Hand", "Segoe Print", cursive;
+    font-weight: 400;
   }
+}
+
+/* Handwritten Font Classes using system fonts */
+.font-handwritten-light {
+  font-family: "Comic Sans MS", "Brush Script MT", "Lucida Handwriting", "Bradley Hand", "Segoe Print", cursive;
+  font-weight: 300;
+}
+
+.font-handwritten {
+  font-family: "Comic Sans MS", "Brush Script MT", "Lucida Handwriting", "Bradley Hand", "Segoe Print", cursive;
+  font-weight: 400;
+}
+
+.font-handwritten-bold {
+  font-family: "Comic Sans MS", "Brush Script MT", "Lucida Handwriting", "Bradley Hand", "Segoe Print", cursive;
+  font-weight: 700;
+}
+
+/* Code and Monospace Elements - Keep readable */
+code,
+pre,
+.font-mono,
+.code-editor,
+.monaco-editor {
+  font-family: "Fira Code", "Monaco", "Cascadia Code", "Roboto Mono", "Consolas", monospace !important;
 }
 
 /* Layout and Spacing */
@@ -128,17 +155,20 @@ body {
   @apply flex items-center gap-3;
 }
 
-/* Typography */
+/* Typography with Handwritten Font */
 .heading-1 {
-  @apply text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl;
+  @apply text-3xl font-handwritten-bold tracking-tight sm:text-4xl md:text-5xl;
+  letter-spacing: 0.02em;
 }
 
 .heading-2 {
-  @apply text-2xl font-semibold tracking-tight sm:text-3xl;
+  @apply text-2xl font-handwritten-bold tracking-tight sm:text-3xl;
+  letter-spacing: 0.015em;
 }
 
 .heading-3 {
-  @apply text-xl font-semibold tracking-tight sm:text-2xl;
+  @apply text-xl font-handwritten-bold tracking-tight sm:text-2xl;
+  letter-spacing: 0.01em;
 }
 
 /* Responsive Design */
@@ -157,4 +187,78 @@ body {
 
 .skip-link {
   @apply sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-background focus:text-foreground focus:shadow-lg;
+}
+
+/* Handwritten Font Enhancements */
+.handwritten-title {
+  font-family: "Comic Sans MS", "Brush Script MT", "Lucida Handwriting", "Bradley Hand", "Segoe Print", cursive;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.handwritten-subtitle {
+  font-family: "Comic Sans MS", "Brush Script MT", "Lucida Handwriting", "Bradley Hand", "Segoe Print", cursive;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+.handwritten-body {
+  font-family: "Comic Sans MS", "Brush Script MT", "Lucida Handwriting", "Bradley Hand", "Segoe Print", cursive;
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+/* Button and Interactive Elements */
+button,
+.btn {
+  font-family: "Comic Sans MS", "Brush Script MT", "Lucida Handwriting", "Bradley Hand", "Segoe Print", cursive;
+  font-weight: 400;
+}
+
+/* Form Elements */
+input,
+textarea,
+select {
+  font-family: "Comic Sans MS", "Brush Script MT", "Lucida Handwriting", "Bradley Hand", "Segoe Print", cursive;
+  font-weight: 300;
+}
+
+/* Preserve readability for data tables */
+table,
+.data-table {
+  font-family: "Comic Sans MS", "Brush Script MT", "Lucida Handwriting", "Bradley Hand", "Segoe Print", cursive;
+  font-weight: 300;
+}
+
+/* Special styling for headers in handwritten font */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Comic Sans MS", "Brush Script MT", "Lucida Handwriting", "Bradley Hand", "Segoe Print", cursive;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+/* Smooth font rendering for handwritten fonts */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Enhanced readability adjustments */
+p,
+span,
+div {
+  line-height: 1.5;
+}
+
+/* Special handling for code blocks to maintain readability */
+.code-block,
+.syntax-highlight {
+  font-family: "Fira Code", "Monaco", "Cascadia Code", "Roboto Mono", "Consolas", monospace !important;
+  font-weight: 400 !important;
 }

@@ -161,20 +161,26 @@ export function DashboardFilter({ config }: DashboardFilterProps) {
                         </Button>
                       </div>
 
-                      <Select value={filter.column} onValueChange={(value) => updateFilter(index, "column", value)}>
+                      <Select
+                        value={filter.column || "default"}
+                        onValueChange={(value) => updateFilter(index, "column", value === "default" ? "" : value)}
+                      >
                         <SelectTrigger className="sketch-input">
                           <SelectValue placeholder="Column" />
                         </SelectTrigger>
                         <SelectContent>
                           {selectedColumns.map((col) => (
-                            <SelectItem key={col} value={col}>
+                            <SelectItem key={col} value={col || `col-${col}`}>
                               {col}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
 
-                      <Select value={filter.operator} onValueChange={(value) => updateFilter(index, "operator", value)}>
+                      <Select
+                        value={filter.operator || "equal"}
+                        onValueChange={(value) => updateFilter(index, "operator", value)}
+                      >
                         <SelectTrigger className="sketch-input">
                           <SelectValue placeholder="Operator" />
                         </SelectTrigger>

@@ -10,13 +10,23 @@ import { BarChart3, FileSpreadsheet, LineChart, PieChart, Upload, ChevronRight, 
 import { useRouter } from "next/navigation"
 import { useData } from "@/lib/data-context"
 import Link from "next/link"
+import { NavigationBreadcrumb } from "@/components/navigation-breadcrumb"
+import { NavigationSidebar } from "@/components/navigation-sidebar"
+import { useNavigation } from "@/lib/navigation-context"
 
 export default function HomePage() {
   const router = useRouter()
   const { resetData } = useData()
+  const { addToHistory } = useNavigation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [navSidebarOpen, setNavSidebarOpen] = useState(false)
 
   const handleUploadSuccess = () => {
+    addToHistory({
+      path: "/notebook",
+      title: "Data Notebook",
+      metadata: { section: "file-upload-success" },
+    })
     router.push("/notebook")
   }
 
@@ -28,8 +38,16 @@ export default function HomePage() {
     <div className="flex min-h-screen flex-col">
       <Navbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
       <Sidebar isOpen={sidebarOpen} />
+      <NavigationSidebar isOpen={navSidebarOpen} onToggle={() => setNavSidebarOpen(!navSidebarOpen)} />
 
-      <main id="main-content" className={`flex-1 ${sidebarOpen ? "app-main sidebar-open" : "app-main"}`}>
+      <main
+        id="main-content"
+        className={`flex-1 ${sidebarOpen ? "app-main sidebar-open" : "app-main"} ${navSidebarOpen ? "ml-80" : ""}`}
+      >
+        <div className="container mx-auto px-4 py-6">
+          <NavigationBreadcrumb />
+        </div>
+
         <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-background to-muted/30">
           <div className="container px-4 md:px-6">
             <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">

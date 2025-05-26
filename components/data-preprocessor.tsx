@@ -356,7 +356,7 @@ console.log('Transformed', transformed_data.length, 'rows')`,
 
               <div className="space-y-2">
                 <Label>Strategy</Label>
-                <Select value={strategy} onValueChange={setStrategy}>
+                <Select value={strategy || "mean"} onValueChange={setStrategy}>
                   <SelectTrigger className="sketch-input">
                     <SelectValue placeholder="Select strategy" />
                   </SelectTrigger>
@@ -465,7 +465,7 @@ console.log('Transformed', transformed_data.length, 'rows')`,
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Detection Method</Label>
-                  <Select value={outlierMethod} onValueChange={setOutlierMethod}>
+                  <Select value={outlierMethod || "iqr"} onValueChange={setOutlierMethod}>
                     <SelectTrigger className="sketch-input">
                       <SelectValue placeholder="Select method" />
                     </SelectTrigger>
@@ -478,7 +478,7 @@ console.log('Transformed', transformed_data.length, 'rows')`,
 
                 <div className="space-y-2">
                   <Label>Action</Label>
-                  <Select value={outlierAction} onValueChange={setOutlierAction}>
+                  <Select value={outlierAction || "remove"} onValueChange={setOutlierAction}>
                     <SelectTrigger className="sketch-input">
                       <SelectValue placeholder="Select action" />
                     </SelectTrigger>
@@ -596,7 +596,7 @@ console.log('Transformed', transformed_data.length, 'rows')`,
 
               <div className="space-y-2">
                 <Label>Normalization Method</Label>
-                <Select value={normalizationMethod} onValueChange={setNormalizationMethod}>
+                <Select value={normalizationMethod || "minmax"} onValueChange={setNormalizationMethod}>
                   <SelectTrigger className="sketch-input">
                     <SelectValue placeholder="Select method" />
                   </SelectTrigger>
@@ -705,13 +705,18 @@ console.log('Transformed', transformed_data.length, 'rows')`,
                   {filterConditions.map((condition, index) => (
                     <div key={index} className="flex flex-wrap items-center gap-2">
                       <Select
-                        value={condition.column}
-                        onValueChange={(value) => updateFilterCondition(index, "column", value)}
+                        value={condition.column || "default"}
+                        onValueChange={(value) =>
+                          updateFilterCondition(index, "column", value === "default" ? "" : value)
+                        }
                       >
                         <SelectTrigger className="w-[150px] sketch-input">
                           <SelectValue placeholder="Column" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="default" disabled>
+                            Select Column
+                          </SelectItem>
                           {columns.map((col) => (
                             <SelectItem key={col} value={col}>
                               {col}
@@ -721,7 +726,7 @@ console.log('Transformed', transformed_data.length, 'rows')`,
                       </Select>
 
                       <Select
-                        value={condition.operator}
+                        value={condition.operator || "equal"}
                         onValueChange={(value) => updateFilterCondition(index, "operator", value)}
                       >
                         <SelectTrigger className="w-[150px] sketch-input">
@@ -838,7 +843,7 @@ console.log('Transformed', transformed_data.length, 'rows')`,
 
                 <div className="space-y-2">
                   <Label>Feature Type</Label>
-                  <Select value={featureType} onValueChange={setFeatureType}>
+                  <Select value={featureType || "arithmetic"} onValueChange={setFeatureType}>
                     <SelectTrigger className="sketch-input">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
@@ -887,11 +892,17 @@ console.log('Transformed', transformed_data.length, 'rows')`,
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label>Select Column</Label>
-                  <Select value={binColumnState} onValueChange={setBinColumnState}>
+                  <Select
+                    value={binColumnState || "default"}
+                    onValueChange={(value) => setBinColumnState(value === "default" ? "" : value)}
+                  >
                     <SelectTrigger className="sketch-input">
                       <SelectValue placeholder="Select column to bin" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="default" disabled>
+                        Select column to bin
+                      </SelectItem>
                       {numericColumns.map((col) => (
                         <SelectItem key={col} value={col}>
                           {col}

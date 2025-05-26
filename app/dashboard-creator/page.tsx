@@ -5,7 +5,7 @@ import { NavigationSidebar } from "@/components/navigation-sidebar"
 import { useNavigation } from "@/lib/navigation-context"
 import { useState } from "react"
 
-export default function DashboardPage() {
+export default function DashboardCreatorPage() {
   const { navigateTo } = useNavigation()
   const [navSidebarOpen, setNavSidebarOpen] = useState(false)
 
