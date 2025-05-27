@@ -21,20 +21,20 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} font-handwritten`}>
-        <a href="#main-content" className="skip-link">
-          Skip to main content
-        </a>
-        <NavigationProvider>
-          <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+      <html lang="en">
+        <body className={`${inter.className} font-handwritten`}>
+          <a href="#main-content" className="skip-link">
+            Skip to main content
+          </a>
+          <NavigationProvider>
             <DataProvider>
               {children}
               <Toaster />
             </DataProvider>
-          </ThemeProvider>
-        </NavigationProvider>
-      </body>
-    </html>
+          </NavigationProvider>
+        </body>
+      </html>
+    </ThemeProvider>
   )
 }

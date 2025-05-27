@@ -789,46 +789,46 @@ export function AutoMLTrainer() {
                                 )}
                               </div>
                             </div>
-                          )
-                        })}
+                          </div>)
                     </div>
+                        )
                   </ScrollArea>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
-                    <div className="text-center">r">
+                    <div className="text-center">
                       <div className="text-lg font-bold text-green-600">
-                          featureAnalysis.filter((f) =>
-                            config.customFeatureSelection?.selectedFeatures.includes(f.feature),
-                          ).length
+                          {featureAnalysis.filter((f) => 
+                            config.customFeatureSelection?.selectedFeatures.includes(f.feature)
+                          ).length}
                       </div>
                       <div className="text-sm text-muted-foreground">Selected</div>
                     </div>
                     <div className="text-center">
                       <div className="text-lg font-bold text-red-600">
-                          featureAnalysis.filter(
-                            (f) =>
+                          {featureAnalysis.filter(
+                            (f) => 
                               config.customFeatureSelection?.selectedFeatures.includes(f.feature) &&
-                              f.recommendation === "required",
-                          ).length
+                              f.recommendation === "required"
+                          ).length}
                       </div>
                       <div className="text-sm text-muted-foreground">Required</div>
                     </div>
                     <div className="text-center">
                       <div className="text-lg font-bold text-blue-600">
-                          featureAnalysis.filter(
-                            (f) =>
+                          {featureAnalysis.filter(
+                            (f) => 
                               config.customFeatureSelection?.selectedFeatures.includes(f.feature) &&
-                              f.recommendation === "recommended",
-                          ).length
+                              f.recommendation === "recommended"
+                          ).length}
                       </div>
                       <div className="text-sm text-muted-foreground">Recommended</div>
                     </div>
                     <div className="text-center">
                       <div className="text-lg font-bold text-yellow-600">
-                          featureAnalysis.filter(
-                            (f) =>
+                          {featureAnalysis.filter(
+                            (f) => 
                               config.customFeatureSelection?.selectedFeatures.includes(f.feature) &&
-                              f.recommendation === "discouraged",
-                          ).length
+                              f.recommendation === "discouraged"
+                          ).length}
                       </div>
                       <div className="text-sm text-muted-foreground">Discouraged</div>
                     </div>
