@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd"
 import { Button } from "@/components/ui/button"
@@ -14,7 +16,15 @@ import { NotebookNavigation } from "@/components/notebook-navigation"
 import { useNavigation } from "@/lib/navigation-context"
 
 export default function NotebookPage() {
-  const { notebookCells, updateCellTitle, removeCell, reorderCells, fileName, processedData, resetData } = useData()
+  const {
+    notebookCells = [],
+    updateCellTitle,
+    removeCell,
+    reorderCells,
+    fileName,
+    processedData = [],
+    resetData,
+  } = useData()
   const { navigateTo } = useNavigation()
   const [isExecutingAll, setIsExecutingAll] = useState(false)
   const [navSidebarOpen, setNavSidebarOpen] = useState(false)
@@ -27,36 +37,55 @@ export default function NotebookPage() {
     const destinationIndex = result.destination.index
 
     if (sourceIndex !== destinationIndex) {
-      reorderCells(sourceIndex, destinationIndex)
+      reorderCells?.(sourceIndex, destinationIndex)
     }
   }
 
-  const executeAllCells = async () => {
+  const handleExecuteAll = async (e: React.MouseEvent) => {
+    e.preventDefault()
     setIsExecutingAll(true)
-    // Simulate execution of all cells
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    setIsExecutingAll(false)
+    try {
+      // Simulate execution of all cells
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+    } catch (err) {
+      console.error("Failed to execute cells:", err)
+    } finally {
+      setIsExecutingAll(false)
+    }
   }
 
-  const exportNotebook = () => {
-    const notebookData = {
-      cells: notebookCells,
-      metadata: {
-        fileName,
-        dataRows: processedData.length,
-        exportedAt: new Date().toISOString(),
-      },
+  const handleExportNotebook = (e: React.MouseEvent) => {
+    e.preventDefault()
+    try {
+      const notebookData = {
+        cells: notebookCells,
+        metadata: {
+          fileName,
+          dataRows: processedData.length,
+          exportedAt: new Date().toISOString(),
+        },
+      }
+
+      const blob = new Blob([JSON.stringify(notebookData, null, 2)], {
+        type: "application/json;charset=utf-8;",
+      })
+      const link = document.createElement("a")
+      const exportFileName = fileName ? `${fileName.split(".")[0]}_notebook.json` : "data_notebook.json"
+
+      link.href = URL.createObjectURL(blob)
+      link.download = exportFileName
+      link.click()
+
+      // Clean up the URL object
+      setTimeout(() => URL.revokeObjectURL(link.href), 100)
+    } catch (err) {
+      console.error("Failed to export notebook:", err)
     }
+  }
 
-    const blob = new Blob([JSON.stringify(notebookData, null, 2)], {
-      type: "application/json;charset=utf-8;",
-    })
-    const link = document.createElement("a")
-    const exportFileName = fileName ? `${fileName.split(".")[0]}_notebook.json` : "data_notebook.json"
-
-    link.href = URL.createObjectURL(blob)
-    link.download = exportFileName
-    link.click()
+  const handleUploadClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    navigateTo?.("/", "Home", "Upload Data")
   }
 
   // Add navigation tracking for cell operations
@@ -64,13 +93,19 @@ export default function NotebookPage() {
     setCurrentCellId(cellId)
     const cell = notebookCells.find((c) => c.id === cellId)
     if (cell) {
-      navigateTo("/notebook", "Data Notebook", cell.title, {
+      navigateTo?.("/notebook", "Data Notebook", cell.title, {
         cellId: cell.id,
         cellType: cell.type,
         section: "notebook",
         subsection: "cell",
       })
     }
+  }
+
+  const handleCellClick = (e: React.MouseEvent, cellId: string) => {
+    // Prevent event bubbling that might cause scrolling
+    e.stopPropagation()
+    handleCellNavigate(cellId)
   }
 
   return (
@@ -87,77 +122,6 @@ export default function NotebookPage() {
             </div>
           )}
         </div>
-
-        {/* Header */}
-        {/* <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <BookOpen className="h-6 w-6" />
-            <h1 className="text-2xl font-bold">Data Analysis Notebook</h1>
-            {fileName && (
-              <Badge variant="outline" className="ml-2">
-                {fileName}
-              </Badge>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2">
-            {notebookCells.length > 0 && (
-              <>
-                <Button variant="outline" onClick={executeAllCells} disabled={isExecutingAll} className="gap-2">
-                  <Play className="h-4 w-4" />
-                  {isExecutingAll ? "Running..." : "Run All"}
-                </Button>
-                <Button variant="outline" onClick={exportNotebook} className="gap-2">
-                  <Download className="h-4 w-4" />
-                  Export
-                </Button>
-              </>
-            )}
-            {processedData.length > 0 && (
-              <Button variant="outline" onClick={resetData} className="gap-2">
-                <RotateCcw className="h-4 w-4" />
-                Reset Data
-              </Button>
-            )}
-          </div>
-        </div> */}
-
-        {/* Notebook Stats */}
-        {/* {notebookCells.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm font-medium">Total Cells</span>
-                </div>
-                <p className="text-2xl font-bold mt-1">{notebookCells.length}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm font-medium">Data Rows</span>
-                </div>
-                <p className="text-2xl font-bold mt-1">{processedData.length.toLocaleString()}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 bg-purple-500 rounded-full"></div>
-                  <span className="text-sm font-medium">Last Modified</span>
-                </div>
-                <p className="text-sm font-medium mt-1">
-                  {notebookCells.length > 0
-                    ? new Date(Math.max(...notebookCells.map((cell) => cell.createdAt.getTime()))).toLocaleDateString()
-                    : "Never"}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        )} */}
 
         {/* Notebook Cells */}
         {notebookCells.length === 0 ? (
@@ -178,7 +142,7 @@ export default function NotebookPage() {
                   <p className="text-sm text-muted-foreground">
                     Upload a CSV or Excel file to get started with data analysis.
                   </p>
-                  <Button className="gap-2">
+                  <Button type="button" className="gap-2" onClick={handleUploadClick}>
                     <Upload className="h-4 w-4" />
                     Upload Data
                   </Button>
@@ -203,7 +167,7 @@ export default function NotebookPage() {
                             className={`transition-all duration-200 ${
                               snapshot.isDragging ? "rotate-2 scale-105 shadow-lg" : ""
                             }`}
-                            onClick={() => handleCellNavigate(cell.id)}
+                            onClick={(e) => handleCellClick(e, cell.id)}
                           >
                             <NotebookCell
                               cell={cell}

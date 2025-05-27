@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -51,7 +53,10 @@ export function NotebookNavigation({ currentCellId, onCellNavigate }: NotebookNa
     return labelMap[type] || "Unknown"
   }
 
-  const handleCellClick = (cellId: string, cellTitle: string, cellType: CellType) => {
+  const handleCellClick = (e: React.MouseEvent, cellId: string, cellTitle: string, cellType: CellType) => {
+    e.preventDefault()
+    e.stopPropagation()
+
     // Update navigation context with cell-specific metadata
     navigateTo("/notebook", "Data Notebook", cellTitle, {
       cellId,
@@ -65,13 +70,32 @@ export function NotebookNavigation({ currentCellId, onCellNavigate }: NotebookNa
       onCellNavigate(cellId)
     }
 
-    // Scroll to the cell
+    // Scroll to the cell smoothly without jumping to top
     const cellElement = document.getElementById(`cell-${cellId}`)
     if (cellElement) {
       cellElement.scrollIntoView({ behavior: "smooth", block: "center" })
     }
 
     setIsOpen(false)
+  }
+
+  const handleNavigationClick = (e: React.MouseEvent, direction: "prev" | "next") => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const currentIndex = notebookCells.findIndex((cell) => cell.id === currentCellId)
+    let targetIndex = -1
+
+    if (direction === "prev" && currentIndex > 0) {
+      targetIndex = currentIndex - 1
+    } else if (direction === "next" && currentIndex < notebookCells.length - 1) {
+      targetIndex = currentIndex + 1
+    }
+
+    if (targetIndex >= 0) {
+      const targetCell = notebookCells[targetIndex]
+      handleCellClick(e, targetCell.id, targetCell.title, targetCell.type)
+    }
   }
 
   const currentCell = notebookCells.find((cell) => cell.id === currentCellId)
@@ -100,7 +124,7 @@ export function NotebookNavigation({ currentCellId, onCellNavigate }: NotebookNa
       {/* Cell Navigation Dropdown */}
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button type="button" variant="outline" size="sm" className="gap-2" onClick={(e) => e.preventDefault()}>
             <span>Navigate to Cell</span>
             <ChevronDown className="h-4 w-4" />
           </Button>
@@ -110,7 +134,7 @@ export function NotebookNavigation({ currentCellId, onCellNavigate }: NotebookNa
           {notebookCells.map((cell, index) => (
             <DropdownMenuItem
               key={cell.id}
-              onClick={() => handleCellClick(cell.id, cell.title, cell.type)}
+              onClick={(e) => handleCellClick(e, cell.id, cell.title, cell.type)}
               className={`flex items-center gap-3 p-3 ${currentCellId === cell.id ? "bg-muted" : ""}`}
             >
               <div className="flex items-center gap-2 flex-shrink-0">
@@ -141,15 +165,10 @@ export function NotebookNavigation({ currentCellId, onCellNavigate }: NotebookNa
       {/* Quick Navigation Buttons */}
       <div className="flex items-center gap-1">
         <Button
+          type="button"
           variant="ghost"
           size="sm"
-          onClick={() => {
-            const currentIndex = notebookCells.findIndex((cell) => cell.id === currentCellId)
-            if (currentIndex > 0) {
-              const prevCell = notebookCells[currentIndex - 1]
-              handleCellClick(prevCell.id, prevCell.title, prevCell.type)
-            }
-          }}
+          onClick={(e) => handleNavigationClick(e, "prev")}
           disabled={!currentCellId || notebookCells.findIndex((cell) => cell.id === currentCellId) === 0}
           className="h-8 w-8 p-0"
           title="Previous cell"
@@ -158,15 +177,10 @@ export function NotebookNavigation({ currentCellId, onCellNavigate }: NotebookNa
         </Button>
 
         <Button
+          type="button"
           variant="ghost"
           size="sm"
-          onClick={() => {
-            const currentIndex = notebookCells.findIndex((cell) => cell.id === currentCellId)
-            if (currentIndex < notebookCells.length - 1) {
-              const nextCell = notebookCells[currentIndex + 1]
-              handleCellClick(nextCell.id, nextCell.title, nextCell.type)
-            }
-          }}
+          onClick={(e) => handleNavigationClick(e, "next")}
           disabled={
             !currentCellId || notebookCells.findIndex((cell) => cell.id === currentCellId) === notebookCells.length - 1
           }

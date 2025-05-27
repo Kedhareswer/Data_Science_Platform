@@ -56,6 +56,7 @@ export function InteractiveDataVisualizer() {
   const { processedData, columns, columnTypes, isLoading } = useData()
   const [config, setConfig] = useState<VisualizationConfig>({
     type: "histogram",
+    xAxis: "default", // Updated default value
     showMissing: true,
     filterMissing: false,
     binCount: 20,
@@ -103,20 +104,40 @@ export function InteractiveDataVisualizer() {
   }, [filteredData, config])
 
   function prepareHistogramData() {
-    if (!config.xAxis || columnTypes[config.xAxis] !== "number") return []
+    if (!config.xAxis || columnTypes[config.xAxis] !== "number") {
+      return []
+    }
 
     const values = filteredData
-      .map((row) => Number(row[config.xAxis]))
-      .filter((val) => !isNaN(val))
+      .map((row) => {
+        const value = Number(row[config.xAxis])
+        return isNaN(value) ? null : value
+      })
+      .filter((val): val is number => val !== null)
       .sort((a, b) => a - b)
 
     if (values.length === 0) return []
 
     const min = Math.min(...values)
     const max = Math.max(...values)
-    const binWidth = (max - min) / (config.binCount || 20)
 
-    const bins = Array.from({ length: config.binCount || 20 }, (_, i) => ({
+    // Handle case where all values are the same
+    if (min === max) {
+      return [
+        {
+          bin: `${min.toFixed(2)}`,
+          binIndex: 0,
+          count: values.length,
+          percentage: 100,
+          midpoint: min,
+        },
+      ]
+    }
+
+    const binCount = Math.min(config.binCount || 20, values.length)
+    const binWidth = (max - min) / binCount
+
+    const bins = Array.from({ length: binCount }, (_, i) => ({
       binStart: min + i * binWidth,
       binEnd: min + (i + 1) * binWidth,
       count: 0,
@@ -125,11 +146,13 @@ export function InteractiveDataVisualizer() {
 
     values.forEach((value) => {
       const binIndex = Math.min(Math.floor((value - min) / binWidth), bins.length - 1)
-      bins[binIndex].count++
+      if (binIndex >= 0 && binIndex < bins.length) {
+        bins[binIndex].count++
+      }
     })
 
     bins.forEach((bin) => {
-      bin.percentage = (bin.count / values.length) * 100
+      bin.percentage = values.length > 0 ? (bin.count / values.length) * 100 : 0
     })
 
     return bins.map((bin, index) => ({
@@ -224,22 +247,24 @@ export function InteractiveDataVisualizer() {
       .map((row, index) => {
         const x = Number(row[config.xAxis])
         const y = Number(row[config.yAxis])
-        const size = config.sizeBy ? Number(row[config.sizeBy]) || 1 : 1
-        const color = config.colorBy ? String(row[config.colorBy]) : "default"
 
         if (isNaN(x) || isNaN(y)) return null
+
+        const size = config.sizeBy ? Math.max(1, Number(row[config.sizeBy]) || 1) : 4
+        const color = config.colorBy ? String(row[config.colorBy] || "default") : "default"
 
         return {
           x,
           y,
-          size,
+          size: Math.min(size, 20), // Cap size for visual clarity
           color,
           index,
           [config.xAxis!]: x,
           [config.yAxis!]: y,
         }
       })
-      .filter(Boolean)
+      .filter((item): item is NonNullable<typeof item> => item !== null)
+      .slice(0, 5000) // Limit points for performance
   }
 
   function prepareBarData() {
@@ -476,7 +501,10 @@ export function InteractiveDataVisualizer() {
             {/* X-Axis */}
             <div className="space-y-2">
               <Label>X-Axis</Label>
-              <Select value={config.xAxis || ""} onValueChange={(value) => setConfig({ ...config, xAxis: value })}>
+              <Select
+                value={config.xAxis || "default"}
+                onValueChange={(value) => setConfig({ ...config, xAxis: value })}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select column" />
                 </SelectTrigger>
@@ -502,7 +530,10 @@ export function InteractiveDataVisualizer() {
               config.type === "bar") && (
               <div className="space-y-2">
                 <Label>Y-Axis</Label>
-                <Select value={config.yAxis || ""} onValueChange={(value) => setConfig({ ...config, yAxis: value })}>
+                <Select
+                  value={config.yAxis || "default"}
+                  onValueChange={(value) => setConfig({ ...config, yAxis: value })}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select column" />
                   </SelectTrigger>
@@ -527,14 +558,14 @@ export function InteractiveDataVisualizer() {
               <div className="space-y-2">
                 <Label>Color By (Optional)</Label>
                 <Select
-                  value={config.colorBy || ""}
+                  value={config.colorBy || "default"}
                   onValueChange={(value) => setConfig({ ...config, colorBy: value })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select column" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="default">None</SelectItem>
                     {categoricalColumns.map((col) => (
                       <SelectItem key={col} value={col}>
                         <div className="flex items-center justify-between w-full">
@@ -623,85 +654,90 @@ export function InteractiveDataVisualizer() {
           {visualizationData.length > 0 ? (
             <div className="h-96">
               <ResponsiveContainer width="100%" height="100%">
-                {config.type === "histogram" && (
+                {config.type === "histogram" && config.xAxis && columnTypes[config.xAxis] === "number" && (
                   <BarChart data={visualizationData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="bin" angle={-45} textAnchor="end" height={100} />
+                    <XAxis dataKey="bin" angle={-45} textAnchor="end" height={100} tick={{ fontSize: 11 }} />
                     <YAxis />
                     <Tooltip
                       formatter={(value, name) => [
                         name === "count" ? `${value} observations` : `${Number(value).toFixed(1)}%`,
                         name === "count" ? "Count" : "Percentage",
                       ]}
+                      labelFormatter={(label) => `Range: ${label}`}
                     />
-                    <Bar dataKey="count" fill="#8884d8" />
+                    <Bar dataKey="count" fill="#8884d8" radius={[2, 2, 0, 0]} />
                   </BarChart>
                 )}
 
-                {config.type === "boxplot" && (
+                {config.type === "scatter" &&
+                  config.xAxis &&
+                  config.yAxis &&
+                  columnTypes[config.xAxis] === "number" &&
+                  columnTypes[config.yAxis] === "number" && (
+                    <ScatterChart data={visualizationData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="x" name={config.xAxis} type="number" domain={["dataMin", "dataMax"]} />
+                      <YAxis dataKey="y" name={config.yAxis} type="number" domain={["dataMin", "dataMax"]} />
+                      <Tooltip
+                        cursor={{ strokeDasharray: "3 3" }}
+                        formatter={(value, name) => [Number(value).toFixed(2), name]}
+                      />
+                      <Scatter name="Data Points" data={visualizationData} fill="#8884d8" />
+                    </ScatterChart>
+                  )}
+
+                {config.type === "bar" && config.xAxis && (
                   <BarChart data={visualizationData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="category" />
-                    <YAxis />
-                    <Tooltip
-                      formatter={(value, name) => [Number(value).toFixed(2), name]}
-                      labelFormatter={(label) => `Category: ${label}`}
+                    <XAxis
+                      dataKey="category"
+                      angle={-45}
+                      textAnchor="end"
+                      height={100}
+                      tick={{ fontSize: 11 }}
+                      interval={0}
                     />
-                    <Bar dataKey="min" fill="#ff7300" name="Min" />
-                    <Bar dataKey="q1" fill="#8884d8" name="Q1" />
-                    <Bar dataKey="median" fill="#82ca9d" name="Median" />
-                    <Bar dataKey="q3" fill="#ffc658" name="Q3" />
-                    <Bar dataKey="max" fill="#ff7300" name="Max" />
-                  </BarChart>
-                )}
-
-                {config.type === "scatter" && (
-                  <ScatterChart data={visualizationData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="x" name={config.xAxis} />
-                    <YAxis dataKey="y" name={config.yAxis} />
-                    <Tooltip cursor={{ strokeDasharray: "3 3" }} />
-                    <Scatter name="Data Points" data={visualizationData} fill="#8884d8" />
-                  </ScatterChart>
-                )}
-
-                {config.type === "bar" && (
-                  <BarChart data={visualizationData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="category" angle={-45} textAnchor="end" height={100} />
                     <YAxis />
-                    <Tooltip />
-                    <Bar dataKey={config.yAxis ? "value" : "count"} fill="#8884d8" />
+                    <Tooltip formatter={(value, name) => [Number(value).toLocaleString(), name]} />
+                    <Bar dataKey={config.yAxis ? "value" : "count"} fill="#8884d8" radius={[2, 2, 0, 0]} />
                   </BarChart>
                 )}
 
-                {config.type === "line" && (
+                {config.type === "line" && config.xAxis && config.yAxis && (
                   <LineChart data={visualizationData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="x" />
                     <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="y" stroke="#8884d8" />
+                    <Tooltip formatter={(value, name) => [Number(value).toFixed(2), name]} />
+                    <Line
+                      type="monotone"
+                      dataKey="y"
+                      stroke="#8884d8"
+                      strokeWidth={2}
+                      dot={{ r: 3 }}
+                      activeDot={{ r: 5 }}
+                    />
                   </LineChart>
                 )}
 
-                {config.type === "pie" && (
+                {config.type === "pie" && config.xAxis && (
                   <PieChart>
                     <Pie
                       data={visualizationData}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percentage }) => `${name}: ${percentage.toFixed(1)}%`}
+                      label={({ name, percentage }) => (percentage > 3 ? `${name}: ${percentage.toFixed(1)}%` : "")}
                       outerRadius={120}
                       fill="#8884d8"
                       dataKey="value"
                     >
                       {visualizationData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={`hsl(${index * 45}, 70%, 60%)`} />
+                        <Cell key={`cell-${index}`} fill={`hsl(${index * 36}, 70%, 60%)`} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip formatter={(value, name) => [Number(value).toLocaleString(), name]} />
                     <Legend />
                   </PieChart>
                 )}
@@ -712,6 +748,12 @@ export function InteractiveDataVisualizer() {
               <Zap className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>Configure the visualization settings to generate a chart</p>
               {!config.xAxis && <p className="text-sm text-muted-foreground mt-2">Select an X-axis column to begin</p>}
+              {config.xAxis && config.type === "scatter" && !config.yAxis && (
+                <p className="text-sm text-muted-foreground mt-2">Select a Y-axis column for scatter plot</p>
+              )}
+              {config.xAxis && config.type === "histogram" && columnTypes[config.xAxis] !== "number" && (
+                <p className="text-sm text-orange-600 mt-2">Histogram requires a numeric column</p>
+              )}
             </div>
           )}
         </CardContent>

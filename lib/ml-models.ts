@@ -461,6 +461,69 @@ export class SimpleDecisionTree {
   }
 }
 
+// Random Forest Implementation
+export class SimpleRandomForest {
+  private trees: SimpleDecisionTree[] = []
+  private trained = false
+  private numTrees: number
+  private maxDepth: number
+
+  constructor(numTrees = 10, maxDepth = 5) {
+    this.numTrees = numTrees
+    this.maxDepth = maxDepth
+  }
+
+  private bootstrapSample(X: number[][], y: number[]): { X: number[][]; y: number[] } {
+    const n = X.length
+    const indices = Array.from({ length: n }, () => Math.floor(Math.random() * n))
+    return {
+      X: indices.map((i) => X[i]),
+      y: indices.map((i) => y[i]),
+    }
+  }
+
+  fit(X: number[][], y: number[]): void {
+    if (X.length !== y.length || X.length === 0) {
+      throw new Error("Invalid input data")
+    }
+
+    this.trees = []
+
+    for (let i = 0; i < this.numTrees; i++) {
+      const { X: bootX, y: bootY } = this.bootstrapSample(X, y)
+      const tree = new SimpleDecisionTree()
+      tree.fit(bootX, bootY, this.maxDepth)
+      this.trees.push(tree)
+    }
+
+    this.trained = true
+  }
+
+  predict(X: number[][]): number[] {
+    if (!this.trained) {
+      throw new Error("Model must be trained before making predictions")
+    }
+
+    return X.map((x) => {
+      const predictions = this.trees.map((tree) => tree.predict([x])[0])
+
+      // For classification, use majority vote
+      const counts: Record<number, number> = {}
+      predictions.forEach((pred) => {
+        counts[pred] = (counts[pred] || 0) + 1
+      })
+
+      return Object.entries(counts).reduce((a, b) => (counts[Number(a[0])] > counts[Number(b[0])] ? a : b))[0] as any
+    })
+  }
+
+  getFeatureImportance(): number[] {
+    // Simplified feature importance calculation
+    const numFeatures = this.trees[0] ? 1 : 0 // Placeholder
+    return Array(numFeatures).fill(1 / numFeatures)
+  }
+}
+
 // Model evaluation utilities
 export function calculateAccuracy(yTrue: number[], yPred: number[]): number {
   if (yTrue.length !== yPred.length) return 0
@@ -551,4 +614,80 @@ export function calculatePrecisionRecallF1(
   const f1Score = precision + recall > 0 ? (2 * precision * recall) / (precision + recall) : 0
 
   return { precision, recall, f1Score }
+}
+
+// Enhanced evaluation metrics
+export function calculateROCAUC(yTrue: number[], yProba: number[]): number {
+  if (yTrue.length !== yProba.length) return 0
+
+  // Simple ROC AUC calculation for binary classification
+  const pairs = yTrue.map((label, i) => ({ label, prob: yProba[i] })).sort((a, b) => b.prob - a.prob)
+
+  let tp = 0,
+    fp = 0
+  const positives = yTrue.filter((y) => y === 1).length
+  const negatives = yTrue.length - positives
+
+  if (positives === 0 || negatives === 0) return 0.5
+
+  let auc = 0
+  let prevFpr = 0
+
+  for (const pair of pairs) {
+    if (pair.label === 1) {
+      tp++
+    } else {
+      fp++
+      const tpr = tp / positives
+      const fpr = fp / negatives
+      auc += tpr * (fpr - prevFpr)
+      prevFpr = fpr
+    }
+  }
+
+  return auc
+}
+
+export function calculateFeatureImportance(
+  X: number[][],
+  y: number[],
+  features: string[],
+): Array<{ feature: string; importance: number }> {
+  // Simplified feature importance using correlation
+  const importances = features.map((feature, idx) => {
+    const featureValues = X.map((row) => row[idx])
+    const correlation = Math.abs(calculateCorrelation(featureValues, y))
+    return { feature, importance: correlation || 0 }
+  })
+
+  // Normalize importances
+  const total = importances.reduce((sum, item) => sum + item.importance, 0)
+  if (total > 0) {
+    importances.forEach((item) => (item.importance /= total))
+  }
+
+  return importances.sort((a, b) => b.importance - a.importance)
+}
+
+function calculateCorrelation(x: number[], y: number[]): number {
+  const n = Math.min(x.length, y.length)
+  if (n < 2) return 0
+
+  const meanX = x.slice(0, n).reduce((a, b) => a + b, 0) / n
+  const meanY = y.slice(0, n).reduce((a, b) => a + b, 0) / n
+
+  let numerator = 0
+  let sumX = 0
+  let sumY = 0
+
+  for (let i = 0; i < n; i++) {
+    const diffX = x[i] - meanX
+    const diffY = y[i] - meanY
+    numerator += diffX * diffY
+    sumX += diffX * diffX
+    sumY += diffY * diffY
+  }
+
+  const denominator = Math.sqrt(sumX * sumY)
+  return denominator === 0 ? 0 : numerator / denominator
 }

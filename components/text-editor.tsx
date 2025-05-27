@@ -16,7 +16,10 @@ export function TextEditor() {
     setIsSaved(false)
   }
 
-  const insertFormatting = (format: string) => {
+  const insertFormatting = (e: React.MouseEvent, format: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+
     const textarea = document.querySelector("textarea")
     if (!textarea) return
 
@@ -45,9 +48,18 @@ export function TextEditor() {
     const newText = text.substring(0, start) + formattedText + text.substring(end)
     setText(newText)
     setIsSaved(false)
+
+    // Restore focus to textarea
+    setTimeout(() => {
+      textarea.focus()
+      textarea.setSelectionRange(start + formattedText.length, start + formattedText.length)
+    }, 0)
   }
 
-  const handleSave = () => {
+  const handleSave = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
     setIsSaved(true)
     setTimeout(() => setIsSaved(false), 2000)
   }
@@ -56,43 +68,47 @@ export function TextEditor() {
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-2">
         <Button
+          type="button"
           variant="outline"
           size="sm"
           className="sketch-button"
-          onClick={() => insertFormatting("bold")}
+          onClick={(e) => insertFormatting(e, "bold")}
           title="Bold"
         >
           <Bold className="h-4 w-4" />
         </Button>
         <Button
+          type="button"
           variant="outline"
           size="sm"
           className="sketch-button"
-          onClick={() => insertFormatting("italic")}
+          onClick={(e) => insertFormatting(e, "italic")}
           title="Italic"
         >
           <Italic className="h-4 w-4" />
         </Button>
         <Button
+          type="button"
           variant="outline"
           size="sm"
           className="sketch-button"
-          onClick={() => insertFormatting("list")}
+          onClick={(e) => insertFormatting(e, "list")}
           title="Bullet List"
         >
           <List className="h-4 w-4" />
         </Button>
         <Button
+          type="button"
           variant="outline"
           size="sm"
           className="sketch-button"
-          onClick={() => insertFormatting("ordered-list")}
+          onClick={(e) => insertFormatting(e, "ordered-list")}
           title="Numbered List"
         >
           <ListOrdered className="h-4 w-4" />
         </Button>
         <div className="flex-1"></div>
-        <Button variant="outline" size="sm" className="sketch-button" onClick={handleSave} title="Save">
+        <Button type="button" variant="outline" size="sm" className="sketch-button" onClick={handleSave} title="Save">
           <Save className="h-4 w-4 mr-2" />
           Save
         </Button>

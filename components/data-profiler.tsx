@@ -25,7 +25,7 @@ import {
 import { useData } from "@/lib/data-context"
 
 export function DataProfiler() {
-  const { dataProfile, isProfileLoading, generateDataProfile, refreshDataProfile, processedData, columns } = useData()
+  const { dataProfile, isProfileLoading, generateDataProfile, processedData, columns } = useData()
   const [selectedColumn, setSelectedColumn] = useState<string | null>(null)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     overview: true,
@@ -83,6 +83,10 @@ export function DataProfiler() {
     if (abs >= 0.4) return "text-yellow-600"
     if (abs >= 0.2) return "text-blue-600"
     return "text-gray-500"
+  }
+
+  const refreshDataProfile = () => {
+    generateDataProfile()
   }
 
   if (!processedData.length) {
@@ -162,7 +166,9 @@ export function DataProfiler() {
                 <Database className="h-5 w-5" />
                 Data Profile Report
               </CardTitle>
-              <CardDescription>Generated on {dataProfile.generatedAt.toLocaleString()}</CardDescription>
+              <CardDescription>
+                Generated on {dataProfile.generatedAt ? dataProfile.generatedAt.toLocaleString() : "Unknown"}
+              </CardDescription>
             </div>
             <Button onClick={refreshDataProfile} variant="outline" className="sketch-button">
               <RefreshCw className="mr-2 h-4 w-4" />
@@ -201,32 +207,36 @@ export function DataProfiler() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center p-4 bg-muted/50 rounded-lg">
                   <div className="text-2xl font-bold text-blue-600">
-                    {dataProfile.overview.totalRows.toLocaleString()}
+                    {dataProfile.overview?.totalRows?.toLocaleString() || processedData.length.toLocaleString()}
                   </div>
                   <div className="text-sm text-muted-foreground">Total Rows</div>
                 </div>
                 <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">{dataProfile.overview.totalColumns}</div>
+                  <div className="text-2xl font-bold text-green-600">
+                    {dataProfile.overview?.totalColumns || columns.length}
+                  </div>
                   <div className="text-sm text-muted-foreground">Total Columns</div>
                 </div>
                 <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <div className="text-2xl font-bold text-purple-600">{dataProfile.overview.completeness}%</div>
+                  <div className="text-2xl font-bold text-purple-600">
+                    {dataProfile.overview?.completeness || "100"}%
+                  </div>
                   <div className="text-sm text-muted-foreground">Data Completeness</div>
                 </div>
                 <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <div className="text-2xl font-bold text-orange-600">{dataProfile.overview.memoryUsage}</div>
+                  <div className="text-2xl font-bold text-orange-600">{dataProfile.overview?.memoryUsage || "N/A"}</div>
                   <div className="text-sm text-muted-foreground">Memory Usage</div>
                 </div>
               </div>
 
-              {dataProfile.overview.duplicateRows > 0 && (
+              {dataProfile.overview?.duplicateRows > 0 && (
                 <Alert className="mt-4">
                   <AlertTriangle className="h-4 w-4" />
                   <AlertTitle>Duplicate Rows Detected</AlertTitle>
                   <AlertDescription>
                     Found {dataProfile.overview.duplicateRows} duplicate rows (
-                    {((dataProfile.overview.duplicateRows / dataProfile.overview.totalRows) * 100).toFixed(1)}% of
-                    total)
+                    {((dataProfile.overview.duplicateRows / (dataProfile.overview.totalRows || 1)) * 100).toFixed(1)}%
+                    of total)
                   </AlertDescription>
                 </Alert>
               )}
@@ -239,30 +249,34 @@ export function DataProfiler() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {Object.entries(
-                  Object.values(dataProfile.columns).reduce(
-                    (acc, col) => {
-                      acc[col.type] = (acc[col.type] || 0) + 1
-                      return acc
-                    },
-                    {} as Record<string, number>,
-                  ),
-                ).map(([type, count]) => (
-                  <div key={type} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="capitalize">
-                        {type}
-                      </Badge>
-                      <span className="text-sm text-muted-foreground">{count} columns</span>
+                {dataProfile.columns &&
+                  Object.entries(
+                    Object.values(dataProfile.columns).reduce(
+                      (acc, col) => {
+                        acc[col.type] = (acc[col.type] || 0) + 1
+                        return acc
+                      },
+                      {} as Record<string, number>,
+                    ),
+                  ).map(([type, count]) => (
+                    <div key={type} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="capitalize">
+                          {type}
+                        </Badge>
+                        <span className="text-sm text-muted-foreground">{count} columns</span>
+                      </div>
+                      <div className="flex-1 mx-4">
+                        <Progress
+                          value={(count / (dataProfile.overview?.totalColumns || columns.length)) * 100}
+                          className="h-2"
+                        />
+                      </div>
+                      <span className="text-sm font-medium">
+                        {Math.round((count / (dataProfile.overview?.totalColumns || columns.length)) * 100)}%
+                      </span>
                     </div>
-                    <div className="flex-1 mx-4">
-                      <Progress value={(count / dataProfile.overview.totalColumns) * 100} className="h-2" />
-                    </div>
-                    <span className="text-sm font-medium">
-                      {Math.round((count / dataProfile.overview.totalColumns) * 100)}%
-                    </span>
-                  </div>
-                ))}
+                  ))}
               </div>
             </CardContent>
           </Card>
@@ -278,32 +292,35 @@ export function DataProfiler() {
               <CardContent>
                 <ScrollArea className="h-96">
                   <div className="space-y-2">
-                    {Object.values(dataProfile.columns).map((column) => (
-                      <div
-                        key={column.name}
-                        className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                          selectedColumn === column.name ? "bg-primary/10 border-primary" : "bg-muted/50 hover:bg-muted"
-                        }`}
-                        onClick={() => setSelectedColumn(column.name)}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-medium">{column.name}</div>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge variant="outline" className="text-xs">
-                                {column.type}
-                              </Badge>
-                              {column.missingPercentage > 0 && (
-                                <Badge variant="secondary" className="text-xs">
-                                  {column.missingPercentage}% missing
+                    {dataProfile.columns &&
+                      Object.values(dataProfile.columns).map((column) => (
+                        <div
+                          key={column.name}
+                          className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                            selectedColumn === column.name
+                              ? "bg-primary/10 border-primary"
+                              : "bg-muted/50 hover:bg-muted"
+                          }`}
+                          onClick={() => setSelectedColumn(column.name)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="font-medium">{column.name}</div>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="outline" className="text-xs">
+                                  {column.type}
                                 </Badge>
-                              )}
+                                {column.missingPercentage > 0 && (
+                                  <Badge variant="secondary" className="text-xs">
+                                    {column.missingPercentage}% missing
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
+                            <Eye className="h-4 w-4 text-muted-foreground" />
                           </div>
-                          <Eye className="h-4 w-4 text-muted-foreground" />
                         </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </ScrollArea>
               </CardContent>
@@ -319,7 +336,7 @@ export function DataProfiler() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {selectedColumn && dataProfile.columns[selectedColumn] ? (
+                {selectedColumn && dataProfile.columns && dataProfile.columns[selectedColumn] ? (
                   <div className="space-y-6">
                     {(() => {
                       const column = dataProfile.columns[selectedColumn]
@@ -330,15 +347,15 @@ export function DataProfiler() {
                             <h4 className="font-semibold mb-3">Basic Statistics</h4>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                               <div className="text-center p-3 bg-muted/50 rounded-lg">
-                                <div className="text-lg font-bold">{column.count.toLocaleString()}</div>
+                                <div className="text-lg font-bold">{column.count?.toLocaleString() || "N/A"}</div>
                                 <div className="text-xs text-muted-foreground">Total Values</div>
                               </div>
                               <div className="text-center p-3 bg-muted/50 rounded-lg">
-                                <div className="text-lg font-bold">{column.unique.toLocaleString()}</div>
+                                <div className="text-lg font-bold">{column.unique?.toLocaleString() || "N/A"}</div>
                                 <div className="text-xs text-muted-foreground">Unique Values</div>
                               </div>
                               <div className="text-center p-3 bg-muted/50 rounded-lg">
-                                <div className="text-lg font-bold">{column.missing.toLocaleString()}</div>
+                                <div className="text-lg font-bold">{column.missing?.toLocaleString() || "0"}</div>
                                 <div className="text-xs text-muted-foreground">Missing Values</div>
                               </div>
                             </div>
@@ -402,7 +419,7 @@ export function DataProfiler() {
                                   <AlertTitle>Outliers Detected</AlertTitle>
                                   <AlertDescription>
                                     Found {column.outliers.length} outliers using IQR method (
-                                    {((column.outliers.length / column.count) * 100).toFixed(1)}% of values)
+                                    {((column.outliers.length / (column.count || 1)) * 100).toFixed(1)}% of values)
                                   </AlertDescription>
                                 </Alert>
                               )}
@@ -446,9 +463,9 @@ export function DataProfiler() {
                                       <span className="font-mono text-sm truncate max-w-32">{String(item.value)}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                      <span className="text-sm">{item.count.toLocaleString()}</span>
+                                      <span className="text-sm">{item.count?.toLocaleString() || "N/A"}</span>
                                       <Badge variant="secondary" className="text-xs">
-                                        {item.percentage}%
+                                        {item.percentage || "N/A"}%
                                       </Badge>
                                     </div>
                                   </div>
@@ -508,13 +525,13 @@ export function DataProfiler() {
                 Data Quality Issues
               </CardTitle>
               <CardDescription>
-                {dataProfile.dataQuality.length > 0
+                {dataProfile.dataQuality && dataProfile.dataQuality.length > 0
                   ? `Found ${dataProfile.dataQuality.length} potential data quality issues`
                   : "No significant data quality issues detected"}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {dataProfile.dataQuality.length > 0 ? (
+              {dataProfile.dataQuality && dataProfile.dataQuality.length > 0 ? (
                 <div className="space-y-4">
                   {dataProfile.dataQuality.map((issue, index) => (
                     <Alert key={index} variant={getSeverityColor(issue.severity) as any}>
@@ -536,7 +553,7 @@ export function DataProfiler() {
                                 </p>
                               )}
                               <p className="text-xs">
-                                <strong>Affected items:</strong> {issue.count.toLocaleString()}
+                                <strong>Affected items:</strong> {issue.count?.toLocaleString() || "N/A"}
                               </p>
                             </div>
                           </AlertDescription>
@@ -565,19 +582,25 @@ export function DataProfiler() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
                   <div className="text-2xl font-bold text-green-600">
-                    {dataProfile.dataQuality.filter((issue) => issue.severity === "low").length}
+                    {dataProfile.dataQuality
+                      ? dataProfile.dataQuality.filter((issue) => issue.severity === "low").length
+                      : 0}
                   </div>
                   <div className="text-sm text-green-700">Low Severity Issues</div>
                 </div>
                 <div className="text-center p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <div className="text-2xl font-bold text-yellow-600">
-                    {dataProfile.dataQuality.filter((issue) => issue.severity === "medium").length}
+                    {dataProfile.dataQuality
+                      ? dataProfile.dataQuality.filter((issue) => issue.severity === "medium").length
+                      : 0}
                   </div>
                   <div className="text-sm text-yellow-700">Medium Severity Issues</div>
                 </div>
                 <div className="text-center p-4 bg-red-50 border border-red-200 rounded-lg">
                   <div className="text-2xl font-bold text-red-600">
-                    {dataProfile.dataQuality.filter((issue) => issue.severity === "high").length}
+                    {dataProfile.dataQuality
+                      ? dataProfile.dataQuality.filter((issue) => issue.severity === "high").length
+                      : 0}
                   </div>
                   <div className="text-sm text-red-700">High Severity Issues</div>
                 </div>
@@ -596,7 +619,7 @@ export function DataProfiler() {
               <CardDescription>Pearson correlation coefficients between numerical columns</CardDescription>
             </CardHeader>
             <CardContent>
-              {Object.keys(dataProfile.correlations).length > 0 ? (
+              {dataProfile.correlations && Object.keys(dataProfile.correlations).length > 0 ? (
                 <div className="space-y-4">
                   <ScrollArea className="w-full">
                     <div className="min-w-max">

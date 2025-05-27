@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -227,7 +229,10 @@ for i, (row_idx, missing_count) in enumerate(row_missing_counts[:5]):
     },
   ]
 
-  const executeCode = async () => {
+  const executeCode = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
     if (!code.trim()) {
       setExecutionResult({
         success: false,
@@ -280,7 +285,10 @@ for i, (row_idx, missing_count) in enumerate(row_missing_counts[:5]):
     }
   }
 
-  const stopExecution = () => {
+  const stopExecution = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
     setIsExecuting(false)
     setOutput("Execution stopped by user")
     setExecutionResult({
@@ -289,7 +297,10 @@ for i, (row_idx, missing_count) in enumerate(row_missing_counts[:5]):
     })
   }
 
-  const copyOutput = async () => {
+  const copyOutput = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
     if (output) {
       try {
         await navigator.clipboard.writeText(output)
@@ -299,7 +310,10 @@ for i, (row_idx, missing_count) in enumerate(row_missing_counts[:5]):
     }
   }
 
-  const downloadOutput = () => {
+  const downloadOutput = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
     if (output) {
       const blob = new Blob([output], { type: "text/plain" })
       const url = URL.createObjectURL(blob)
@@ -311,12 +325,25 @@ for i, (row_idx, missing_count) in enumerate(row_missing_counts[:5]):
     }
   }
 
-  const clearOutput = () => {
+  const clearOutput = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
     setOutput("")
     setExecutionResult(null)
   }
 
-  const insertExample = (exampleCode: string) => {
+  const clearCode = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    setCode("")
+  }
+
+  const insertExample = (e: React.MouseEvent, exampleCode: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+
     setCode(exampleCode)
     setActiveTab("editor")
   }
@@ -391,7 +418,12 @@ for i, (row_idx, missing_count) in enumerate(row_missing_counts[:5]):
               />
 
               <div className="flex gap-2">
-                <Button onClick={isExecuting ? stopExecution : executeCode} disabled={!code.trim()} className="gap-2">
+                <Button
+                  type="button"
+                  onClick={isExecuting ? stopExecution : executeCode}
+                  disabled={!code.trim()}
+                  className="gap-2"
+                >
                   {isExecuting ? (
                     <>
                       <Square className="h-4 w-4" />
@@ -405,7 +437,7 @@ for i, (row_idx, missing_count) in enumerate(row_missing_counts[:5]):
                   )}
                 </Button>
 
-                <Button variant="outline" onClick={() => setCode("")}>
+                <Button type="button" variant="outline" onClick={clearCode}>
                   Clear
                 </Button>
 
@@ -426,7 +458,13 @@ for i, (row_idx, missing_count) in enumerate(row_missing_counts[:5]):
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base">{example.title}</CardTitle>
-                    <Button variant="outline" size="sm" onClick={() => insertExample(example.code)} className="gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => insertExample(e, example.code)}
+                      className="gap-2"
+                    >
                       <Code2 className="h-3 w-3" />
                       Use Example
                     </Button>
@@ -451,17 +489,17 @@ for i, (row_idx, missing_count) in enumerate(row_missing_counts[:5]):
                 <div className="flex gap-2">
                   {output && (
                     <>
-                      <Button variant="outline" size="sm" onClick={copyOutput} className="gap-2">
+                      <Button type="button" variant="outline" size="sm" onClick={copyOutput} className="gap-2">
                         <Copy className="h-3 w-3" />
                         Copy
                       </Button>
-                      <Button variant="outline" size="sm" onClick={downloadOutput} className="gap-2">
+                      <Button type="button" variant="outline" size="sm" onClick={downloadOutput} className="gap-2">
                         <Download className="h-3 w-3" />
                         Download
                       </Button>
                     </>
                   )}
-                  <Button variant="outline" size="sm" onClick={clearOutput}>
+                  <Button type="button" variant="outline" size="sm" onClick={clearOutput}>
                     Clear
                   </Button>
                 </div>

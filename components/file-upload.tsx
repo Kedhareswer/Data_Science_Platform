@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { useDropzone } from "react-dropzone"
-import { Upload, FileSpreadsheet, X, AlertCircle } from "lucide-react"
+import { Upload, FileSpreadsheet, X, AlertCircle, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -15,6 +15,14 @@ interface FileUploadProps {
   onSuccess?: () => void
 }
 
+const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
+const SUPPORTED_TYPES = {
+  "text/csv": [".csv"],
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
+  "application/vnd.ms-excel": [".xls"],
+  "application/json": [".json"],
+}
+
 export function FileUpload({ className, onSuccess }: FileUploadProps) {
   const router = useRouter()
   const { processFile, error: contextError, isLoading } = useData()
@@ -22,33 +30,78 @@ export function FileUpload({ className, onSuccess }: FileUploadProps) {
   const [error, setError] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [success, setSuccess] = useState(false)
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    setError(null)
-
-    if (acceptedFiles.length === 0) {
-      return
+  const validateFile = useCallback((file: File): string | null => {
+    // Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      return `File size (${(file.size / 1024 / 1024).toFixed(2)}MB) exceeds maximum limit of 50MB`
     }
 
-    const selectedFile = acceptedFiles[0]
-    const fileExtension = selectedFile.name.split(".").pop()?.toLowerCase()
-
-    if (!fileExtension || !["csv", "xlsx", "xls"].includes(fileExtension)) {
-      setError("Please upload a CSV or Excel file")
-      return
+    // Check file type
+    const fileExtension = file.name.split(".").pop()?.toLowerCase()
+    if (!fileExtension) {
+      return "File must have a valid extension"
     }
 
-    setFile(selectedFile)
+    const supportedExtensions = Object.values(SUPPORTED_TYPES)
+      .flat()
+      .map((ext) => ext.slice(1))
+    if (!supportedExtensions.includes(fileExtension)) {
+      return `Unsupported file type. Please upload: ${supportedExtensions.join(", ")}`
+    }
+
+    // Check MIME type if available
+    if (file.type && !Object.keys(SUPPORTED_TYPES).includes(file.type)) {
+      return "File type does not match file extension"
+    }
+
+    return null
   }, [])
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: {
-      "text/csv": [".csv"],
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
-      "application/vnd.ms-excel": [".xls"],
+  const onDrop = useCallback(
+    (acceptedFiles: File[], rejectedFiles: any[]) => {
+      setError(null)
+      setSuccess(false)
+
+      // Handle rejected files
+      if (rejectedFiles.length > 0) {
+        const rejection = rejectedFiles[0]
+        if (rejection.errors?.[0]?.code === "file-too-large") {
+          setError(`File too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB`)
+        } else if (rejection.errors?.[0]?.code === "file-invalid-type") {
+          setError("Invalid file type. Please upload CSV, Excel, or JSON files")
+        } else {
+          setError("File upload failed. Please try again")
+        }
+        return
+      }
+
+      if (acceptedFiles.length === 0) {
+        setError("No valid files selected")
+        return
+      }
+
+      const selectedFile = acceptedFiles[0]
+
+      // Additional validation
+      const validationError = validateFile(selectedFile)
+      if (validationError) {
+        setError(validationError)
+        return
+      }
+
+      setFile(selectedFile)
     },
+    [validateFile],
+  )
+
+  const { getRootProps, getInputProps, isDragActive, isDragReject } = useDropzone({
+    onDrop,
+    accept: SUPPORTED_TYPES,
     maxFiles: 1,
+    maxSize: MAX_FILE_SIZE,
+    multiple: false,
   })
 
   const handleUpload = async () => {
@@ -56,21 +109,28 @@ export function FileUpload({ className, onSuccess }: FileUploadProps) {
 
     setUploading(true)
     setProgress(0)
+    setError(null)
 
-    // Simulate upload progress
-    const interval = setInterval(() => {
+    // Create progress simulation
+    const progressInterval = setInterval(() => {
       setProgress((prevProgress) => {
         if (prevProgress >= 90) {
-          clearInterval(interval)
+          clearInterval(progressInterval)
           return 90
         }
-        return prevProgress + 10
+        return prevProgress + Math.random() * 15
       })
     }, 200)
 
     try {
       await processFile(file)
+
+      // Complete progress
+      clearInterval(progressInterval)
       setProgress(100)
+      setSuccess(true)
+
+      // Navigate after success
       setTimeout(() => {
         setUploading(false)
         if (onSuccess) {
@@ -78,11 +138,26 @@ export function FileUpload({ className, onSuccess }: FileUploadProps) {
         } else {
           router.push("/notebook")
         }
-      }, 500)
+      }, 1000)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to process file")
+      clearInterval(progressInterval)
+      setProgress(0)
       setUploading(false)
-      clearInterval(interval)
+
+      // Handle specific error types
+      if (err instanceof Error) {
+        if (err.message.includes("parsing")) {
+          setError("Failed to parse file. Please check file format and try again")
+        } else if (err.message.includes("memory")) {
+          setError("File too large for processing. Try a smaller file")
+        } else if (err.message.includes("encoding")) {
+          setError("File encoding not supported. Please save as UTF-8")
+        } else {
+          setError(err.message)
+        }
+      } else {
+        setError("An unexpected error occurred. Please try again")
+      }
     }
   }
 
@@ -90,6 +165,15 @@ export function FileUpload({ className, onSuccess }: FileUploadProps) {
     setFile(null)
     setProgress(0)
     setError(null)
+    setSuccess(false)
+  }
+
+  const resetUpload = () => {
+    setFile(null)
+    setProgress(0)
+    setError(null)
+    setSuccess(false)
+    setUploading(false)
   }
 
   return (
@@ -97,8 +181,23 @@ export function FileUpload({ className, onSuccess }: FileUploadProps) {
       {(error || contextError) && (
         <Alert variant="destructive" className="mb-4">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error || contextError}</AlertDescription>
+          <AlertTitle>Upload Error</AlertTitle>
+          <AlertDescription>
+            {error || contextError}
+            <Button variant="outline" size="sm" className="mt-2 ml-2" onClick={resetUpload}>
+              Try Again
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {success && (
+        <Alert className="mb-4 border-green-200 bg-green-50">
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          <AlertTitle className="text-green-800">Upload Successful</AlertTitle>
+          <AlertDescription className="text-green-700">
+            File processed successfully. Redirecting to notebook...
+          </AlertDescription>
         </Alert>
       )}
 
@@ -107,8 +206,12 @@ export function FileUpload({ className, onSuccess }: FileUploadProps) {
           {!file ? (
             <div
               {...getRootProps()}
-              className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-12 text-center transition-colors ${
-                isDragActive ? "border-primary bg-primary/5" : "border-muted-foreground/25"
+              className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-12 text-center transition-colors cursor-pointer ${
+                isDragActive && !isDragReject
+                  ? "border-primary bg-primary/5"
+                  : isDragReject
+                    ? "border-destructive bg-destructive/5"
+                    : "border-muted-foreground/25 hover:border-muted-foreground/50"
               }`}
               role="button"
               tabIndex={0}
@@ -116,14 +219,24 @@ export function FileUpload({ className, onSuccess }: FileUploadProps) {
             >
               <input {...getInputProps()} />
               <div className="flex flex-col items-center justify-center space-y-2">
-                <div className="rounded-full bg-primary/10 p-3">
-                  <Upload className="h-6 w-6 text-primary" />
+                <div className={`rounded-full p-3 ${isDragReject ? "bg-destructive/10" : "bg-primary/10"}`}>
+                  <Upload className={`h-6 w-6 ${isDragReject ? "text-destructive" : "text-primary"}`} />
                 </div>
-                <h3 className="text-lg font-semibold">Drag & drop your file</h3>
-                <p className="text-sm text-muted-foreground">Supports CSV and Excel files</p>
-                <Button variant="outline" className="mt-2">
-                  Browse Files
-                </Button>
+                <h3 className="text-lg font-semibold">
+                  {isDragActive
+                    ? isDragReject
+                      ? "File type not supported"
+                      : "Drop your file here"
+                    : "Drag & drop your file"}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Supports CSV, Excel (.xlsx, .xls), and JSON files up to 50MB
+                </p>
+                {!isDragActive && (
+                  <Button variant="outline" className="mt-2">
+                    Browse Files
+                  </Button>
+                )}
               </div>
             </div>
           ) : (
@@ -135,7 +248,9 @@ export function FileUpload({ className, onSuccess }: FileUploadProps) {
                   </div>
                   <div>
                     <p className="text-sm font-medium">{file.name}</p>
-                    <p className="text-xs text-muted-foreground">{(file.size / 1024).toFixed(2)} KB</p>
+                    <p className="text-xs text-muted-foreground">
+                      {(file.size / 1024).toFixed(2)} KB • {file.type || "Unknown type"}
+                    </p>
                   </div>
                 </div>
                 <Button
@@ -152,13 +267,16 @@ export function FileUpload({ className, onSuccess }: FileUploadProps) {
 
               {uploading && (
                 <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">{progress < 100 ? "Processing..." : "Complete!"}</span>
+                    <span className="font-medium">{Math.round(progress)}%</span>
+                  </div>
                   <Progress value={progress} className="h-2" />
-                  <p className="text-xs text-muted-foreground text-right">{progress}% processed</p>
                 </div>
               )}
 
-              <Button className="w-full" onClick={handleUpload} disabled={uploading || isLoading}>
-                {uploading || isLoading ? "Processing..." : "Upload & Analyze"}
+              <Button className="w-full" onClick={handleUpload} disabled={uploading || isLoading || success}>
+                {uploading || isLoading ? "Processing..." : success ? "Processing Complete" : "Upload & Analyze"}
               </Button>
             </div>
           )}

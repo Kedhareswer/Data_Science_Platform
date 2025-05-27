@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -40,21 +40,37 @@ export function DashboardTable({ config }: DashboardTableProps) {
     }
   }, [columns, visibleColumns])
 
-  const filteredData = processedData.filter((row) => {
-    if (!row || typeof row !== "object") return false
+  const filteredData = useMemo(() => {
+    if (!processedData || processedData.length === 0) return []
 
-    return Object.entries(row).some(([key, value]) => {
-      if (!visibleColumns.includes(key)) return false
-      if (value === null || value === undefined) return false
+    return processedData.filter((row) => {
+      if (!row || typeof row !== "object") return false
 
-      const stringValue = String(value).toLowerCase()
-      return stringValue.includes(searchTerm.toLowerCase())
+      // If no search term, include all rows with visible columns
+      if (!searchTerm.trim()) {
+        return visibleColumns.some((col) => col in row)
+      }
+
+      return Object.entries(row).some(([key, value]) => {
+        if (!visibleColumns.includes(key)) return false
+        if (value === null || value === undefined) return false
+
+        try {
+          const stringValue = String(value).toLowerCase()
+          return stringValue.includes(searchTerm.toLowerCase())
+        } catch (error) {
+          console.warn(`Error converting value to string for column ${key}:`, error)
+          return false
+        }
+      })
     })
-  })
+  }, [processedData, searchTerm, visibleColumns])
 
   const totalPages = Math.max(1, Math.ceil(filteredData.length / pageSize))
-  const currentPageSafe = Math.min(currentPage, totalPages)
-  const paginatedData = filteredData.slice((currentPageSafe - 1) * pageSize, currentPageSafe * pageSize)
+  const currentPageSafe = Math.min(Math.max(1, currentPage), totalPages)
+  const startIndex = (currentPageSafe - 1) * pageSize
+  const endIndex = Math.min(startIndex + pageSize, filteredData.length)
+  const paginatedData = filteredData.slice(startIndex, endIndex)
 
   // Update current page if it's out of bounds
   useEffect(() => {
@@ -144,16 +160,26 @@ export function DashboardTable({ config }: DashboardTableProps) {
           <TableBody>
             {paginatedData.length > 0 ? (
               paginatedData.map((row, rowIndex) => (
-                <TableRow key={rowIndex}>
+                <TableRow key={`row-${rowIndex}`}>
                   {columns.map(
                     (column) =>
                       visibleColumns.includes(column) && (
-                        <TableCell key={column} className="max-w-[200px] truncate">
+                        <TableCell key={`${rowIndex}-${column}`} className="max-w-[200px] truncate">
                           {(() => {
-                            const value = row[column]
-                            if (value === null || value === undefined) return ""
-                            if (typeof value === "object") return JSON.stringify(value)
-                            return String(value)
+                            try {
+                              const value = row[column]
+                              if (value === null || value === undefined) return "—"
+                              if (typeof value === "object") {
+                                return JSON.stringify(value).length > 50
+                                  ? `${JSON.stringify(value).substring(0, 47)}...`
+                                  : JSON.stringify(value)
+                              }
+                              const stringValue = String(value)
+                              return stringValue.length > 50 ? `${stringValue.substring(0, 47)}...` : stringValue
+                            } catch (error) {
+                              console.warn(`Error rendering cell value for column ${column}:`, error)
+                              return "Error"
+                            }
                           })()}
                         </TableCell>
                       ),
@@ -163,7 +189,7 @@ export function DashboardTable({ config }: DashboardTableProps) {
             ) : (
               <TableRow>
                 <TableCell colSpan={visibleColumns.length} className="h-24 text-center">
-                  No results found.
+                  {searchTerm ? `No results found for "${searchTerm}"` : "No data available"}
                 </TableCell>
               </TableRow>
             )}

@@ -68,12 +68,23 @@ export function DashboardChart({ config }: DashboardChartProps) {
   // Prepare data for visualization
   const prepareChartData = () => {
     try {
-      if (!xAxis || !yAxis || processedData.length === 0) return []
+      if (!xAxis || !yAxis || !processedData || processedData.length === 0) {
+        return []
+      }
+
+      // Validate that the selected columns exist in the data
+      const sampleRow = processedData[0]
+      if (!sampleRow || !(xAxis in sampleRow) || !(yAxis in sampleRow)) {
+        console.warn(`Selected columns ${xAxis} or ${yAxis} not found in data`)
+        return []
+      }
 
       if (chartType === "pie") {
         const aggregatedData = processedData.reduce(
           (acc, row) => {
-            const key = String(row[xAxis] || "Unknown")
+            if (!row || typeof row !== "object") return acc
+
+            const key = String(row[xAxis] ?? "Unknown")
             if (!acc[key]) {
               acc[key] = 0
             }
@@ -87,13 +98,28 @@ export function DashboardChart({ config }: DashboardChartProps) {
         return Object.entries(aggregatedData)
           .map(([name, value]) => ({ name, value }))
           .filter((item) => item.value > 0)
+          .slice(0, 10) // Limit to top 10 for better readability
       } else {
         return processedData
-          .map((row) => ({
-            name: row[xAxis] || "Unknown",
-            value: Number(row[yAxis]) || 0,
-          }))
-          .filter((item) => !isNaN(item.value))
+          .map((row, index) => {
+            if (!row || typeof row !== "object") return null
+
+            const xValue = row[xAxis]
+            const yValue = Number(row[yAxis])
+
+            // Skip invalid data points
+            if (xValue === null || xValue === undefined || isNaN(yValue)) {
+              return null
+            }
+
+            return {
+              name: String(xValue),
+              value: yValue,
+              originalIndex: index,
+            }
+          })
+          .filter((item): item is NonNullable<typeof item> => item !== null)
+          .slice(0, 1000) // Limit data points for performance
       }
     } catch (error) {
       console.error("Error preparing chart data:", error)
@@ -182,67 +208,108 @@ export function DashboardChart({ config }: DashboardChartProps) {
       </div>
 
       <div className="h-[300px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          {chartType === "bar" && chartData.length > 0 && (
-            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="name"
-                angle={-45}
-                textAnchor="end"
-                height={60}
-                interval={0}
-                tick={{ fontSize: 12 }}
-                tickFormatter={(value) => String(value).substring(0, 10)}
-              />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="value" fill={COLOR_PALETTES[colorScheme][0]} name={yAxis} />
-            </BarChart>
-          )}
+        {chartData.length === 0 ? (
+          <div className="flex items-center justify-center h-full text-muted-foreground">
+            <div className="text-center">
+              <div className="text-lg mb-2">No data to display</div>
+              <div className="text-sm">
+                {!xAxis || !yAxis
+                  ? "Please select both X and Y axes"
+                  : "No valid data points found for the selected columns"}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            {chartType === "bar" && (
+              <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="name"
+                  angle={-45}
+                  textAnchor="end"
+                  height={60}
+                  interval={0}
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(value) =>
+                    String(value).length > 15 ? `${String(value).substring(0, 12)}...` : String(value)
+                  }
+                />
+                <YAxis tickFormatter={(value) => Number(value).toLocaleString()} />
+                <Tooltip
+                  formatter={(value, name) => [Number(value).toLocaleString(), name]}
+                  labelFormatter={(label) => `Category: ${label}`}
+                />
+                <Legend />
+                <Bar
+                  dataKey="value"
+                  fill={COLOR_PALETTES[colorScheme]?.[0] || "#8884d8"}
+                  name={yAxis}
+                  radius={[2, 2, 0, 0]}
+                />
+              </BarChart>
+            )}
 
-          {chartType === "line" && (
-            <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" angle={-45} textAnchor="end" height={60} interval={0} tick={{ fontSize: 12 }} />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke={COLOR_PALETTES[colorScheme][0]}
-                activeDot={{ r: 8 }}
-                name={yAxis}
-              />
-            </LineChart>
-          )}
+            {chartType === "line" && (
+              <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="name"
+                  angle={-45}
+                  textAnchor="end"
+                  height={60}
+                  interval={0}
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(value) =>
+                    String(value).length > 15 ? `${String(value).substring(0, 12)}...` : String(value)
+                  }
+                />
+                <YAxis tickFormatter={(value) => Number(value).toLocaleString()} />
+                <Tooltip
+                  formatter={(value, name) => [Number(value).toLocaleString(), name]}
+                  labelFormatter={(label) => `X: ${label}`}
+                />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke={COLOR_PALETTES[colorScheme]?.[0] || "#8884d8"}
+                  activeDot={{ r: 6 }}
+                  name={yAxis}
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                />
+              </LineChart>
+            )}
 
-          {chartType === "pie" && (
-            <PieChart>
-              <Pie
-                data={chartData}
-                cx="50%"
-                cy="50%"
-                labelLine={true}
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                outerRadius={120}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {chartData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLOR_PALETTES[colorScheme][index % COLOR_PALETTES[colorScheme].length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          )}
-        </ResponsiveContainer>
+            {chartType === "pie" && (
+              <PieChart>
+                <Pie
+                  data={chartData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={true}
+                  label={({ name, percent, value }) => (percent > 5 ? `${name}: ${(percent * 100).toFixed(1)}%` : "")}
+                  outerRadius={120}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {chartData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={
+                        COLOR_PALETTES[colorScheme]?.[index % COLOR_PALETTES[colorScheme].length] ||
+                        `hsl(${index * 45}, 70%, 60%)`
+                      }
+                    />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value, name) => [Number(value).toLocaleString(), name]} />
+                <Legend />
+              </PieChart>
+            )}
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   )
