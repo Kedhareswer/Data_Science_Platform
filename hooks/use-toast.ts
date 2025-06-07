@@ -17,6 +17,7 @@ type ToasterToast = {
   action?: ToastActionElement
   variant?: "default" | "destructive"
   open: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 const TOAST_LIMIT = 1
@@ -140,7 +141,11 @@ function dispatch(action: Action) {
   })
 }
 
-type ToastWithoutId = Omit<ToasterToast, "id">
+type ToastWithoutId = Partial<Omit<ToasterToast, "id">> & {
+  title?: string
+  description?: string
+  variant?: "default" | "destructive"
+}
 
 function toast({ ...props }: ToastWithoutId) {
   const id = genId()
@@ -158,7 +163,7 @@ function toast({ ...props }: ToastWithoutId) {
       ...props,
       id,
       open: true,
-      onOpenChange: (open) => {
+      onOpenChange: (open: boolean) => {
         if (!open) dismiss()
       },
     },

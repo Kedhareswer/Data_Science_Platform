@@ -36,8 +36,305 @@ export interface MLModel {
   version: number
 }
 
+export interface AutoMLRequest {
+  data: any[]
+  targetColumn: string
+  taskType: "classification" | "regression"
+  maxModels?: number
+  maxTime?: number
+  optimizeFor?: "accuracy" | "speed" | "balanced"
+}
+
+export interface AutoMLResult {
+  modelId: string
+  success: boolean
+  bestAlgorithm: string
+  bestScore: number
+  allModels: Array<{
+    algorithm: string
+    score: number
+    hyperparameters: Record<string, any>
+    performance: Record<string, any>
+  }>
+  featureImportance?: Array<{ feature: string; importance: number }>
+  executionTime: number
+  error?: string
+}
+
 export class MLService {
   private models: Map<string, MLModel> = new Map()
+
+  async runAutoML(request: AutoMLRequest): Promise<AutoMLResult> {
+    const startTime = Date.now()
+    const modelId = randomUUID()
+
+    try {
+      // Extract features (all columns except target)
+      const allColumns = Object.keys(request.data[0] || {})
+      const features = allColumns.filter(col => col !== request.targetColumn)
+
+      // Define algorithms to try based on task type
+      const algorithms = request.taskType === "classification" 
+        ? ["random_forest", "gradient_boosting", "logistic_regression", "svm", "neural_network", "decision_tree"]
+        : ["random_forest", "gradient_boosting", "linear_regression", "svm", "neural_network", "decision_tree"]
+      
+      // Limit algorithms based on optimization preference
+      let algorithmsToTry = algorithms
+      if (request.optimizeFor === "speed") {
+        algorithmsToTry = algorithms.filter(a => !["neural_network", "svm"].includes(a))
+      }
+      
+      // Limit by max models if specified
+      const maxModels = request.maxModels || 5
+      algorithmsToTry = algorithmsToTry.slice(0, maxModels)
+      
+      // Generate AutoML Python script
+      const autoMLScript = this.generateAutoMLScript(request, algorithmsToTry, features)
+      
+      // Execute AutoML via Python
+      const response = await fetch("/api/python/execute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: autoMLScript,
+          dataContext: {
+            data: request.data,
+            features: features,
+            target: request.targetColumn,
+            columns: [...features, request.targetColumn],
+          },
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!result.success) {
+        return {
+          modelId,
+          success: false,
+          bestAlgorithm: "",
+          bestScore: 0,
+          allModels: [],
+          error: result.error,
+          executionTime: Date.now() - startTime,
+        }
+      }
+
+      // Parse AutoML results
+      const autoMLResults = result.result || {}
+      
+      // Store the best model
+      if (autoMLResults.bestModel) {
+        const model: MLModel = {
+          id: modelId,
+          name: `AutoML_${request.taskType}_${request.targetColumn}_${Date.now()}`,
+          algorithm: autoMLResults.bestAlgorithm,
+          taskType: request.taskType,
+          features: features,
+          target: request.targetColumn,
+          performance: autoMLResults.bestPerformance || {},
+          createdAt: new Date(),
+          serializedModel: autoMLResults.serializedModel,
+          version: 1,
+        }
+
+        this.models.set(modelId, model)
+      }
+
+      return {
+        modelId,
+        success: true,
+        bestAlgorithm: autoMLResults.bestAlgorithm || "",
+        bestScore: autoMLResults.bestScore || 0,
+        allModels: autoMLResults.allModels || [],
+        featureImportance: autoMLResults.featureImportance,
+        executionTime: Date.now() - startTime,
+      }
+    } catch (error) {
+      return {
+        modelId,
+        success: false,
+        bestAlgorithm: "",
+        bestScore: 0,
+        allModels: [],
+        error: error instanceof Error ? error.message : "Unknown error",
+        executionTime: Date.now() - startTime,
+      }
+    }
+  }
+
+  private generateAutoMLScript(request: AutoMLRequest, algorithms: string[], features: string[]): string {
+    const { taskType, maxTime = 120 } = request
+    const metric = taskType === "classification" ? "accuracy" : "r2"
+    
+    return `
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, mean_squared_error, r2_score
+import pickle
+import json
+import base64
+import time
+
+# Set maximum execution time
+max_time = ${maxTime}
+start_time = time.time()
+
+# Prepare data
+df = pd.DataFrame(data)
+X = df[${JSON.stringify(features)}].values
+y = df['${request.targetColumn}'].values
+
+# Handle missing values
+from sklearn.impute import SimpleImputer
+imputer = SimpleImputer(strategy='mean')
+X = imputer.fit_transform(X)
+
+# Handle categorical target for classification
+if '${taskType}' == 'classification':
+    le = LabelEncoder()
+    y = le.fit_transform(y)
+
+# Scale features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+# Define models to evaluate
+models = []
+${algorithms.map(algo => `
+# ${algo}
+try:
+    ${this.getAlgorithmImport(algo, taskType)}
+    ${this.getModelInitialization(algo, taskType, {})}
+    models.append({
+        'name': '${algo}',
+        'model': model,
+        'hyperparameters': {},
+    })
+except Exception as e:
+    print(f"Error initializing {algo}: {str(e)}")
+`).join('')}
+
+# Train and evaluate all models
+results = []
+best_score = -float('inf') if '${metric}' in ['accuracy', 'r2', 'f1'] else float('inf')
+best_model = None
+best_model_name = ""
+best_performance = {}
+
+for model_info in models:
+    # Check if we've exceeded time limit
+    if time.time() - start_time > max_time:
+        break
+        
+    try:
+        model = model_info['model']
+        name = model_info['name']
+        hyperparams = model_info['hyperparameters']
+        
+        # Train model
+        model.fit(X_train, y_train)
+        
+        # Make predictions
+        y_pred = model.predict(X_test)
+        
+        # Calculate performance metrics
+        performance = {}
+        if '${taskType}' == 'classification':
+            performance['accuracy'] = float(accuracy_score(y_test, y_pred))
+            performance['precision'] = float(precision_score(y_test, y_pred, average='weighted', zero_division=0))
+            performance['recall'] = float(recall_score(y_test, y_pred, average='weighted', zero_division=0))
+            performance['f1'] = float(f1_score(y_test, y_pred, average='weighted', zero_division=0))
+            current_score = performance['${metric}']
+        else:  # regression
+            performance['mse'] = float(mean_squared_error(y_test, y_pred))
+            performance['rmse'] = float(np.sqrt(performance['mse']))
+            performance['r2'] = float(r2_score(y_test, y_pred))
+            current_score = performance['${metric}']
+            
+        # Cross-validation
+        cv_scores = cross_val_score(model, X_scaled, y, cv=5, 
+                                  scoring='accuracy' if '${taskType}' == 'classification' else 'r2')
+        performance['cv_mean'] = float(cv_scores.mean())
+        performance['cv_std'] = float(cv_scores.std())
+        
+        # Feature importance
+        feature_importance = None
+        if hasattr(model, 'feature_importances_'):
+            feature_importance = list(zip(${JSON.stringify(features)}, model.feature_importances_))
+        elif hasattr(model, 'coef_'):
+            coefs = model.coef_.flatten() if len(model.coef_.shape) > 1 else model.coef_
+            feature_importance = list(zip(${JSON.stringify(features)}, abs(coefs)))
+            
+        # Compare with best model
+        is_better = False
+        if '${metric}' in ['accuracy', 'r2', 'f1']:
+            is_better = current_score > best_score
+        else:  # metrics where lower is better (mse, rmse)
+            is_better = current_score < best_score
+            
+        # Update best model if current is better
+        if is_better:
+            best_score = current_score
+            best_model = model
+            best_model_name = name
+            best_performance = performance
+            
+        # Add to results
+        model_result = {
+            'algorithm': name,
+            'score': float(current_score),
+            'hyperparameters': hyperparams,
+            'performance': performance
+        }
+        results.append(model_result)
+        
+    except Exception as e:
+        print(f"Error training {name}: {str(e)}")
+
+# Prepare final results
+final_results = {
+    'bestAlgorithm': best_model_name,
+    'bestScore': float(best_score),
+    'bestPerformance': best_performance,
+    'allModels': results,
+}
+
+# Feature importance for best model
+if best_model is not None:
+    if hasattr(best_model, 'feature_importances_'):
+        importances = best_model.feature_importances_
+        final_results['featureImportance'] = [{'feature': f, 'importance': float(i)} 
+                                           for f, i in zip(${JSON.stringify(features)}, importances)]
+    elif hasattr(best_model, 'coef_'):
+        coefs = best_model.coef_.flatten() if len(best_model.coef_.shape) > 1 else best_model.coef_
+        total = np.sum(np.abs(coefs))
+        if total > 0:  # Avoid division by zero
+            normalized = np.abs(coefs) / total
+            final_results['featureImportance'] = [{'feature': f, 'importance': float(i)} 
+                                               for f, i in zip(${JSON.stringify(features)}, normalized)]
+
+# Serialize best model if available
+if best_model is not None:
+    model_package = {
+        'model': best_model,
+        'scaler': scaler,
+        'imputer': imputer,
+        'is_classification': '${taskType}' == 'classification',
+        'label_encoder': le if '${taskType}' == 'classification' else None
+    }
+    model_bytes = pickle.dumps(model_package)
+    final_results['serializedModel'] = base64.b64encode(model_bytes).decode('utf-8')
+    final_results['bestModel'] = True
+
+final_results['executionTime'] = time.time() - start_time
+`
+  }
 
   async trainModel(request: MLTrainingRequest): Promise<MLTrainingResult> {
     const startTime = Date.now()
@@ -69,6 +366,7 @@ export class MLService {
           modelId,
           success: false,
           error: result.error,
+          performance: {}, // Add empty performance object to satisfy TypeScript
           executionTime: Date.now() - startTime,
         }
       }
@@ -106,6 +404,7 @@ export class MLService {
         modelId,
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
+        performance: {}, // Add empty performance object to satisfy TypeScript
         executionTime: Date.now() - startTime,
       }
     }

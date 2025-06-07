@@ -22,12 +22,15 @@ import { formatDistanceToNow } from "date-fns"
 
 interface NavigationSidebarProps {
   isOpen: boolean
-  onToggle: () => void
+  onToggle?: () => void
+  onClose?: () => void
+  currentCellId?: string
+  onCellSelect?: (cellId: string | undefined) => void
 }
 
-export function NavigationSidebar({ isOpen, onToggle }: NavigationSidebarProps) {
+export function NavigationSidebar({ isOpen, onToggle, onClose, currentCellId, onCellSelect }: NavigationSidebarProps) {
   const navigation = useNavigation()
-  const { history = [], bookmarks = [], removeBookmark, clearHistory, currentPage, addToHistory } = navigation || {}
+  const { history = [], bookmarks = [], removeBookmark, clearHistory, addToHistory } = navigation || {}
 
   const [activeTab, setActiveTab] = useState<"history" | "bookmarks" | "recent">("recent")
 
@@ -122,17 +125,19 @@ export function NavigationSidebar({ isOpen, onToggle }: NavigationSidebarProps) 
               recentPages.map((page) => (
                 <Card
                   key={page.id}
-                  className={`cursor-pointer transition-colors hover:bg-muted/50 ${
-                    currentPage?.path === page.path ? "bg-muted" : ""
-                  }`}
-                  onClick={() => addToHistory({ path: page.path, title: page.title, metadata: page.metadata })}
+                  className="cursor-pointer transition-colors hover:bg-muted/50"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    navigation.navigateTo?.(page.path, page.title, page.metadata?.subsection);
+                  }}
                 >
                   <CardContent className="p-3">
                     <div className="flex items-start gap-3">
                       {getPageIcon(page.path)}
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-sm truncate">{page.title}</h4>
-                        {page.subtitle && <p className="text-xs text-muted-foreground truncate">{page.subtitle}</p>}
+                        {page.metadata?.subsection && <p className="text-xs text-muted-foreground truncate">{page.metadata.subsection}</p>}
                         <p className="text-xs text-muted-foreground mt-1">{formatTimestamp(page.timestamp)}</p>
                       </div>
                     </div>
@@ -152,17 +157,19 @@ export function NavigationSidebar({ isOpen, onToggle }: NavigationSidebarProps) 
                 <Card
                   key={bookmark.id}
                   className="cursor-pointer transition-colors hover:bg-muted/50 group"
-                  onClick={() =>
-                    addToHistory({ path: bookmark.path, title: bookmark.title, metadata: bookmark.metadata })
-                  }
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    navigation.navigateTo?.(bookmark.path, bookmark.title, bookmark.description);
+                  }}
                 >
                   <CardContent className="p-3">
                     <div className="flex items-start gap-3">
                       {getPageIcon(bookmark.path)}
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-sm truncate">{bookmark.title}</h4>
-                        {bookmark.subtitle && (
-                          <p className="text-xs text-muted-foreground truncate">{bookmark.subtitle}</p>
+                        {bookmark.description && (
+                          <p className="text-xs text-muted-foreground truncate">{bookmark.description}</p>
                         )}
                         <p className="text-xs text-muted-foreground mt-1">{formatTimestamp(bookmark.timestamp)}</p>
                       </div>
@@ -205,9 +212,7 @@ export function NavigationSidebar({ isOpen, onToggle }: NavigationSidebarProps) 
                 .map((item, index) => (
                   <Card
                     key={item.id}
-                    className={`cursor-pointer transition-colors hover:bg-muted/50 ${
-                      currentPage?.path === item.path ? "bg-muted" : ""
-                    }`}
+                    className="cursor-pointer transition-colors hover:bg-muted/50"
                     onClick={() => addToHistory({ path: item.path, title: item.title, metadata: item.metadata })}
                   >
                     <CardContent className="p-3">
@@ -215,7 +220,7 @@ export function NavigationSidebar({ isOpen, onToggle }: NavigationSidebarProps) 
                         {getPageIcon(item.path)}
                         <div className="flex-1 min-w-0">
                           <h4 className="font-medium text-sm truncate">{item.title}</h4>
-                          {item.subtitle && <p className="text-xs text-muted-foreground truncate">{item.subtitle}</p>}
+                          {item.metadata?.subsection && <p className="text-xs text-muted-foreground truncate">{item.metadata.subsection}</p>}
                           <p className="text-xs text-muted-foreground mt-1">{formatTimestamp(item.timestamp)}</p>
                         </div>
                         {index === 0 && (

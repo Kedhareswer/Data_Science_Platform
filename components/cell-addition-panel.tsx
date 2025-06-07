@@ -116,6 +116,15 @@ const cellTypes: CellTypeOption[] = [
     requiresData: true,
     category: "ml",
   },
+  {
+    type: "auto-ml",
+    label: "Auto ML Trainer",
+    description: "Automatically train and compare multiple ML models",
+    icon: <Sparkles className="h-5 w-5" />,
+    color: "bg-violet-50 text-violet-700 border-violet-200",
+    requiresData: true,
+    category: "ml",
+  },
 ]
 
 const categoryLabels = {
@@ -145,7 +154,7 @@ export function CellAdditionPanel({ insertIndex, onClose }: CellAdditionPanelPro
 
       toast({
         title: "Cell added",
-        description: `Added ${cellInfo?.label || cellType} cell to notebook`,
+        description: `Added ${cellInfo?.label || cellType} cell to notebook`
       })
 
       setIsOpen(false)
@@ -162,7 +171,7 @@ export function CellAdditionPanel({ insertIndex, onClose }: CellAdditionPanelPro
       toast({
         title: "Failed to add cell",
         description: "There was an error adding the cell to your notebook",
-        variant: "destructive",
+        variant: "destructive"
       })
     }
   }
@@ -206,7 +215,10 @@ export function CellAdditionPanel({ insertIndex, onClose }: CellAdditionPanelPro
           type="button"
           variant="outline"
           className="gap-2 hover:bg-primary/5 border-dashed border-2 hover:border-primary/20 transition-all duration-200"
-          onClick={(e) => e.preventDefault()}
+          onClick={(e) => {
+            e.preventDefault();
+            setIsOpen(true);
+          }}
         >
           <Plus className="h-4 w-4" />
           Add Cell
@@ -322,7 +334,7 @@ interface QuickAddButtonProps {
 export function QuickAddButton({ insertIndex, className }: QuickAddButtonProps) {
   return (
     <div className={`flex justify-center ${className}`}>
-      <div className="opacity-0 hover:opacity-100 transition-opacity duration-200 group-hover:opacity-100">
+      <div className="transition-all duration-200 opacity-100 hover:scale-105">
         <CellAdditionPanel insertIndex={insertIndex} />
       </div>
     </div>

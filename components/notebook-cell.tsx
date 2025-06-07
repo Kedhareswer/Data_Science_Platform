@@ -20,6 +20,7 @@ import { EnhancedPythonEditor } from "@/components/enhanced-python-editor"
 import { EnhancedMLTrainer } from "@/components/enhanced-ml-trainer"
 import { MLPredictor } from "@/components/ml-predictor"
 import { MLModelComparison } from "@/components/ml-model-comparison"
+import { AutoMLTrainer } from "@/components/auto-ml-trainer"
 
 interface NotebookCellProps {
   cell: NotebookCellType
@@ -42,6 +43,7 @@ const getCellTypeInfo = (type: string) => {
     "ml-trainer": { label: "ML Trainer", color: "bg-red-50 text-red-700 border-red-200", icon: "🤖" },
     "ml-predictor": { label: "ML Predictor", color: "bg-pink-50 text-pink-700 border-pink-200", icon: "🔮" },
     "ml-insights": { label: "ML Insights", color: "bg-cyan-50 text-cyan-700 border-cyan-200", icon: "🧠" },
+    "auto-ml": { label: "Auto ML", color: "bg-violet-50 text-violet-700 border-violet-200", icon: "✨" },
   }
   return typeMap[type as keyof typeof typeMap] || typeMap.text
 }
@@ -124,6 +126,8 @@ export function NotebookCell({
           return <MLPredictor />
         case "ml-insights":
           return <MLModelComparison />
+        case "auto-ml":
+          return <AutoMLTrainer />
         default:
           return (
             <div className="p-8 text-center text-muted-foreground">

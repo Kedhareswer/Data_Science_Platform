@@ -1,7 +1,8 @@
 "use client"
 
 import type React from "react"
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
+import { setupNavigationPrevention } from "@/lib/prevent-navigation"
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -30,6 +31,11 @@ export default function NotebookPage() {
   const [isExecutingAll, setIsExecutingAll] = useState(false)
   const [navSidebarOpen, setNavSidebarOpen] = useState(false)
   const [currentCellId, setCurrentCellId] = useState<string | null>(null)
+
+  // Prevent default navigation behavior that causes page refreshes
+  useEffect(() => {
+    setupNavigationPrevention()
+  }, [])
 
   const handleDragEnd = useCallback(
     (result: any) => {
@@ -151,16 +157,11 @@ export default function NotebookPage() {
 
   // Add navigation tracking for cell operations
   const handleCellNavigate = useCallback(
-    (cellId: string) => {
-      setCurrentCellId(cellId)
-      const cell = notebookCells.find((c) => c.id === cellId)
+    (cellId: string | undefined) => {
+      setCurrentCellId(cellId || null)
+      const cell = cellId ? notebookCells.find((c) => c.id === cellId) : undefined
       if (cell) {
-        navigateTo?.("/notebook", "Data Notebook", cell.title, {
-          cellId: cell.id,
-          cellType: cell.type,
-          section: "notebook",
-          subsection: "cell",
-        })
+        navigateTo?.("/notebook", "Data Notebook", cell.title)
       }
     },
     [notebookCells, navigateTo],
@@ -177,7 +178,13 @@ export default function NotebookPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <NavigationSidebar isOpen={navSidebarOpen} onToggle={() => setNavSidebarOpen(!navSidebarOpen)} />
+      <NavigationSidebar
+        isOpen={navSidebarOpen}
+        onToggle={() => setNavSidebarOpen(!navSidebarOpen)}
+        onClose={() => setNavSidebarOpen(false)}
+        currentCellId={currentCellId || undefined}
+        onCellSelect={handleCellNavigate}
+      />
 
       <div className={`transition-all duration-200 ${navSidebarOpen ? "ml-80" : ""}`}>
         <div className="container mx-auto p-6 max-w-6xl">
@@ -188,7 +195,7 @@ export default function NotebookPage() {
             {/* Notebook Controls */}
             {notebookCells.length > 0 && (
               <div className="mt-4 flex items-center justify-between">
-                <NotebookNavigation currentCellId={currentCellId} onCellNavigate={handleCellNavigate} />
+                <NotebookNavigation currentCellId={currentCellId || undefined} onCellNavigate={handleCellNavigate} />
 
                 <div className="flex items-center gap-2">
                   <Button

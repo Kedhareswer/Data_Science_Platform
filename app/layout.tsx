@@ -21,9 +21,9 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-      <html lang="en">
-        <body className={`${inter.className} font-handwritten`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.className} font-handwritten`} suppressHydrationWarning>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <a href="#main-content" className="skip-link">
             Skip to main content
           </a>
@@ -33,8 +33,8 @@ export default function RootLayout({
               <Toaster />
             </DataProvider>
           </NavigationProvider>
-        </body>
-      </html>
-    </ThemeProvider>
+        </ThemeProvider>
+      </body>
+    </html>
   )
 }

@@ -15,6 +15,7 @@ export type CellType =
   | "ml-trainer"
   | "ml-predictor"
   | "ml-insights"
+  | "auto-ml"
 
 export interface NotebookCell {
   id: string
@@ -196,7 +197,7 @@ const generateCellId = (): string => {
 }
 
 const getCellTitle = (type: CellType): string => {
-  const titles: Record<CellType, string> = {
+  const cellTitles = {
     data: "Data Table",
     profile: "Data Profile",
     "missing-data": "Missing Data Analysis",
@@ -205,10 +206,11 @@ const getCellTitle = (type: CellType): string => {
     text: "Text Note",
     code: "Python Code",
     "ml-trainer": "ML Model Trainer",
-    "ml-predictor": "ML Predictor",
-    "ml-insights": "ML Model Comparison",
+    "ml-predictor": "ML Model Predictor",
+    "ml-insights": "ML Model Insights",
+    "auto-ml": "Auto ML Trainer",
   }
-  return titles[type] || "Untitled Cell"
+  return cellTitles[type] || "Untitled Cell"
 }
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
