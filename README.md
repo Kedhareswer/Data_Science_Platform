@@ -36,30 +36,30 @@ A modern, interactive data analysis and visualization platform built with Next.j
 ### Installation
 
 1. Clone the repository:
-   ```bash
+   \`\`\`bash
    git clone https://github.com/Kedhareswer/Data_Science_Platform.git
    cd Data_Science_Platform
-   ```
+   \`\`\`
 
 2. Install dependencies:
-   ```bash
+   \`\`\`bash
    npm install
    # or
    yarn install
-   ```
+   \`\`\`
 
 3. Start the development server:
-   ```bash
+   \`\`\`bash
    npm run dev
    # or
    yarn dev
-   ```
+   \`\`\`
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
 ## 📦 Project Structure
 
-```
+\`\`\`
 data-analysis-platform/
 ├── app/                    # App router pages and layouts
 │   ├── dashboard/          # Dashboard components
@@ -73,7 +73,7 @@ data-analysis-platform/
 ├── lib/                   # Utility functions and hooks
 ├── public/                 # Static assets
 └── styles/                 # Global styles
-```
+\`\`\`
 
 ## 🧪 Available Scripts
 

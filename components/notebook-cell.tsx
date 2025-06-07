@@ -2,21 +2,24 @@
 
 import type React from "react"
 import { useState } from "react"
-import type { NotebookCellType } from "@/types"
-import { useData } from "@/lib/data-context"
-import { AlertCircle } from "lucide-react"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import { AlertCircle, GripVertical, Trash2, Play, Square } from "lucide-react"
+import type { NotebookCell as NotebookCellType } from "@/lib/data-context"
 
-// Import necessary components (replace with actual imports)
-import { DataTable } from "@/components/data-table" // Assuming this exists
-import { DataProfiler } from "@/components/data-profiler" // Assuming this exists
-import { MissingDataExplorer } from "@/components/missing-data-explorer" // Assuming this exists
-import { InteractiveDataVisualizer } from "@/components/interactive-data-visualizer" // Assuming this exists
-import { DataPreprocessor } from "@/components/data-preprocessor" // Assuming this exists
-import { TextEditor } from "@/components/text-editor" // Assuming this exists
-import { PythonCodeEditor } from "@/components/python-code-editor" // Assuming this exists
-import { MLModelTrainer } from "@/components/ml-model-trainer" // Assuming this exists
-import { MLPredictor } from "@/components/ml-predictor" // Assuming this exists
-import { MLModelComparison } from "@/components/ml-model-comparison" // Assuming this exists
+// Import cell components
+import { DataTable } from "@/components/data-table"
+import { DataProfiler } from "@/components/data-profiler"
+import { MissingDataExplorer } from "@/components/missing-data-explorer"
+import { InteractiveDataVisualizer } from "@/components/interactive-data-visualizer"
+import { DataPreprocessor } from "@/components/data-preprocessor"
+import { TextEditor } from "@/components/text-editor"
+import { EnhancedPythonEditor } from "@/components/enhanced-python-editor"
+import { EnhancedMLTrainer } from "@/components/enhanced-ml-trainer"
+import { MLPredictor } from "@/components/ml-predictor"
+import { MLModelComparison } from "@/components/ml-model-comparison"
 
 interface NotebookCellProps {
   cell: NotebookCellType
@@ -29,51 +32,71 @@ interface NotebookCellProps {
 
 const getCellTypeInfo = (type: string) => {
   const typeMap = {
-    data: { label: "Data", color: "bg-blue-100 text-blue-800", icon: "📊" },
-    profile: { label: "Profile", color: "bg-green-100 text-green-800", icon: "📈" },
-    "missing-data": { label: "Missing Data", color: "bg-orange-100 text-orange-800", icon: "🔍" },
-    visualization: { label: "Visualizer", color: "bg-purple-100 text-purple-800", icon: "📊" },
-    preprocessing: { label: "Preprocessing", color: "bg-yellow-100 text-yellow-800", icon: "🔧" },
-    text: { label: "Text", color: "bg-gray-100 text-gray-800", icon: "📝" },
-    code: { label: "Code", color: "bg-purple-100 text-purple-800", icon: "💻" },
-    "ml-trainer": { label: "ML Trainer", color: "bg-red-100 text-red-800", icon: "🤖" },
-    "ml-predictor": { label: "ML Predictor", color: "bg-indigo-100 text-indigo-800", icon: "🔮" },
-    "ml-insights": { label: "ML Insights", color: "bg-pink-100 text-pink-800", icon: "🧠" },
+    data: { label: "Data Table", color: "bg-blue-50 text-blue-700 border-blue-200", icon: "📊" },
+    profile: { label: "Data Profile", color: "bg-green-50 text-green-700 border-green-200", icon: "📈" },
+    "missing-data": { label: "Missing Data", color: "bg-orange-50 text-orange-700 border-orange-200", icon: "🔍" },
+    visualization: { label: "Visualization", color: "bg-purple-50 text-purple-700 border-purple-200", icon: "📊" },
+    preprocessing: { label: "Preprocessing", color: "bg-yellow-50 text-yellow-700 border-yellow-200", icon: "🔧" },
+    text: { label: "Text/Markdown", color: "bg-gray-50 text-gray-700 border-gray-200", icon: "📝" },
+    code: { label: "Python Code", color: "bg-indigo-50 text-indigo-700 border-indigo-200", icon: "💻" },
+    "ml-trainer": { label: "ML Trainer", color: "bg-red-50 text-red-700 border-red-200", icon: "🤖" },
+    "ml-predictor": { label: "ML Predictor", color: "bg-pink-50 text-pink-700 border-pink-200", icon: "🔮" },
+    "ml-insights": { label: "ML Insights", color: "bg-cyan-50 text-cyan-700 border-cyan-200", icon: "🧠" },
   }
   return typeMap[type as keyof typeof typeMap] || typeMap.text
 }
 
-const NotebookCell: React.FC<NotebookCellProps> = ({
+export function NotebookCell({
   cell,
   index,
   onUpdateTitle,
   onRemove,
   dragHandleProps,
-  isExecuting,
-}) => {
+  isExecuting = false,
+}: NotebookCellProps) {
   const [title, setTitle] = useState(cell.title)
-  const { data } = useData()
+  const [isEditing, setIsEditing] = useState(false)
+  const [isRunning, setIsRunning] = useState(false)
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault()
     setTitle(e.target.value)
   }
 
-  const handleTitleBlur = () => {
+  const handleTitleSubmit = () => {
     onUpdateTitle(cell.id, title)
+    setIsEditing(false)
   }
 
   const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      e.preventDefault()
-      e.currentTarget.blur()
+      handleTitleSubmit()
+    } else if (e.key === "Escape") {
+      setTitle(cell.title)
+      setIsEditing(false)
     }
   }
 
   const handleRemoveClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     e.stopPropagation()
-    onRemove(cell.id)
+    if (window.confirm("Are you sure you want to delete this cell?")) {
+      onRemove(cell.id)
+    }
+  }
+
+  const handleRunCell = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsRunning(true)
+
+    try {
+      // Simulate cell execution
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+    } catch (error) {
+      console.error("Error running cell:", error)
+    } finally {
+      setIsRunning(false)
+    }
   }
 
   const typeInfo = getCellTypeInfo(cell.type)
@@ -94,9 +117,9 @@ const NotebookCell: React.FC<NotebookCellProps> = ({
         case "text":
           return <TextEditor />
         case "code":
-          return <PythonCodeEditor />
+          return <EnhancedPythonEditor />
         case "ml-trainer":
-          return <MLModelTrainer />
+          return <EnhancedMLTrainer />
         case "ml-predictor":
           return <MLPredictor />
         case "ml-insights":
@@ -120,49 +143,98 @@ const NotebookCell: React.FC<NotebookCellProps> = ({
   }
 
   return (
-    <div className="relative rounded-md border border-gray-200 bg-white shadow-sm">
-      <div className="flex items-center justify-between px-4 py-2">
-        <div className="flex items-center">
-          {dragHandleProps && (
+    <Card className="relative group hover:shadow-md transition-all duration-200 border-l-4 border-l-transparent hover:border-l-primary">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {/* Drag Handle */}
             <div
-              className="cursor-grab p-1 hover:bg-gray-100 rounded"
+              className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted rounded opacity-0 group-hover:opacity-100 transition-opacity"
               {...dragHandleProps}
               role="button"
               aria-label="Drag to reorder cell"
             >
-              ☰
+              <GripVertical className="h-4 w-4 text-muted-foreground" />
             </div>
-          )}
-          <span className={`ml-2 rounded-full px-2.5 py-0.5 text-xs font-medium ${typeInfo.color}`}>
-            {typeInfo.icon} {typeInfo.label}
-          </span>
-          {isExecuting && <div className="ml-2 h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>}
+
+            {/* Cell Type Badge */}
+            <Badge variant="outline" className={`${typeInfo.color} font-medium`}>
+              <span className="mr-1">{typeInfo.icon}</span>
+              {typeInfo.label}
+            </Badge>
+
+            {/* Cell Index */}
+            <span className="text-xs text-muted-foreground font-mono">[{index + 1}]</span>
+
+            {/* Execution Status */}
+            {(isExecuting || isRunning) && (
+              <div className="flex items-center gap-1">
+                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-xs text-green-600">Running</span>
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Run Button */}
+            {(cell.type === "code" || cell.type === "ml-trainer") && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleRunCell}
+                disabled={isRunning || isExecuting}
+                className="h-8 w-8 p-0"
+                title="Run cell"
+              >
+                {isRunning || isExecuting ? <Square className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+              </Button>
+            )}
+
+            {/* Delete Button */}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleRemoveClick}
+              className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+              title="Delete cell"
+            >
+              <Trash2 className="h-3 w-3" />
+            </Button>
+          </div>
         </div>
 
-        <div className="flex items-center">
-          <input
-            type="text"
-            className="w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
-            placeholder="Cell title"
-            value={title}
-            onChange={handleTitleChange}
-            onBlur={handleTitleBlur}
-            onKeyDown={handleTitleKeyDown}
-          />
-          <button
-            type="button"
-            onClick={handleRemoveClick}
-            className="ml-2 rounded-md bg-red-500 px-3 py-1 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 text-sm transition-colors"
-            aria-label="Delete cell"
-          >
-            Delete
-          </button>
+        {/* Cell Title */}
+        <div className="mt-2">
+          {isEditing ? (
+            <Input
+              type="text"
+              value={title}
+              onChange={handleTitleChange}
+              onBlur={handleTitleSubmit}
+              onKeyDown={handleTitleKeyDown}
+              className="text-lg font-semibold"
+              placeholder="Enter cell title..."
+              autoFocus
+            />
+          ) : (
+            <h3
+              className="text-lg font-semibold cursor-pointer hover:text-primary transition-colors"
+              onClick={() => setIsEditing(true)}
+              title="Click to edit title"
+            >
+              {title || "Untitled Cell"}
+            </h3>
+          )}
         </div>
-      </div>
-      <div className="p-4">{renderCellContent()}</div>
-    </div>
+      </CardHeader>
+
+      <CardContent className="pt-0">
+        <div className="min-h-[200px]">{renderCellContent()}</div>
+      </CardContent>
+    </Card>
   )
 }
 
-export { NotebookCell }
 export default NotebookCell

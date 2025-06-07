@@ -25,7 +25,7 @@ import {
 } from "@/lib/ml-models"
 import { Brain, Target, AlertCircle, CheckCircle, Play, Settings } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
-import { AutoMLTrainer } from "@/components/automl-trainer"
+import { EnhancedMLTrainer } from "@/components/enhanced-ml-trainer"
 
 export function MLModelTrainer() {
   const { processedData, columns, columnTypes, addTrainedModel } = useData()
@@ -274,7 +274,7 @@ export function MLModelTrainer() {
       <Tabs defaultValue="manual" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="manual">Manual Training</TabsTrigger>
-          <TabsTrigger value="automl">AutoML</TabsTrigger>
+          <TabsTrigger value="automl">Enhanced ML</TabsTrigger>
           <TabsTrigger value="results">Training Results</TabsTrigger>
         </TabsList>
 
@@ -400,7 +400,7 @@ export function MLModelTrainer() {
         </TabsContent>
 
         <TabsContent value="automl" className="space-y-4">
-          <AutoMLTrainer />
+          <EnhancedMLTrainer />
         </TabsContent>
 
         <TabsContent value="results" className="space-y-4">
