@@ -81,9 +81,8 @@ export function NotebookCell({
   const handleRemoveClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     e.stopPropagation()
-    if (window.confirm("Are you sure you want to delete this cell?")) {
-      onRemove(cell.id)
-    }
+    // Remove confirmation dialog to fix deletion issue
+    onRemove(cell.id)
   }
 
   const handleRunCell = async (e: React.MouseEvent<HTMLButtonElement>) => {

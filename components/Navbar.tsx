@@ -31,7 +31,7 @@ export function Navbar({ onToggleSidebar }: NavbarProps) {
             <Link href="/notebook" className="nav-item">
               Notebook
             </Link>
-            <Link href="/docs" className="nav-item">
+            <Link href="/docs" className="nav-item" prefetch={true}>
               Documentation
             </Link>
           </nav>
@@ -39,7 +39,7 @@ export function Navbar({ onToggleSidebar }: NavbarProps) {
 
         <div className="flex items-center gap-4">
           <Button variant="outline" size="sm" asChild>
-            <Link href="/docs" className="hidden sm:flex items-center gap-2">
+            <Link href="/docs" className="hidden sm:flex items-center gap-2" prefetch={true}>
               <FileSpreadsheet className="h-4 w-4" />
               Documentation
             </Link>

@@ -23,6 +23,8 @@ import {
   Bookmark,
   Copy,
   Check,
+  Brain,
+  Clock,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { NavigationBreadcrumb } from "@/components/navigation-breadcrumb"
@@ -87,6 +89,16 @@ const DocsPage = () => {
       ],
     },
     {
+      id: "ml-features",
+      title: "Machine Learning Features",
+      icon: <Brain className="h-4 w-4" />,
+      description: "Information about upcoming machine learning capabilities",
+      subsections: [
+        { id: "ml-roadmap", title: "ML Feature Roadmap", description: "Planned ML features and timeline" },
+        { id: "ml-status", title: "Development Status", description: "Current status of ML implementation" },
+      ],
+    },
+    {
       id: "troubleshooting",
       title: "Troubleshooting",
       icon: <HelpCircle className="h-4 w-4" />,
@@ -107,11 +119,12 @@ const DocsPage = () => {
     const title = subsection?.title || section?.title || "Documentation"
     const subtitle = subsection ? section?.title : undefined
 
-    navigateTo("/docs", title, subtitle, {
+    navigateTo("/docs", title, {
       sectionId,
       subsectionId,
       section: "docs",
       subsection: subsectionId || sectionId,
+      subtitle
     })
 
     setActiveSection(sectionId)
@@ -299,6 +312,157 @@ const DocsPage = () => {
           {/* Main Content */}
           <div className="lg:col-span-3">
             <Breadcrumb />
+            
+            {/* ML Features Section */}
+            {activeSection === "ml-features" && (
+              <div className="space-y-6">
+                {(!activeSubsection || activeSubsection === "ml-roadmap") && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <Brain className="h-5 w-5 mr-2" />
+                        ML Feature Roadmap
+                      </CardTitle>
+                      <CardDescription>
+                        Planned machine learning capabilities and development timeline
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <Alert className="bg-yellow-50 border-yellow-200">
+                        <Zap className="h-4 w-4 text-yellow-600" />
+                        <AlertTitle>Coming Soon</AlertTitle>
+                        <AlertDescription className="text-yellow-700">
+                          Machine learning features are currently under active development and will be available in an upcoming release.
+                        </AlertDescription>
+                      </Alert>
+                      
+                      <p>
+                        We're working hard to bring powerful machine learning capabilities to DataNotebook. Our ML features
+                        are designed to make advanced analytics accessible to users of all skill levels.
+                      </p>
+                      
+                      <h3 className="font-semibold text-lg mt-6">Planned ML Features</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-base">ML Model Training</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-sm text-muted-foreground">
+                              Train various machine learning models on your data with customizable parameters and evaluation metrics.
+                            </p>
+                          </CardContent>
+                        </Card>
+                        
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-base">AutoML</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-sm text-muted-foreground">
+                              Automatically train and compare multiple ML models to find the best performer for your specific dataset.
+                            </p>
+                          </CardContent>
+                        </Card>
+                        
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-base">ML Prediction</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-sm text-muted-foreground">
+                              Make predictions on new data using your trained models with easy-to-use interfaces.
+                            </p>
+                          </CardContent>
+                        </Card>
+                        
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-base">Model Insights</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-sm text-muted-foreground">
+                              Understand your models with feature importance, partial dependence plots, and other interpretability tools.
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                
+                {activeSubsection === "ml-status" && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <HelpCircle className="h-5 w-5 mr-2" />
+                        Development Status
+                      </CardTitle>
+                      <CardDescription>
+                        Current status of machine learning implementation
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <Alert className="bg-yellow-50 border-yellow-200">
+                        <Zap className="h-4 w-4 text-yellow-600" />
+                        <AlertTitle>Under Development</AlertTitle>
+                        <AlertDescription className="text-yellow-700">
+                          Our ML features are currently under active development and temporarily unavailable.
+                        </AlertDescription>
+                      </Alert>
+                      
+                      <p>
+                        We're working on implementing robust machine learning capabilities that will allow you to train models,
+                        make predictions, and gain insights from your data. These features will be available in an upcoming release.
+                      </p>
+                      
+                      <h3 className="font-semibold text-lg mt-6">Development Timeline</h3>
+                      <div className="space-y-4 mt-3">
+                        <div className="flex items-start gap-3 p-3 border rounded-lg">
+                          <div className="bg-green-100 text-green-700 p-2 rounded-full">
+                            <Check className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium">Phase 1: Architecture Design</h4>
+                            <p className="text-sm text-muted-foreground mt-1">Completed</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start gap-3 p-3 border rounded-lg">
+                          <div className="bg-blue-100 text-blue-700 p-2 rounded-full">
+                            <ArrowLeft className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium">Phase 2: Core Implementation</h4>
+                            <p className="text-sm text-muted-foreground mt-1">In Progress</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start gap-3 p-3 border rounded-lg opacity-60">
+                          <div className="bg-gray-100 text-gray-700 p-2 rounded-full">
+                            <Clock className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium">Phase 3: Testing & Optimization</h4>
+                            <p className="text-sm text-muted-foreground mt-1">Upcoming</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start gap-3 p-3 border rounded-lg opacity-60">
+                          <div className="bg-gray-100 text-gray-700 p-2 rounded-full">
+                            <Clock className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium">Phase 4: Release</h4>
+                            <p className="text-sm text-muted-foreground mt-1">Upcoming</p>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            )}
 
             {/* Getting Started Section */}
             {activeSection === "getting-started" && (

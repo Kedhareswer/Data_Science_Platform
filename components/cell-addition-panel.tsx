@@ -25,6 +25,8 @@ interface CellTypeOption {
   color: string
   requiresData?: boolean
   category: "data" | "analysis" | "ml" | "utility"
+  disabled?: boolean
+  disabledReason?: string
 }
 
 const cellTypes: CellTypeOption[] = [
@@ -97,6 +99,8 @@ const cellTypes: CellTypeOption[] = [
     color: "bg-red-50 text-red-700 border-red-200",
     requiresData: true,
     category: "ml",
+    disabled: true,
+    disabledReason: "ML features are currently under development and will be available soon",
   },
   {
     type: "ml-predictor",
@@ -106,6 +110,8 @@ const cellTypes: CellTypeOption[] = [
     color: "bg-pink-50 text-pink-700 border-pink-200",
     requiresData: true,
     category: "ml",
+    disabled: true,
+    disabledReason: "ML features are currently under development and will be available soon",
   },
   {
     type: "ml-insights",
@@ -115,6 +121,8 @@ const cellTypes: CellTypeOption[] = [
     color: "bg-cyan-50 text-cyan-700 border-cyan-200",
     requiresData: true,
     category: "ml",
+    disabled: true,
+    disabledReason: "ML features are currently under development and will be available soon",
   },
   {
     type: "auto-ml",
@@ -124,6 +132,8 @@ const cellTypes: CellTypeOption[] = [
     color: "bg-violet-50 text-violet-700 border-violet-200",
     requiresData: true,
     category: "ml",
+    disabled: true,
+    disabledReason: "ML features are currently under development and will be available soon",
   },
 ]
 
@@ -187,15 +197,20 @@ export function CellAdditionPanel({ insertIndex, onClose }: CellAdditionPanelPro
     if (cellType.requiresData && processedData.length === 0) {
       return false
     }
+    if (cellType.disabled) {
+      return false
+    }
     return true
   })
 
   const unavailableCells = cellTypes.filter((cellType) => {
-    if (cellType.requiresData && processedData.length === 0) {
+    if (cellType.requiresData && processedData.length === 0 && !cellType.disabled) {
       return true
     }
     return false
   })
+  
+  const disabledMlCells = cellTypes.filter((cellType) => cellType.disabled)
 
   const groupedAvailableCells = availableCells.reduce(
     (acc, cell) => {
@@ -301,6 +316,41 @@ export function CellAdditionPanel({ insertIndex, onClose }: CellAdditionPanelPro
                       <p className="text-sm text-muted-foreground">{cellType.description}</p>
                       <p className="text-xs text-orange-600 mt-2 font-medium">
                         Upload data first to enable this cell type
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Disabled ML Features */}
+          {disabledMlCells.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold mb-4 text-muted-foreground flex items-center gap-2">
+                Machine Learning Features
+                <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200">
+                  Coming Soon
+                </Badge>
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {disabledMlCells.map((cellType) => (
+                  <Card key={cellType.type} className="opacity-50 cursor-not-allowed border-2 border-dashed">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-lg bg-muted">{cellType.icon}</div>
+                          <CardTitle className="text-base">{cellType.label}</CardTitle>
+                        </div>
+                        <Badge variant="outline" className={`${cellType.color} text-xs`}>
+                          {cellType.type}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <p className="text-sm text-muted-foreground">{cellType.description}</p>
+                      <p className="text-xs text-yellow-600 mt-2 font-medium">
+                        {cellType.disabledReason}
                       </p>
                     </CardContent>
                   </Card>
