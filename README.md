@@ -335,40 +335,6 @@ graph TD
 
 </div>
 
-## 📈 Performance Metrics
-
-<div align="center">
-
-### 🏆 *Lighthouse Performance Scores*
-
-</div>
-
-```mermaid
-xychart-beta
-    title "Lighthouse Scores"
-    x-axis [Performance, Accessibility, "Best Practices", SEO]
-    y-axis "Score" 0 --> 100
-    bar [98, 100, 96, 100]
-```
-
-<div align="center">
-
-| 🎯 Metric | 📊 Score | 🏆 Status |
-|-----------|----------|-----------|
-| **🚀 Performance** | 98/100 | 🟢 Excellent |
-| **♿ Accessibility** | 100/100 | 🟢 Perfect |
-| **✅ Best Practices** | 96/100 | 🟢 Excellent |
-| **🔍 SEO** | 100/100 | 🟢 Perfect |
-
-### 📊 *Core Web Vitals*
-
-| 🎯 Metric | 📈 Value | 🎨 Status |
-|-----------|----------|-----------|
-| **⚡ First Contentful Paint** | < 1.2s | 🟢 Fast |
-| **🎨 Largest Contentful Paint** | < 2.5s | 🟢 Fast |
-| **📱 Cumulative Layout Shift** | < 0.1 | 🟢 Stable |
-
-</div>
 
 ## 🤝 Contributing
 
@@ -379,18 +345,6 @@ xychart-beta
 **We welcome contributions from developers who love beautiful, functional code**
 
 </div>
-
-```mermaid
-gitgraph
-    commit id: "Initial Commit"
-    branch feature/amazing-feature
-    checkout feature/amazing-feature
-    commit id: "Add Feature"
-    commit id: "Add Tests"
-    checkout main
-    merge feature/amazing-feature
-    commit id: "Feature Merged! 🎉"
-```
 
 <details>
 <summary>🚀 <strong>Contribution Flow</strong></summary>
@@ -455,31 +409,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 </div>
 
-```mermaid
-mindmap
-  root((🙏 Thanks))
-    [Next.js]
-      React Framework
-      App Router
-      Server Components
-    [Radix UI]
-      Accessible Components
-      Unstyled Primitives
-      Design System
-    [Tailwind CSS]
-      Utility Classes
-      Responsive Design
-      Custom Styling
-    [TypeScript]
-      Type Safety
-      Developer Experience
-      Code Quality
-    [Recharts]
-      Data Visualization
-      Interactive Charts
-      React Integration
-```
-
 <div align="center">
 
 | 🛠️ Technology | 🎯 Purpose | 🔗 Link |
@@ -495,45 +424,12 @@ mindmap
 
 ---
 
-<div align="center">
-
-### 🎨 *Made with handwritten love and digital magic* ✨
-
-**Created by [Kedhareswer](https://github.com/Kedhareswer)**
-
-*"Where data analysis meets artistic expression"*
-
-[![GitHub](https://img.shields.io/badge/GitHub-Kedhareswer-181717?style=for-the-badge&logo=github)](https://github.com/Kedhareswer)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/kedhareswer)
-
----
-
-### 🌟 **Star this repo if you love handwritten data analysis!** ⭐
-
-</div>
-
 ## ⭐ Star History
 
 <div align="center">
 
-### 📈 *Watch our handwritten journey grow!*
-
 **Help us reach more data enthusiasts by starring the repository**
 
-</div>
-
-```mermaid
-gitgraph
-    commit id: "🎨 Initial Release"
-    commit id: "📊 Data Viz Added"
-    commit id: "🎭 UI Improvements"
-    commit id: "📚 Docs Enhanced"
-    commit id: "🐛 Bug Fixes"
-    commit id: "✨ New Features"
-    commit id: "🌟 Growing Stars!"
-```
-
-<div align="center">
 
 [![Star History Chart](https://api.star-history.com/svg?repos=Kedhareswer/Data_Science_Platform&type=Date)](https://star-history.com/#Kedhareswer/Data_Science_Platform&Date)
 
