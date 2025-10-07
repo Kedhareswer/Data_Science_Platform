@@ -154,7 +154,7 @@ graph TB
 | **📊 Data** | React Context API, PapaParse, XLSX | State management and file processing |
 | **📈 Visualization** | Recharts, Custom Charts | Interactive data visualization |
 | **🔧 Development** | ESLint, Prettier, Vercel Analytics | Code quality and performance monitoring |
-| **🎨 Styling** | Comic Sans MS, Brush Script MT | Unique handwritten font experience |
+| **🎨 Styling** | Comic Sans MS, Brush Script MT, Lucida Handwriting, Bradley Hand, Segoe Print, cursive | Unique handwritten font experience |
 
 </details>
 
