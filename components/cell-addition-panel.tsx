@@ -170,13 +170,13 @@ export function CellAdditionPanel({ insertIndex, onClose }: CellAdditionPanelPro
       setIsOpen(false)
       onClose?.()
 
-      // Scroll to the new cell after a brief delay
+      // Scroll to the new cell after a brief delay without triggering navigation
       setTimeout(() => {
         const cellElement = document.getElementById(`cell-${cellId}`)
         if (cellElement) {
           cellElement.scrollIntoView({ behavior: "smooth", block: "center" })
         }
-      }, 100)
+      }, 150) // Slightly longer delay to ensure DOM is updated
     } catch (error) {
       toast({
         title: "Failed to add cell",
@@ -231,8 +231,9 @@ export function CellAdditionPanel({ insertIndex, onClose }: CellAdditionPanelPro
           variant="outline"
           className="gap-2 hover:bg-primary/5 border-dashed border-2 hover:border-primary/20 transition-all duration-200"
           onClick={(e) => {
-            e.preventDefault();
-            setIsOpen(true);
+            e.preventDefault()
+            e.stopPropagation()
+            setIsOpen(true)
           }}
         >
           <Plus className="h-4 w-4" />

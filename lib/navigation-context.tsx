@@ -135,9 +135,14 @@ export function NavigationProvider({ children }: { children: React.ReactNode }) 
         title: pageTitle,
         metadata,
       })
-      router.push(path)
+      
+      // Only navigate if we're going to a different page
+      // This prevents unnecessary scrolling to top on the same page
+      if (pathname !== path) {
+        router.push(path)
+      }
     },
-    [addToHistory, router],
+    [addToHistory, router, pathname],
   )
 
   const addBookmark = useCallback((bookmark: Omit<Bookmark, "id" | "timestamp">) => {

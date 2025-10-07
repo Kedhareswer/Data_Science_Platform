@@ -23,18 +23,6 @@ export function Navbar({ onToggleSidebar }: NavbarProps) {
             <BookOpen className="h-6 w-6" />
             <span className="hidden font-bold sm:inline-block">DataNotebook</span>
           </Link>
-
-          <nav className="hidden md:flex items-center space-x-4">
-            <Link href="/" className="nav-item">
-              Home
-            </Link>
-            <Link href="/notebook" className="nav-item">
-              Notebook
-            </Link>
-            <Link href="/docs" className="nav-item" prefetch={true}>
-              Documentation
-            </Link>
-          </nav>
         </div>
 
         <div className="flex items-center gap-4">

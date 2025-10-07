@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useCallback, useEffect } from "react"
-import { setupNavigationPrevention } from "@/lib/prevent-navigation"
+import { setupNavigationPrevention, preventScrollRestoration } from "@/lib/prevent-navigation"
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -35,6 +35,7 @@ export default function NotebookPage() {
   // Prevent default navigation behavior that causes page refreshes
   useEffect(() => {
     setupNavigationPrevention()
+    preventScrollRestoration()
   }, [])
 
   const handleDragEnd = useCallback(
@@ -134,6 +135,7 @@ export default function NotebookPage() {
   const handleUploadClick = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault()
+      e.stopPropagation()
       navigateTo?.("/", "Home", "Upload Data")
     },
     [navigateTo],
@@ -161,6 +163,7 @@ export default function NotebookPage() {
       setCurrentCellId(cellId || null)
       const cell = cellId ? notebookCells.find((c) => c.id === cellId) : undefined
       if (cell) {
+        // This will now only update history without causing navigation since we're on the same page
         navigateTo?.("/notebook", "Data Notebook", cell.title)
       }
     },
@@ -170,6 +173,7 @@ export default function NotebookPage() {
   const handleCellClick = useCallback(
     (e: React.MouseEvent, cellId: string) => {
       // Prevent event bubbling that might cause scrolling
+      e.preventDefault()
       e.stopPropagation()
       handleCellNavigate(cellId)
     },
@@ -186,49 +190,53 @@ export default function NotebookPage() {
         onCellSelect={handleCellNavigate}
       />
 
+      {/* Sticky Navigation Header */}
+      <div className={`sticky top-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b transition-all duration-200 ${navSidebarOpen ? "ml-80" : ""}`}>
+        <div className="container mx-auto px-6 py-4 max-w-6xl">
+          <NavigationBreadcrumb />
+
+          {/* Notebook Controls */}
+          {notebookCells.length > 0 && (
+            <div className="mt-4 flex items-center justify-between">
+              <NotebookNavigation currentCellId={currentCellId || undefined} onCellNavigate={handleCellNavigate} />
+
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExecuteAll}
+                  disabled={isExecutingAll}
+                  className="gap-2"
+                >
+                  <Play className="h-4 w-4" />
+                  {isExecutingAll ? "Running..." : "Run All"}
+                </Button>
+
+                <Button type="button" variant="outline" size="sm" onClick={handleExportNotebook} className="gap-2">
+                  <Download className="h-4 w-4" />
+                  Export
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleResetNotebook}
+                  className="gap-2 text-red-600 hover:text-red-700"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Reset
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Main Content Area */}
       <div className={`transition-all duration-200 ${navSidebarOpen ? "ml-80" : ""}`}>
         <div className="container mx-auto p-6 max-w-6xl">
-          {/* Navigation Header */}
-          <div className="mb-6">
-            <NavigationBreadcrumb />
-
-            {/* Notebook Controls */}
-            {notebookCells.length > 0 && (
-              <div className="mt-4 flex items-center justify-between">
-                <NotebookNavigation currentCellId={currentCellId || undefined} onCellNavigate={handleCellNavigate} />
-
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleExecuteAll}
-                    disabled={isExecutingAll}
-                    className="gap-2"
-                  >
-                    <Play className="h-4 w-4" />
-                    {isExecutingAll ? "Running..." : "Run All"}
-                  </Button>
-
-                  <Button type="button" variant="outline" size="sm" onClick={handleExportNotebook} className="gap-2">
-                    <Download className="h-4 w-4" />
-                    Export
-                  </Button>
-
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleResetNotebook}
-                    className="gap-2 text-red-600 hover:text-red-700"
-                  >
-                    <RotateCcw className="h-4 w-4" />
-                    Reset
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
 
           {/* Notebook Content */}
           {notebookCells.length === 0 ? (

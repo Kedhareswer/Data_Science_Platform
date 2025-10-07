@@ -1,5 +1,12 @@
 "use client"
 
+// Additional utility to prevent scroll restoration
+export function preventScrollRestoration() {
+  if (typeof window !== 'undefined' && 'scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+}
+
 /**
  * Utility to prevent default navigation behavior on links and buttons
  * This helps avoid full page refreshes when using client-side navigation
@@ -36,6 +43,11 @@ export function setupNavigationPrevention() {
       // Buttons in forms without type default to 'submit' which causes page refresh
       button.setAttribute('type', 'button');
     }
+    
+    // Prevent buttons from causing unwanted scrolling by ensuring they have proper type
+    if (button && !button.hasAttribute('type')) {
+      button.setAttribute('type', 'button');
+    }
   }, { capture: true });
   
   // Prevent form submissions that would cause page refresh
@@ -45,5 +57,10 @@ export function setupNavigationPrevention() {
     if (!form.hasAttribute('action')) {
       e.preventDefault();
     }
+  }, { capture: true });
+  
+  // Prevent hash changes from causing scroll jumps
+  window.addEventListener('hashchange', (e) => {
+    e.preventDefault();
   }, { capture: true });
 }
