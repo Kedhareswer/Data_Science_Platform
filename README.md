@@ -20,7 +20,7 @@
 
 <div align="center">
 
-### 🎨 *"Where data meets creativity in a handwritten world"*
+### 🎨 *"Where data meets creativity and lazy"*
 
 **Transform your data into actionable insights through an intuitive, beautifully crafted notebook interface with a unique handwritten aesthetic.**
 
