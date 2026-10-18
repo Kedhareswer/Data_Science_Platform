@@ -128,6 +128,17 @@ Your files never leave your browser — there are no API routes. The Python runt
 time you use it (no data is sent), and pure-Python packages you import are fetched from PyPI. See the in-app
 [privacy page](app/privacy/page.tsx).
 
+### Security
+
+- No API routes or server-side execution; `npm audit --omit=dev` reports **0 vulnerabilities** in runtime dependencies.
+- Strict security headers (CSP, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, COOP).
+  The CSP only lets the app (and its Python worker) connect to its own origin, the Pyodide CDN and PyPI, so code in an
+  imported notebook cannot send your data to other servers.
+- Markdown is rendered without raw HTML; CSV exports neutralise spreadsheet formulas; user code and data are never
+  interpolated into Python source.
+- Dev tooling: `npm audit` still lists the `braces` advisory pulled in by `eslint-config-next`. It only affects local
+  linting and has no patched release yet.
+
 ## 🗺️ What changed in v2
 
 v2 is a ground-up modernization of the original v0.dev prototype:

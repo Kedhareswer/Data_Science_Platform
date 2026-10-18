@@ -151,7 +151,8 @@ export function DataTableCell({ cellId }: CellProps) {
 
   const download = (format: "csv" | "json") => {
     const name = `${baseName(fileName)}${deferredQuery ? "-filtered" : ""}`
-    if (format === "csv") downloadText(Papa.unparse(sorted, { columns }), `${name}.csv`, "text/csv")
+    if (format === "csv")
+      downloadText(Papa.unparse(sorted, { columns, escapeFormulae: true }), `${name}.csv`, "text/csv")
     else downloadText(JSON.stringify(sorted, null, 2), `${name}.json`, "application/json")
   }
 

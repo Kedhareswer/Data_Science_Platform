@@ -106,3 +106,11 @@ scripts/                  check-python-helpers.mjs
 - `next/font/google` downloads fonts at build time (network needed for `npm run build`).
 - `<Analytics />` (Vercel Web Analytics) only renders when `process.env.VERCEL` is set, to avoid 404s elsewhere.
 - `NEXT_PUBLIC_*` variables are inlined at build time — rebuild after changing them.
+- **Security headers / CSP** are set in `next.config.ts`. `connect-src` only allows this origin, the Pyodide origin
+  and PyPI, so Python code (which runs in a worker that inherits the CSP) cannot send data elsewhere. If you add a
+  feature that talks to a new host, add it there deliberately. `NEXT_PUBLIC_PYODIDE_INDEX_URL` may be relative
+  (e.g. `/pyodide/` served from `public/pyodide`, which is git-ignored).
+- CSV exports must neutralise spreadsheet formulas (`escapeFormulae` for Papa, `csvField` in `components/charts/export.ts`).
+- `npm audit` reports `braces` (via `eslint-config-next` → `fast-glob` → `micromatch`) — dev-only lint tooling with no
+  patched release yet; production dependencies audit clean (`npm audit --omit=dev`). `postcss-selector-parser` is
+  pinned to a patched version through `overrides` in `package.json`.

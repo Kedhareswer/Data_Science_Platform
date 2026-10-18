@@ -31,3 +31,6 @@ yarn-error.log*
 .idea
 .vscode/*
 !.vscode/extensions.json
+
+# self-hosted Pyodide distribution (see .env.example)
+/public/pyodide

@@ -39,7 +39,9 @@ function post(message: WorkerResponse) {
   self.postMessage(message)
 }
 
-async function load(indexURL: string): Promise<Pyodide> {
+async function load(configuredURL: string): Promise<Pyodide> {
+  // Allow relative index URLs (self-hosting, e.g. "/pyodide/").
+  const indexURL = new URL(configuredURL, self.location.href).href
   if (pyodide) return pyodide
   if (loading) return loading
   loading = (async () => {

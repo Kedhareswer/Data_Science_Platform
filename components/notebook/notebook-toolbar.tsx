@@ -57,7 +57,11 @@ export function NotebookToolbar({ onRunningCell }: { onRunningCell: (id: string 
       if (!isNotebookFile(parsed)) throw new Error("This is not a DataNotebook file.")
       importNotebook(parsed)
       toast.success(`Imported ${parsed.cells.length} cells`, {
-        description: parsed.dataset ? "Including the embedded dataset." : "Load the matching dataset to run the cells.",
+        description: `${parsed.dataset ? "Including the embedded dataset." : "Load the matching dataset to run the cells."}${
+          parsed.cells.some((c) => c.type === "code")
+            ? " Review Python cells before running notebooks from others."
+            : ""
+        }`,
       })
     } catch (err) {
       toast.error("Import failed", { description: err instanceof Error ? err.message : String(err) })

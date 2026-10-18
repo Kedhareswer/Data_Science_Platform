@@ -55,6 +55,11 @@ export default function PrivacyPage() {
           dataset contents. Operators can self-host via <code>NEXT_PUBLIC_PYODIDE_INDEX_URL</code>.
         </li>
         <li>
+          <strong>PyPI</strong> — if Python code imports a pure-Python package that Pyodide doesn&apos;t bundle (for
+          example seaborn), it is downloaded from pypi.org. A Content-Security-Policy restricts the app and its Python
+          worker to this site, the Pyodide CDN and PyPI, so code cannot send your data to other servers.
+        </li>
+        <li>
           <strong>Vercel Web Analytics</strong> — when deployed on Vercel with analytics enabled, anonymous, cookie-less
           page-view metrics are collected. No dataset contents are sent.
         </li>

@@ -150,7 +150,9 @@ export async function exportChartPng(
 
 function csvField(value: unknown): string {
   if (value === null || value === undefined) return ""
-  const text = typeof value === "number" && !Number.isFinite(value) ? "" : String(value)
+  let text = typeof value === "number" && !Number.isFinite(value) ? "" : String(value)
+  // Neutralise spreadsheet formulas (CSV injection) in text cells.
+  if (typeof value === "string" && /^[=+\-@\t\r]/.test(text)) text = `'${text}`
   return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text
 }
 
