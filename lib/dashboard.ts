@@ -3,6 +3,8 @@
 export type Aggregation = "count" | "sum" | "mean" | "median" | "min" | "max" | "distinct"
 export type WidgetChart = "bar" | "line" | "area" | "pie" | "scatter"
 export type WidgetSize = "sm" | "md" | "lg" | "full"
+/** How date x-axes are bucketed; "auto" picks day / month / year from the data's span. */
+export type DateBucket = "auto" | "day" | "month" | "year"
 
 interface WidgetBase {
   id: string
@@ -23,8 +25,10 @@ export interface ChartWidget extends WidgetBase {
   x?: string
   y?: string
   aggregation: Aggregation
-  /** Max categories shown (rest grouped as "Other"). */
+  /** Max categories shown (rest grouped as "Other"); bin count for wide numeric x axes. */
   limit?: number
+  /** Date x-axis bucketing (default "auto"). */
+  bucket?: DateBucket
 }
 
 export interface TableWidget extends WidgetBase {
@@ -48,6 +52,9 @@ export interface DashboardFilter {
   /** Numeric range. */
   min?: number
   max?: number
+  /** Date range (inclusive, ISO `YYYY-MM-DD`). */
+  from?: string
+  to?: string
 }
 
 export interface DashboardState {
