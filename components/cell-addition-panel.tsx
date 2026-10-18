@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog"
 import { Plus, Database, BarChart3, Search, Settings, FileText, Code, Brain, Target, Sparkles } from "lucide-react"
 import { useData, type CellType } from "@/lib/data-context"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 
 interface CellTypeOption {
   type: CellType
@@ -151,7 +151,6 @@ interface CellAdditionPanelProps {
 
 export function CellAdditionPanel({ insertIndex, onClose }: CellAdditionPanelProps) {
   const { addCell, processedData } = useData()
-  const { toast } = useToast()
   const [isOpen, setIsOpen] = useState(false)
 
   const handleAddCell = (e: React.MouseEvent, cellType: CellType) => {
@@ -162,10 +161,7 @@ export function CellAdditionPanel({ insertIndex, onClose }: CellAdditionPanelPro
       const cellId = addCell(cellType, insertIndex)
       const cellInfo = cellTypes.find((ct) => ct.type === cellType)
 
-      toast({
-        title: "Cell added",
-        description: `Added ${cellInfo?.label || cellType} cell to notebook`
-      })
+      toast.success("Cell added", { description: `Added ${cellInfo?.label || cellType} cell to notebook` })
 
       setIsOpen(false)
       onClose?.()
@@ -178,11 +174,7 @@ export function CellAdditionPanel({ insertIndex, onClose }: CellAdditionPanelPro
         }
       }, 150) // Slightly longer delay to ensure DOM is updated
     } catch (error) {
-      toast({
-        title: "Failed to add cell",
-        description: "There was an error adding the cell to your notebook",
-        variant: "destructive"
-      })
+      toast.error("Failed to add cell", { description: "There was an error adding the cell to your notebook" })
     }
   }
 

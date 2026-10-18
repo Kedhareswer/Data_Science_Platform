@@ -454,7 +454,7 @@ export function DataProfiler() {
                                 {column.topValues.slice(0, 5).map((item, index) => (
                                   <div
                                     key={index}
-                                    className="flex items-center justify-between p-2 bg-muted/50 rounded"
+                                    className="flex items-center justify-between p-2 bg-muted/50 rounded-sm"
                                   >
                                     <div className="flex items-center gap-2">
                                       <Badge variant="outline" className="text-xs">
@@ -665,19 +665,19 @@ export function DataProfiler() {
                     <h4 className="font-semibold mb-2">Correlation Strength Guide</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-red-500 rounded"></div>
+                        <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
                         <span>Strong (&gt;=0.8)</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-orange-500 rounded"></div>
+                        <div className="w-3 h-3 bg-orange-500 rounded-sm"></div>
                         <span>Moderate (&gt;=0.6)</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-yellow-500 rounded"></div>
+                        <div className="w-3 h-3 bg-yellow-500 rounded-sm"></div>
                         <span>Weak (&gt;=0.4)</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-gray-500 rounded"></div>
+                        <div className="w-3 h-3 bg-gray-500 rounded-sm"></div>
                         <span>Very Weak (&lt;0.4)</span>
                       </div>
                     </div>

@@ -114,7 +114,7 @@ export function NavigationBreadcrumb({
 
         {pathSegments.map((segment, index) => (
           <React.Fragment key={index}>
-            <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
             <Link
               href={getSegmentPath(index)}
               className={cn(
@@ -183,7 +183,7 @@ export function NavigationBreadcrumb({
                     <DropdownMenuItem key={bookmark.id} asChild>
                       <Link href={bookmark.path} className="flex items-center justify-between">
                         <span className="truncate">{bookmark.title}</span>
-                        <Bookmark className="h-3 w-3 ml-2 flex-shrink-0" />
+                        <Bookmark className="h-3 w-3 ml-2 shrink-0" />
                       </Link>
                     </DropdownMenuItem>
                   ))}

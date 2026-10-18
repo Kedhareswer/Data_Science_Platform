@@ -1,30 +1,48 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import type { Metadata, Viewport } from "next"
+import { Fira_Code, Kalam } from "next/font/google"
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/sonner"
 import { DataProvider } from "@/lib/data-context"
 import { NavigationProvider } from "@/lib/navigation-context"
-import { Toaster } from "@/components/ui/toaster"
-import { Analytics } from "@vercel/analytics/react"
 
-const inter = Inter({ subsets: ["latin"] })
+const kalam = Kalam({
+  subsets: ["latin"],
+  weight: ["300", "400", "700"],
+  variable: "--font-kalam",
+  display: "swap",
+})
+
+const firaCode = Fira_Code({
+  subsets: ["latin"],
+  variable: "--font-fira-code",
+  display: "swap",
+})
 
 export const metadata: Metadata = {
-  title: "Data Analysis Platform",
-  description: "A comprehensive platform for data analysis and visualization with a soothing handwritten aesthetic",
-  generator: "v0.dev",
+  title: {
+    default: "DataNotebook",
+    template: "%s · DataNotebook",
+  },
+  description:
+    "A whimsical, handwritten-style data analysis notebook. Upload data, profile it, visualize it, run Python and train ML models — entirely in your browser.",
+  applicationName: "DataNotebook",
+  keywords: ["data analysis", "notebook", "visualization", "machine learning", "pyodide", "pandas"],
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fcfbf8" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f0f0f" },
+  ],
+}
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} font-handwritten`} suppressHydrationWarning>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+    <html lang="en" className={`${kalam.variable} ${firaCode.variable}`} suppressHydrationWarning>
+      <body>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <a href="#main-content" className="skip-link">
             Skip to main content
           </a>
@@ -32,10 +50,10 @@ export default function RootLayout({
             <DataProvider>
               {children}
               <Toaster />
-              <Analytics />
             </DataProvider>
           </NavigationProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   )

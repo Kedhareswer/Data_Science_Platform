@@ -12,7 +12,7 @@ import { BarChart3, Table, Gauge, Settings, Plus, LayoutDashboard, Save, Downloa
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
@@ -71,10 +71,7 @@ export function DashboardCreator() {
     setWidgets((prev) => [...prev, newWidget])
     setAddWidgetDialogOpen(false)
 
-    toast({
-      title: "Widget added",
-      description: `A new ${type} widget has been added to your dashboard.`,
-    })
+    toast.success("Widget added", { description: `A new ${type} widget has been added to your dashboard.` })
   }
 
   // Get default title for a widget type
@@ -173,11 +170,7 @@ export function DashboardCreator() {
   // Save dashboard
   const saveDashboard = () => {
     if (!dashboardNameInput.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter a dashboard name",
-        variant: "destructive",
-      })
+      toast.error("Error", { description: "Please enter a dashboard name" })
       return
     }
 
@@ -185,10 +178,7 @@ export function DashboardCreator() {
     setSaveDashboardDialogOpen(false)
     setDashboardNameInput("")
 
-    toast({
-      title: "Dashboard saved",
-      description: "Your dashboard has been saved successfully.",
-    })
+    toast.success("Dashboard saved", { description: "Your dashboard has been saved successfully." })
   }
 
   return (

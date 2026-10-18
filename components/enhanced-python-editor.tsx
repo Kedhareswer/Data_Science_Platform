@@ -27,7 +27,7 @@ import {
   Plus,
 } from "lucide-react"
 import { useData } from "@/lib/data-context"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 
 interface ExecutionResult {
   success: boolean
@@ -140,16 +140,9 @@ if not data.empty:
       setExecutionResult(result)
 
       if (result.success) {
-        toast({
-          title: "Code Executed Successfully",
-          description: `Execution completed in ${result.executionTime}ms`,
-        })
+        toast.success("Code Executed Successfully", { description: `Execution completed in ${result.executionTime}ms` })
       } else {
-        toast({
-          title: "Execution Failed",
-          description: result.error,
-          variant: "destructive",
-        })
+        toast.error("Execution Failed", { description: result.error })
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
@@ -159,11 +152,7 @@ if not data.empty:
         error: errorMessage,
       })
 
-      toast({
-        title: "Execution Failed",
-        description: errorMessage,
-        variant: "destructive",
-      })
+      toast.error("Execution Failed", { description: errorMessage })
     } finally {
       setIsExecuting(false)
     }
@@ -194,25 +183,14 @@ if not data.empty:
       const result = await response.json()
 
       if (result.success) {
-        toast({
-          title: "Package Installed",
-          description: result.message,
-        })
+        toast.success("Package Installed", { description: result.message })
         setNewPackage("")
         await loadInstalledPackages()
       } else {
-        toast({
-          title: "Installation Failed",
-          description: result.message,
-          variant: "destructive",
-        })
+        toast.error("Installation Failed", { description: result.message })
       }
     } catch (error) {
-      toast({
-        title: "Installation Failed",
-        description: "Failed to install package",
-        variant: "destructive",
-      })
+      toast.error("Installation Failed", { description: "Failed to install package" })
     } finally {
       setIsInstallingPackage(false)
     }
@@ -254,10 +232,7 @@ if not data.empty:
     if (output) {
       try {
         await navigator.clipboard.writeText(output)
-        toast({
-          title: "Copied",
-          description: "Output copied to clipboard",
-        })
+        toast.success("Copied", { description: "Output copied to clipboard" })
       } catch (err) {
         console.error("Failed to copy output:", err)
       }
@@ -626,7 +601,7 @@ else:
                       {suggestions.slice(0, 5).map((suggestion, index) => (
                         <button
                           key={index}
-                          className="block text-xs text-left hover:bg-muted p-1 rounded w-full"
+                          className="block text-xs text-left hover:bg-muted p-1 rounded-sm w-full"
                           onClick={() => {
                             const textarea = codeEditorRef.current
                             if (textarea) {
@@ -743,7 +718,7 @@ else:
                   {packages.length > 0 ? (
                     <div className="space-y-2">
                       {packages.map((pkg, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 border rounded">
+                        <div key={index} className="flex items-center justify-between p-2 border rounded-sm">
                           <div>
                             <span className="font-medium">{pkg.name}</span>
                             <span className="text-sm text-muted-foreground ml-2">v{pkg.version}</span>

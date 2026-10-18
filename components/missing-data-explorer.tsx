@@ -659,11 +659,11 @@ export function MissingDataExplorer() {
                       {/* Heatmap Legend */}
                       <div className="flex items-center gap-4 text-sm">
                         <div className="flex items-center gap-2">
-                          <div className="w-4 h-4 bg-green-500 rounded"></div>
+                          <div className="w-4 h-4 bg-green-500 rounded-sm"></div>
                           <span>Present</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <div className="w-4 h-4 bg-red-500 rounded"></div>
+                          <div className="w-4 h-4 bg-red-500 rounded-sm"></div>
                           <span>Missing</span>
                         </div>
                       </div>

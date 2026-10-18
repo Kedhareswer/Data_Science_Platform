@@ -27,7 +27,7 @@ import {
   Zap,
   Sparkles
 } from "lucide-react"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 
 interface AutoMLResult {
   modelId: string
@@ -84,11 +84,7 @@ export function AutoMLTrainer() {
   const trainModels = async () => {
     const validationError = validateTrainingInputs()
     if (validationError) {
-      toast({
-        title: "Validation Error",
-        description: validationError,
-        variant: "destructive",
-      })
+      toast.error("Validation Error", { description: validationError })
       return
     }
 
@@ -124,24 +120,13 @@ export function AutoMLTrainer() {
 
       if (result.success) {
         setAutoMLResult(result)
-        toast({
-          title: "AutoML Complete",
-          description: `Best model: ${result.bestAlgorithm} with score: ${result.bestScore.toFixed(4)}`,
-        })
+        toast.success("AutoML Complete", { description: `Best model: ${result.bestAlgorithm} with score: ${result.bestScore.toFixed(4)}` })
       } else {
-        toast({
-          title: "AutoML Failed",
-          description: result.error || "An error occurred during AutoML process",
-          variant: "destructive",
-        })
+        toast.error("AutoML Failed", { description: result.error || "An error occurred during AutoML process" })
       }
     } catch (error) {
       clearInterval(progressInterval)
-      toast({
-        title: "AutoML Failed",
-        description: error instanceof Error ? error.message : "An error occurred during AutoML process",
-        variant: "destructive",
-      })
+      toast.error("AutoML Failed", { description: error instanceof Error ? error.message : "An error occurred during AutoML process" })
     } finally {
       setIsTraining(false)
       setTrainingProgress(0)
@@ -165,23 +150,12 @@ export function AutoMLTrainer() {
       const result = await response.json()
 
       if (result.success) {
-        toast({
-          title: "Model Saved",
-          description: `Model "${modelName}" has been saved to your collection`,
-        })
+        toast.success("Model Saved", { description: `Model "${modelName}" has been saved to your collection` })
       } else {
-        toast({
-          title: "Save Failed",
-          description: result.error || "Failed to save model",
-          variant: "destructive",
-        })
+        toast.error("Save Failed", { description: result.error || "Failed to save model" })
       }
     } catch (error) {
-      toast({
-        title: "Save Failed",
-        description: error instanceof Error ? error.message : "An error occurred while saving the model",
-        variant: "destructive",
-      })
+      toast.error("Save Failed", { description: error instanceof Error ? error.message : "An error occurred while saving the model" })
     }
   }
 
@@ -406,7 +380,7 @@ export function AutoMLTrainer() {
                           <div className="w-2/3">
                             <div className="flex items-center">
                               <div
-                                className="bg-primary h-4 rounded"
+                                className="bg-primary h-4 rounded-sm"
                                 style={{
                                   width: `${Math.max(
                                     feature.importance * 100,

@@ -137,7 +137,7 @@ export function NotebookNavigation({ currentCellId, onCellNavigate }: NotebookNa
               onClick={(e) => handleCellClick(e, cell.id, cell.title, cell.type)}
               className={`flex items-center gap-3 p-3 ${currentCellId === cell.id ? "bg-muted" : ""}`}
             >
-              <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex items-center gap-2 shrink-0">
                 <span className="text-xs font-mono text-muted-foreground w-6">[{index + 1}]</span>
                 {getCellIcon(cell.type)}
               </div>
@@ -145,7 +145,7 @@ export function NotebookNavigation({ currentCellId, onCellNavigate }: NotebookNa
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium truncate">{cell.title}</span>
-                  <Badge variant="secondary" className="text-xs flex-shrink-0">
+                  <Badge variant="secondary" className="text-xs shrink-0">
                     {getCellTypeLabel(cell.type)}
                   </Badge>
                 </div>

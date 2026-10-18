@@ -1390,7 +1390,7 @@ export function MLModelComparison() {
                     ).map(([type, count]) => (
                       <div
                         key={type}
-                        className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-900 rounded"
+                        className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-900 rounded-sm"
                       >
                         <div className="flex items-center gap-2">
                           {getModelTypeIcon(type)}
@@ -1422,7 +1422,7 @@ export function MLModelComparison() {
                     ).map(([algorithm, count]) => (
                       <div
                         key={algorithm}
-                        className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-900 rounded"
+                        className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-900 rounded-sm"
                       >
                         <span className="capitalize">{algorithm}</span>
                         <Badge variant="outline">

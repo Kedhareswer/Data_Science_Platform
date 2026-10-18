@@ -15,7 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useData } from "@/lib/data-context"
 import { DataUploadPrompt } from "@/components/data-upload-prompt"
 import { Brain, Target, AlertCircle, CheckCircle, Play, Settings, Download, Trash2, BarChart3, Zap } from "lucide-react"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 
 interface MLModel {
   id: string
@@ -146,11 +146,7 @@ export function EnhancedMLTrainer() {
   const trainModel = async () => {
     const validationError = validateTrainingInputs()
     if (validationError) {
-      toast({
-        title: "Validation Error",
-        description: validationError,
-        variant: "destructive",
-      })
+      toast.error("Validation Error", { description: validationError })
       return
     }
 
@@ -204,25 +200,14 @@ export function EnhancedMLTrainer() {
 
         setTrainedModels((prev) => [newModel, ...prev])
 
-        toast({
-          title: "Training Complete",
-          description: `Model "${modelName}" has been trained successfully`,
-        })
+        toast.success("Training Complete", { description: `Model "${modelName}" has been trained successfully` })
       } else {
         setCurrentResult(result)
-        toast({
-          title: "Training Failed",
-          description: result.error || "An error occurred during training",
-          variant: "destructive",
-        })
+        toast.error("Training Failed", { description: result.error || "An error occurred during training" })
       }
     } catch (error) {
       clearInterval(progressInterval)
-      toast({
-        title: "Training Failed",
-        description: error instanceof Error ? error.message : "An error occurred during training",
-        variant: "destructive",
-      })
+      toast.error("Training Failed", { description: error instanceof Error ? error.message : "An error occurred during training" })
     } finally {
       setIsTraining(false)
       setTrainingProgress(0)
@@ -241,17 +226,10 @@ export function EnhancedMLTrainer() {
 
       if (result.success) {
         setTrainedModels((prev) => prev.filter((model) => model.id !== modelId))
-        toast({
-          title: "Model Deleted",
-          description: "Model has been deleted successfully",
-        })
+        toast("Model Deleted", { description: "Model has been deleted successfully" })
       }
     } catch (error) {
-      toast({
-        title: "Delete Failed",
-        description: "Failed to delete model",
-        variant: "destructive",
-      })
+      toast.error("Delete Failed", { description: "Failed to delete model" })
     }
   }
 
@@ -269,16 +247,9 @@ export function EnhancedMLTrainer() {
       a.click()
       URL.revokeObjectURL(url)
 
-      toast({
-        title: "Model Exported",
-        description: "Model has been exported successfully",
-      })
+      toast.success("Model Exported", { description: "Model has been exported successfully" })
     } catch (error) {
-      toast({
-        title: "Export Failed",
-        description: "Failed to export model",
-        variant: "destructive",
-      })
+      toast.error("Export Failed", { description: "Failed to export model" })
     }
   }
 
@@ -538,7 +509,7 @@ export function EnhancedMLTrainer() {
                           <Label className="text-sm font-medium">Feature Importance</Label>
                           <div className="space-y-1">
                             {currentResult.featureImportance.slice(0, 5).map((item, index) => (
-                              <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
+                              <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-sm">
                                 <span className="text-sm">{item.feature}</span>
                                 <div className="flex items-center gap-2">
                                   <div className="w-20 bg-background rounded-full h-2">

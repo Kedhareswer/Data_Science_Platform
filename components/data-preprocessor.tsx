@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react"
 import { useData } from "@/lib/data-context"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -235,16 +235,9 @@ export function DataPreprocessor() {
       }
 
       setProcessedData(data)
-      toast({
-        title: "Preprocessing Complete",
-        description: `Applied ${steps.length} preprocessing steps. ${data.length} rows remaining.`,
-      })
+      toast.success("Preprocessing Complete", { description: `Applied ${steps.length} preprocessing steps. ${data.length} rows remaining.` })
     } catch (error) {
-      toast({
-        title: "Preprocessing Error",
-        description: "An error occurred while processing the data.",
-        variant: "destructive",
-      })
+      toast.error("Preprocessing Error", { description: "An error occurred while processing the data." })
     } finally {
       setIsProcessing(false)
     }
@@ -252,10 +245,7 @@ export function DataPreprocessor() {
 
   const resetSteps = () => {
     setSteps([])
-    toast({
-      title: "Steps Cleared",
-      description: "All preprocessing steps have been removed.",
-    })
+    toast("Steps Cleared", { description: "All preprocessing steps have been removed." })
   }
 
   const exportProcessedData = () => {

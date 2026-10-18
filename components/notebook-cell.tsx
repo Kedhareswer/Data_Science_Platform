@@ -152,7 +152,7 @@ export function NotebookCell({
           <div className="flex items-center gap-3">
             {/* Drag Handle */}
             <div
-              className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted rounded opacity-0 group-hover:opacity-100 transition-opacity"
+              className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted rounded-sm opacity-0 group-hover:opacity-100 transition-opacity"
               {...dragHandleProps}
               role="button"
               aria-label="Drag to reorder cell"

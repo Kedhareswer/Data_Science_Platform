@@ -14,7 +14,7 @@ import { NavigationBreadcrumb } from "@/components/navigation-breadcrumb"
 import { NavigationSidebar } from "@/components/navigation-sidebar"
 import { NotebookNavigation } from "@/components/notebook-navigation"
 import { useNavigation } from "@/lib/navigation-context"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 
 export default function NotebookPage() {
   const {
@@ -27,7 +27,6 @@ export default function NotebookPage() {
     resetData,
   } = useData()
   const { navigateTo } = useNavigation()
-  const { toast } = useToast()
   const [isExecutingAll, setIsExecutingAll] = useState(false)
   const [navSidebarOpen, setNavSidebarOpen] = useState(false)
   const [currentCellId, setCurrentCellId] = useState<string | null>(null)
@@ -47,10 +46,7 @@ export default function NotebookPage() {
 
       if (sourceIndex !== destinationIndex) {
         reorderCells?.(sourceIndex, destinationIndex)
-        toast({
-          title: "Cell reordered",
-          description: `Moved cell from position ${sourceIndex + 1} to ${destinationIndex + 1}`,
-        })
+        toast("Cell reordered", { description: `Moved cell from position ${sourceIndex + 1} to ${destinationIndex + 1}` })
       }
     },
     [reorderCells, toast],
@@ -62,25 +58,15 @@ export default function NotebookPage() {
       setIsExecutingAll(true)
 
       try {
-        toast({
-          title: "Executing all cells",
-          description: "Running all executable cells in sequence...",
-        })
+        toast("Executing all cells", { description: "Running all executable cells in sequence..." })
 
         // Simulate execution of all cells
         await new Promise((resolve) => setTimeout(resolve, 3000))
 
-        toast({
-          title: "Execution complete",
-          description: "All cells have been executed successfully",
-        })
+        toast.success("Execution complete", { description: "All cells have been executed successfully" })
       } catch (err) {
         console.error("Failed to execute cells:", err)
-        toast({
-          title: "Execution failed",
-          description: "Some cells failed to execute",
-          variant: "destructive",
-        })
+        toast.error("Execution failed", { description: "Some cells failed to execute" })
       } finally {
         setIsExecutingAll(false)
       }
@@ -116,17 +102,10 @@ export default function NotebookPage() {
         // Clean up the URL object
         setTimeout(() => URL.revokeObjectURL(link.href), 100)
 
-        toast({
-          title: "Notebook exported",
-          description: `Saved as ${exportFileName}`,
-        })
+        toast.success("Notebook exported", { description: `Saved as ${exportFileName}` })
       } catch (err) {
         console.error("Failed to export notebook:", err)
-        toast({
-          title: "Export failed",
-          description: "Failed to export notebook",
-          variant: "destructive",
-        })
+        toast.error("Export failed", { description: "Failed to export notebook" })
       }
     },
     [notebookCells, fileName, processedData.length, toast],
@@ -148,10 +127,7 @@ export default function NotebookPage() {
       if (window.confirm("Are you sure you want to reset the notebook? This will clear all cells and data.")) {
         resetData()
         setCurrentCellId(null)
-        toast({
-          title: "Notebook reset",
-          description: "All cells and data have been cleared",
-        })
+        toast("Notebook reset", { description: "All cells and data have been cleared" })
       }
     },
     [resetData, toast],
@@ -191,7 +167,7 @@ export default function NotebookPage() {
       />
 
       {/* Sticky Navigation Header */}
-      <div className={`sticky top-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b transition-all duration-200 ${navSidebarOpen ? "ml-80" : ""}`}>
+      <div className={`sticky top-0 z-30 bg-background/95 backdrop-blur-sm supports-[backdrop-filter]:bg-background/60 border-b transition-all duration-200 ${navSidebarOpen ? "ml-80" : ""}`}>
         <div className="container mx-auto px-6 py-4 max-w-6xl">
           <NavigationBreadcrumb />
 

@@ -11,7 +11,7 @@ interface NavbarProps {
 
 export function Navbar({ onToggleSidebar }: NavbarProps) {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" className="mr-2" onClick={onToggleSidebar} aria-label="Toggle sidebar">

@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useData } from "@/lib/data-context"
 import { DataUploadPrompt } from "@/components/data-upload-prompt"
 import { Brain, Play, AlertCircle, Download, Target, TrendingUp, BarChart3 } from "lucide-react"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 
 interface PredictionResult {
   value: any
@@ -85,11 +85,7 @@ export function MLPredictor() {
   const makePrediction = async () => {
     const validationError = validateInputs()
     if (validationError) {
-      toast({
-        title: "Validation Error",
-        description: validationError,
-        variant: "destructive",
-      })
+      toast.error("Validation Error", { description: validationError })
       return
     }
 
@@ -165,16 +161,9 @@ export function MLPredictor() {
 
       setPredictions((prev) => [newPrediction, ...prev.slice(0, 9)]) // Keep last 10 predictions
 
-      toast({
-        title: "Prediction Complete",
-        description: `Prediction made using ${selectedModel!.name}`,
-      })
+      toast.success("Prediction Complete", { description: `Prediction made using ${selectedModel!.name}` })
     } catch (error) {
-      toast({
-        title: "Prediction Failed",
-        description: error instanceof Error ? error.message : "An error occurred during prediction",
-        variant: "destructive",
-      })
+      toast.error("Prediction Failed", { description: error instanceof Error ? error.message : "An error occurred during prediction" })
     } finally {
       setIsLoading(false)
     }
@@ -184,16 +173,9 @@ export function MLPredictor() {
     if (selectedModel) {
       try {
         downloadModel(selectedModel.id)
-        toast({
-          title: "Download Started",
-          description: `Downloading ${selectedModel.name}`,
-        })
+        toast("Download Started", { description: `Downloading ${selectedModel.name}` })
       } catch (error) {
-        toast({
-          title: "Download Failed",
-          description: error instanceof Error ? error.message : "Failed to download model",
-          variant: "destructive",
-        })
+        toast.error("Download Failed", { description: error instanceof Error ? error.message : "Failed to download model" })
       }
     }
   }
