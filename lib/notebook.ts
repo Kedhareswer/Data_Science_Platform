@@ -28,22 +28,24 @@ export interface CellMeta {
   title: string
   description: string
   category: "data" | "analysis" | "ml" | "notes"
+  /** Cells that are useless without a dataset. */
+  requiresData?: boolean
   /** Whether "Run all" executes this cell. */
   runnable?: boolean
 }
 
 export const CELL_META: Record<CellType, CellMeta> = {
-  data: { title: "Data Table", description: "Browse, search and sort the current dataset", category: "data" },
-  profile: { title: "Data Profile", description: "Column statistics, quality issues and correlations", category: "analysis" },
-  "missing-data": { title: "Missing Data", description: "Find and visualise missing values", category: "analysis" },
-  visualization: { title: "Visualization", description: "Interactive charts", category: "analysis" },
-  preprocessing: { title: "Preprocessing", description: "Clean and transform data with a replayable pipeline", category: "data", runnable: true },
+  data: { requiresData: true, title: "Data Table", description: "Browse, search and sort the current dataset", category: "data" },
+  profile: { requiresData: true, title: "Data Profile", description: "Column statistics, quality issues and correlations", category: "analysis", runnable: true },
+  "missing-data": { requiresData: true, title: "Missing Data", description: "Find and visualise missing values", category: "analysis" },
+  visualization: { requiresData: true, title: "Visualization", description: "Interactive charts", category: "analysis" },
+  preprocessing: { requiresData: true, title: "Preprocessing", description: "Clean and transform data with a replayable pipeline", category: "data", runnable: true },
   text: { title: "Notes", description: "Markdown notes", category: "notes" },
   code: { title: "Python", description: "Run Python (pandas, numpy, scikit-learn, matplotlib) in your browser", category: "analysis", runnable: true },
-  "ml-trainer": { title: "Model Trainer", description: "Train a model with held-out evaluation", category: "ml" },
+  "ml-trainer": { requiresData: true, title: "Model Trainer", description: "Train a model with held-out evaluation", category: "ml", runnable: true },
   "ml-predictor": { title: "Predictor", description: "Make predictions with a trained model", category: "ml" },
   "ml-insights": { title: "Model Insights", description: "Compare models, feature importance, ROC and residuals", category: "ml" },
-  "auto-ml": { title: "AutoML", description: "Train and rank many models automatically", category: "ml" },
+  "auto-ml": { requiresData: true, title: "AutoML", description: "Train and rank many models automatically", category: "ml", runnable: true },
 }
 
 /** On-disk notebook format (`.dnb.json`). */

@@ -5,7 +5,6 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import { DataProvider } from "@/lib/data-context"
-import { NavigationProvider } from "@/lib/navigation-context"
 
 const kalam = Kalam({
   subsets: ["latin"],
@@ -46,12 +45,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <a href="#main-content" className="skip-link">
             Skip to main content
           </a>
-          <NavigationProvider>
             <DataProvider>
               {children}
               <Toaster />
             </DataProvider>
-          </NavigationProvider>
         </ThemeProvider>
         <Analytics />
       </body>
