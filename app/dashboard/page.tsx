@@ -201,7 +201,8 @@ export default function DashboardPage() {
       imported = parseDashboardFile(JSON.parse(await file.text()) as unknown)
     } catch (error) {
       toast.error("Couldn't import that file", {
-        description: error instanceof SyntaxError ? "It isn't valid JSON." : error instanceof Error ? error.message : undefined,
+        description:
+          error instanceof SyntaxError ? "It isn't valid JSON." : error instanceof Error ? error.message : undefined,
       })
       return
     }
@@ -258,16 +259,16 @@ export default function DashboardPage() {
                 onBlur={(e) => {
                   if (!e.target.value.trim()) setDashboard((prev) => ({ ...prev, title: "My dashboard" }))
                 }}
-                className="h-auto max-w-xl border-dashed bg-transparent px-2 py-1 font-handwritten-bold text-3xl md:text-3xl"
+                className="font-handwritten-bold h-auto max-w-xl border-dashed bg-transparent px-2 py-1 text-3xl md:text-3xl"
               />
             ) : (
-              <h1 className="flex items-center gap-2 truncate font-handwritten-bold text-3xl">
-                <LayoutDashboard className="size-7 shrink-0 text-muted-foreground" aria-hidden />
+              <h1 className="font-handwritten-bold flex items-center gap-2 truncate text-3xl">
+                <LayoutDashboard className="text-muted-foreground size-7 shrink-0" aria-hidden />
                 <span className="truncate">{dashboard.title}</span>
               </h1>
             )}
             {hasData && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 {fileName ? `${fileName} · ` : ""}
                 {processedData.length.toLocaleString()} rows · {columns.length} columns
               </p>
@@ -276,7 +277,11 @@ export default function DashboardPage() {
 
           {hasData && (
             <div className="flex flex-wrap items-center gap-2" role="toolbar" aria-label="Dashboard actions">
-              <Button variant={editMode ? "default" : "outline"} aria-pressed={editMode} onClick={() => setEditMode((v) => !v)}>
+              <Button
+                variant={editMode ? "default" : "outline"}
+                aria-pressed={editMode}
+                onClick={() => setEditMode((v) => !v)}
+              >
                 {editMode ? <Check aria-hidden /> : <Pencil aria-hidden />}
                 {editMode ? "Done" : "Edit"}
               </Button>
@@ -314,12 +319,16 @@ export default function DashboardPage() {
         </div>
 
         {!isHydrated ? (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-busy="true" aria-label="Loading dashboard">
+          <div
+            className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4"
+            aria-busy="true"
+            aria-label="Loading dashboard"
+          >
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="sketch-card h-36 animate-pulse bg-muted/40" />
+              <div key={i} className="sketch-card bg-muted/40 h-36 animate-pulse" />
             ))}
-            <div className="sketch-card h-80 animate-pulse bg-muted/40 md:col-span-2" />
-            <div className="sketch-card h-80 animate-pulse bg-muted/40 md:col-span-2" />
+            <div className="sketch-card bg-muted/40 h-80 animate-pulse md:col-span-2" />
+            <div className="sketch-card bg-muted/40 h-80 animate-pulse md:col-span-2" />
           </div>
         ) : !hasData ? (
           <div className="py-8">
@@ -340,8 +349,11 @@ export default function DashboardPage() {
             />
 
             {widgets.length === 0 ? (
-              <section className="sketch-card mx-auto max-w-2xl space-y-4 p-8 text-center" aria-labelledby="empty-dashboard-title">
-                <Wand2 className="mx-auto size-10 text-muted-foreground" aria-hidden />
+              <section
+                className="sketch-card mx-auto max-w-2xl space-y-4 p-8 text-center"
+                aria-labelledby="empty-dashboard-title"
+              >
+                <Wand2 className="text-muted-foreground mx-auto size-10" aria-hidden />
                 <h2 id="empty-dashboard-title" className="font-handwritten-bold text-2xl">
                   A blank page, full of possibilities
                 </h2>
@@ -363,9 +375,9 @@ export default function DashboardPage() {
             ) : (
               <>
                 {editMode && (
-                  <p className="text-sm text-muted-foreground font-handwritten">
-                    Editing: drag the handle (or focus it and press space, then the arrow keys) to reorder; use each widget’s menu
-                    to edit, resize, duplicate or delete.
+                  <p className="text-muted-foreground font-handwritten text-sm">
+                    Editing: drag the handle (or focus it and press space, then the arrow keys) to reorder; use each
+                    widget’s menu to edit, resize, duplicate or delete.
                   </p>
                 )}
                 <DashboardView

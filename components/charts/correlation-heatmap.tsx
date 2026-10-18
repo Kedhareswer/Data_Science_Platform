@@ -29,7 +29,7 @@ export function CorrelationHeatmap({ columns, matrix, label = "Correlation heatm
         aria-label={label}
         viewBox={`0 0 ${size + 8} ${size + 8}`}
         width={size + 8}
-        className="h-auto max-w-full font-handwritten"
+        className="font-handwritten h-auto max-w-full"
       >
         <title>{label}</title>
         {columns.map((col, i) => (
@@ -90,7 +90,7 @@ export function CorrelationHeatmap({ columns, matrix, label = "Correlation heatm
           }),
         )}
       </svg>
-      <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground" aria-hidden="true">
+      <div className="text-muted-foreground mt-2 flex items-center gap-2 text-xs" aria-hidden="true">
         <span>-1</span>
         <span
           className="h-2 w-40 rounded-full"

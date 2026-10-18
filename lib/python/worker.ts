@@ -8,12 +8,16 @@ interface PyProxy {
   toJs(options?: { dict_converter?: typeof Object.fromEntries }): unknown
   destroy(): void
 }
+interface LoadOptions {
+  messageCallback?: (message: string) => void
+  errorCallback?: (message: string) => void
+}
 interface Pyodide {
   globals: { get(name: string): unknown; set(name: string, value: unknown): void }
   runPythonAsync(code: string, options?: { globals?: unknown }): Promise<unknown>
   runPython(code: string): unknown
-  loadPackage(names: string | string[]): Promise<unknown>
-  loadPackagesFromImports(code: string): Promise<unknown>
+  loadPackage(names: string | string[], options?: LoadOptions): Promise<unknown>
+  loadPackagesFromImports(code: string, options?: LoadOptions): Promise<unknown>
   setStdout(options: { batched: (text: string) => void }): void
   setStderr(options: { batched: (text: string) => void }): void
   pyimport(name: string): { install(pkgs: string[]): Promise<void> }
@@ -21,6 +25,9 @@ interface Pyodide {
 }
 
 declare const self: DedicatedWorkerGlobalScope
+
+// Keep Pyodide's "Loading numpy…" chatter out of cell output.
+const QUIET: LoadOptions = { messageCallback: () => {}, errorCallback: (message) => console.warn(message) }
 
 let pyodide: Pyodide | null = null
 let loading: Promise<Pyodide> | null = null
@@ -43,7 +50,7 @@ async function load(indexURL: string): Promise<Pyodide> {
     }
     const py = await mod.loadPyodide({ indexURL })
     post({ kind: "status", status: "loading", message: "Loading pandas & numpy…" })
-    await py.loadPackage(["numpy", "pandas"])
+    await py.loadPackage(["numpy", "pandas"], QUIET)
     py.setStdout({
       batched: (text) => {
         stdout += text + "\n"
@@ -76,6 +83,30 @@ function errorMessage(err: unknown): string {
   return String(err)
 }
 
+/** Install imports that Pyodide doesn't bundle (e.g. seaborn) from PyPI via micropip. */
+async function installMissing(py: Pyodide, code: string) {
+  py.globals.set("__dn_code", code)
+  const missing = toJs(py.runPython("_dn_missing_imports(__dn_code)")) as string[]
+  py.runPython("del __dn_code")
+  if (missing.length === 0) return
+  await py.loadPackage("micropip", QUIET)
+  const micropip = py.pyimport("micropip")
+  for (const name of missing) {
+    try {
+      post({ kind: "stream", id: currentId, stream: "stderr", text: `Installing ${name} from PyPI…\n` })
+      await micropip.install([name])
+    } catch (err) {
+      // Not available as a pure-Python wheel: report it and let the import fail with Python's own error.
+      post({
+        kind: "stream",
+        id: currentId,
+        stream: "stderr",
+        text: `Could not install ${name}: ${errorMessage(err).trim().split("\n").pop()}\n`,
+      })
+    }
+  }
+}
+
 function syncDataset(py: Pyodide, dataset?: DatasetPayload) {
   if (!dataset) return
   py.globals.set("__dn_version", dataset.version)
@@ -99,9 +130,10 @@ async function run(py: Pyodide, code: string, dataset?: DatasetPayload): Promise
   stdout = ""
   stderr = ""
   try {
-    await py.loadPackagesFromImports(code)
+    await py.loadPackagesFromImports(code, QUIET)
+    await installMissing(py, code)
     if (/\b(matplotlib|seaborn|plt)\b/.test(code)) {
-      await py.loadPackage("matplotlib")
+      await py.loadPackage("matplotlib", QUIET)
       py.runPython("_dn_setup_matplotlib()")
     }
     syncDataset(py, dataset)
@@ -127,7 +159,14 @@ async function run(py: Pyodide, code: string, dataset?: DatasetPayload): Promise
     } catch {
       // ignore – the interpreter may be in a bad state
     }
-    return { ok: false, stdout, stderr, figures, error: errorMessage(err), durationMs: Math.round(performance.now() - started) }
+    return {
+      ok: false,
+      stdout,
+      stderr,
+      figures,
+      error: errorMessage(err),
+      durationMs: Math.round(performance.now() - started),
+    }
   }
 }
 
@@ -142,7 +181,7 @@ async function handle(req: WorkerRequest): Promise<unknown> {
     case "run":
       return run(py, req.code, req.dataset)
     case "install": {
-      await py.loadPackage("micropip")
+      await py.loadPackage("micropip", QUIET)
       const micropip = py.pyimport("micropip")
       await micropip.install(req.packages)
       return true
@@ -153,7 +192,7 @@ async function handle(req: WorkerRequest): Promise<unknown> {
       return JSON.parse(json)
     }
     case "call": {
-      if (req.packages.length) await py.loadPackage(req.packages)
+      if (req.packages.length) await py.loadPackage(req.packages, QUIET)
       syncDataset(py, req.dataset)
       py.globals.set("__dn_payload", req.payload)
       // `fn` is chosen by our own code from a fixed allow-list (see client.ts).

@@ -28,8 +28,8 @@ export default function TermsPage() {
 
       <h2 id="service">The service</h2>
       <p>
-        DataNotebook is a browser-based tool for exploring, visualising and modelling tabular data. It is provided
-        free of charge, without accounts, and may change or be unavailable at any time.
+        DataNotebook is a browser-based tool for exploring, visualising and modelling tabular data. It is provided free
+        of charge, without accounts, and may change or be unavailable at any time.
       </p>
 
       <h2 id="use">Acceptable use</h2>
@@ -48,15 +48,15 @@ export default function TermsPage() {
       <h2 id="warranty">No warranty</h2>
       <p>
         The software is provided &quot;as is&quot;, without warranty of any kind. Statistical results and machine-
-        learning predictions may be wrong; verify them before making decisions. To the maximum extent permitted by
-        law, the authors are not liable for any damages arising from its use.
+        learning predictions may be wrong; verify them before making decisions. To the maximum extent permitted by law,
+        the authors are not liable for any damages arising from its use.
       </p>
 
       <h2 id="license">Open-source license</h2>
       <p>
         The source code is available under the{" "}
-        <a href="https://github.com/Kedhareswer/Data_Science_Platform/blob/main/LICENSE">MIT License</a>, which
-        governs your use, modification and redistribution of the code.
+        <a href="https://github.com/Kedhareswer/Data_Science_Platform/blob/main/LICENSE">MIT License</a>, which governs
+        your use, modification and redistribution of the code.
       </p>
 
       <h2 id="changes">Changes</h2>

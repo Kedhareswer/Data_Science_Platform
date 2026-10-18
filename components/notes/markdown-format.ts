@@ -26,12 +26,20 @@ export function applyMarkdown(text: string, start: number, end: number, action: 
     // Multi-line code selections become a fenced block.
     if (action === "code" && selected.includes("\n")) {
       const block = `\n\`\`\`python\n${selected}\n\`\`\`\n`
-      return { text: text.slice(0, start) + block + text.slice(end), selectionStart: start + 11, selectionEnd: start + 11 + selected.length }
+      return {
+        text: text.slice(0, start) + block + text.slice(end),
+        selectionStart: start + 11,
+        selectionEnd: start + 11 + selected.length,
+      }
     }
     const inner = selected || wrap.placeholder
     const insert = `${wrap.before}${inner}${wrap.after}`
     const innerStart = start + wrap.before.length
-    return { text: text.slice(0, start) + insert + text.slice(end), selectionStart: innerStart, selectionEnd: innerStart + inner.length }
+    return {
+      text: text.slice(0, start) + insert + text.slice(end),
+      selectionStart: innerStart,
+      selectionEnd: innerStart + inner.length,
+    }
   }
 
   const prefix = LINE_PREFIX[action]

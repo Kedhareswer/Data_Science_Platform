@@ -39,18 +39,19 @@ function MetricWidgetViewImpl({ widget, rows, allRows, columnTypes }: MetricWidg
 
   return (
     <div className="flex h-full flex-col justify-between gap-2">
-      <p className="text-4xl font-handwritten-bold tabular-nums leading-tight break-words" aria-live="polite">
+      <p className="font-handwritten-bold text-4xl leading-tight break-words tabular-nums" aria-live="polite">
         {formatValue(result.value, format)}
       </p>
-      <div className="space-y-0.5 text-xs text-muted-foreground">
+      <div className="text-muted-foreground space-y-0.5 text-xs">
         <p>
-          {describeAggregation(aggregation, column)} · {result.rowCount.toLocaleString()} row{result.rowCount === 1 ? "" : "s"}
+          {describeAggregation(aggregation, column)} · {result.rowCount.toLocaleString()} row
+          {result.rowCount === 1 ? "" : "s"}
         </p>
         {baseline && (
           <p>
             Unfiltered: {formatValue(baseline.value, format)}
             {delta !== null && Number.isFinite(delta) && (
-              <span className="ml-1 font-semibold text-foreground">
+              <span className="text-foreground ml-1 font-semibold">
                 ({delta > 0 ? "+" : ""}
                 {formatValue(delta, "percent")})
               </span>

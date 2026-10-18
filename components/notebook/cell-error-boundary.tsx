@@ -27,10 +27,13 @@ export class CellErrorBoundary extends Component<Props, State> {
   render() {
     if (!this.state.error) return this.props.children
     return (
-      <div role="alert" className="flex flex-col items-center gap-3 rounded-md border border-dashed border-destructive/50 p-6 text-center">
-        <AlertTriangle className="h-6 w-6 text-destructive" aria-hidden />
+      <div
+        role="alert"
+        className="border-destructive/50 flex flex-col items-center gap-3 rounded-md border border-dashed p-6 text-center"
+      >
+        <AlertTriangle className="text-destructive h-6 w-6" aria-hidden />
         <p className="font-handwritten-bold">This cell hit a snag.</p>
-        <pre className="max-w-full overflow-auto text-xs text-muted-foreground">{this.state.error.message}</pre>
+        <pre className="text-muted-foreground max-w-full overflow-auto text-xs">{this.state.error.message}</pre>
         <Button size="sm" variant="outline" onClick={() => this.setState({ error: null })}>
           <RotateCcw aria-hidden /> Try again
         </Button>

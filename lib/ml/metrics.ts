@@ -49,7 +49,7 @@ export function rocAuc(yTrue: readonly number[], scores: readonly number[]): num
   const nNeg = pairs.length - nPos
   if (nPos === 0 || nNeg === 0) return Number.NaN
   let rankSum = 0
-  for (let i = 0; i < pairs.length; ) {
+  for (let i = 0; i < pairs.length;) {
     let j = i
     while (j < pairs.length && pairs[j].s === pairs[i].s) j++
     const avgRank = (i + j + 1) / 2

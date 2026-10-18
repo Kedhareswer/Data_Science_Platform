@@ -28,7 +28,10 @@ function summarize(filter: DashboardFilter, type: ColumnType | undefined): strin
   }
   const [lo, hi] =
     kind === "range"
-      ? [filter.min !== undefined ? formatValue(filter.min) : undefined, filter.max !== undefined ? formatValue(filter.max) : undefined]
+      ? [
+          filter.min !== undefined ? formatValue(filter.min) : undefined,
+          filter.max !== undefined ? formatValue(filter.max) : undefined,
+        ]
       : [filter.from || undefined, filter.to || undefined]
   if (lo !== undefined && hi !== undefined) return `${lo} – ${hi}`
   return lo !== undefined ? `≥ ${lo}` : `≤ ${hi}`
@@ -63,12 +66,16 @@ export function FilterBar({ filters, rows, columns, columnTypes, filteredCount, 
   const activeCount = filters.filter((f) => isFilterActive(f) && f.column in columnTypes).length
 
   return (
-    <div role="region" aria-label="Dashboard filters" className="sketch-card flex flex-wrap items-center gap-2 px-3 py-2">
-      <span className="flex items-center gap-1.5 font-handwritten-bold text-sm">
+    <div
+      role="region"
+      aria-label="Dashboard filters"
+      className="sketch-card flex flex-wrap items-center gap-2 px-3 py-2"
+    >
+      <span className="font-handwritten-bold flex items-center gap-1.5 text-sm">
         <Filter className="size-4" aria-hidden /> Filters
       </span>
 
-      {filters.length === 0 && <span className="text-sm text-muted-foreground">None — showing every row.</span>}
+      {filters.length === 0 && <span className="text-muted-foreground text-sm">None — showing every row.</span>}
 
       {filters.map((filter) => {
         const type = columnTypes[filter.column]
@@ -79,7 +86,7 @@ export function FilterBar({ filters, rows, columns, columnTypes, filteredCount, 
             key={filter.id}
             className={cn(
               "flex items-center rounded-full border text-sm",
-              active && !stale ? "border-primary/50 bg-primary/10" : "border-dashed bg-muted/40",
+              active && !stale ? "border-primary/50 bg-primary/10" : "bg-muted/40 border-dashed",
             )}
           >
             <Popover open={openId === filter.id} onOpenChange={(open) => setOpenId(open ? filter.id : null)}>
@@ -87,7 +94,7 @@ export function FilterBar({ filters, rows, columns, columnTypes, filteredCount, 
                 <button
                   type="button"
                   disabled={stale}
-                  className="max-w-64 truncate rounded-l-full py-1 pl-3 pr-1 text-left focus-visible:outline-2 focus-visible:outline-ring disabled:cursor-not-allowed"
+                  className="focus-visible:outline-ring max-w-64 truncate rounded-l-full py-1 pr-1 pl-3 text-left focus-visible:outline-2 disabled:cursor-not-allowed"
                   aria-label={`Edit filter on ${filter.column}`}
                 >
                   <span className="font-semibold">{filter.column}</span>
@@ -107,7 +114,7 @@ export function FilterBar({ filters, rows, columns, columnTypes, filteredCount, 
             <button
               type="button"
               onClick={() => remove(filter.id)}
-              className="rounded-r-full py-1 pl-1 pr-2 text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+              className="text-muted-foreground hover:text-foreground focus-visible:outline-ring rounded-r-full py-1 pr-2 pl-1 focus-visible:outline-2"
               aria-label={`Remove filter on ${filter.column}`}
             >
               <X className="size-3.5" aria-hidden />
@@ -123,7 +130,7 @@ export function FilterBar({ filters, rows, columns, columnTypes, filteredCount, 
           </Button>
         </PopoverTrigger>
         <PopoverContent align="start" className="w-64 p-1">
-          <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Filter by column</p>
+          <p className="text-muted-foreground px-2 py-1.5 text-xs font-semibold">Filter by column</p>
           <ScrollArea className="max-h-72">
             <ul className="max-h-72">
               {available.map((column) => (
@@ -131,10 +138,10 @@ export function FilterBar({ filters, rows, columns, columnTypes, filteredCount, 
                   <button
                     type="button"
                     onClick={() => add(column)}
-                    className="flex w-full items-center justify-between gap-2 rounded-sm px-2 py-1.5 text-left text-sm hover:bg-accent focus-visible:bg-accent focus-visible:outline-hidden"
+                    className="hover:bg-accent focus-visible:bg-accent flex w-full items-center justify-between gap-2 rounded-sm px-2 py-1.5 text-left text-sm focus-visible:outline-hidden"
                   >
                     <span className="truncate">{column}</span>
-                    <span className="text-xs text-muted-foreground">{columnTypes[column]}</span>
+                    <span className="text-muted-foreground text-xs">{columnTypes[column]}</span>
                   </button>
                 </li>
               ))}
@@ -143,7 +150,7 @@ export function FilterBar({ filters, rows, columns, columnTypes, filteredCount, 
         </PopoverContent>
       </Popover>
 
-      <div className="ml-auto flex items-center gap-2 text-sm text-muted-foreground">
+      <div className="text-muted-foreground ml-auto flex items-center gap-2 text-sm">
         <span aria-live="polite">
           {activeCount > 0
             ? `${filteredCount.toLocaleString()} of ${rows.length.toLocaleString()} rows`
@@ -204,19 +211,23 @@ function CategoryEditor({
           {shown.map((option, i) => {
             const id = `${filter.id}-opt-${i}`
             return (
-              <li key={option.value} className="flex items-center gap-2 rounded-sm px-2 py-1 hover:bg-accent">
-                <Checkbox id={id} checked={selected.has(option.value)} onCheckedChange={(c) => toggle(option.value, c === true)} />
+              <li key={option.value} className="hover:bg-accent flex items-center gap-2 rounded-sm px-2 py-1">
+                <Checkbox
+                  id={id}
+                  checked={selected.has(option.value)}
+                  onCheckedChange={(c) => toggle(option.value, c === true)}
+                />
                 <label htmlFor={id} className="min-w-0 flex-1 cursor-pointer truncate text-sm">
                   {option.value}
                 </label>
-                <span className="text-xs tabular-nums text-muted-foreground">{option.count.toLocaleString()}</span>
+                <span className="text-muted-foreground text-xs tabular-nums">{option.count.toLocaleString()}</span>
               </li>
             )
           })}
-          {shown.length === 0 && <li className="px-2 py-3 text-center text-sm text-muted-foreground">No matches</li>}
+          {shown.length === 0 && <li className="text-muted-foreground px-2 py-3 text-center text-sm">No matches</li>}
         </ul>
       </ScrollArea>
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
+      <div className="text-muted-foreground flex items-center justify-between text-xs">
         <span>{selected.size.toLocaleString()} selected</span>
         <div className="flex gap-1">
           <Button
@@ -227,7 +238,13 @@ function CategoryEditor({
           >
             Select shown
           </Button>
-          <Button variant="ghost" size="sm" className="h-7 px-2" disabled={selected.size === 0} onClick={() => onChange([])}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2"
+            disabled={selected.size === 0}
+            onClick={() => onChange([])}
+          >
             Clear
           </Button>
         </div>
@@ -305,9 +322,9 @@ function RangeEditor({
         </div>
       </div>
       {extent && (
-        <p className="text-xs text-muted-foreground">
-          Data range: {formatValue(extent.min)} – {formatValue(extent.max)}. Rows without a value are excluded while a range is
-          set.
+        <p className="text-muted-foreground text-xs">
+          Data range: {formatValue(extent.min)} – {formatValue(extent.max)}. Rows without a value are excluded while a
+          range is set.
         </p>
       )}
     </div>

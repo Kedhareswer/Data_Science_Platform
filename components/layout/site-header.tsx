@@ -27,9 +27,13 @@ export function SiteHeader({ children }: { children?: React.ReactNode }) {
   const pathname = usePathname()
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+    <header className="bg-background/85 supports-[backdrop-filter]:bg-background/70 sticky top-0 z-40 border-b backdrop-blur">
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-2 px-4 sm:px-6">
-        <Link href="/" className="mr-2 flex items-center gap-2 font-handwritten-bold text-lg" aria-label="DataNotebook home">
+        <Link
+          href="/"
+          className="font-handwritten-bold mr-2 flex items-center gap-2 text-lg"
+          aria-label="DataNotebook home"
+        >
           <Sparkles className="h-5 w-5 -rotate-12" aria-hidden />
           <span className="hidden sm:inline">DataNotebook</span>
         </Link>

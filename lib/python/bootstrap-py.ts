@@ -9,7 +9,7 @@ import io, json, base64, sys, traceback
 _dn_dataset_version = None
 
 def _dn_load_dataset(version, columns_json, rows_json):
-    """(Re)build the global DataFrame \`df\` when the notebook data changed."""
+    """(Re)build the global DataFrame df when the notebook data changed."""
     global _dn_dataset_version
     if version == _dn_dataset_version:
         return False
@@ -71,6 +71,19 @@ def _dn_export(name):
         "columns": list(frame.columns),
         "rows": json.loads(frame.to_json(orient="records", date_format="iso", default_handler=str)),
     })
+
+def _dn_missing_imports(code):
+    """Top-level modules imported by the code that are not importable yet."""
+    import importlib.util
+    from pyodide.code import find_imports
+    missing = []
+    for name in find_imports(code):
+        try:
+            if importlib.util.find_spec(name) is None:
+                missing.append(name)
+        except (ImportError, ValueError):
+            missing.append(name)
+    return missing
 
 def _dn_setup_matplotlib():
     try:

@@ -53,16 +53,16 @@ export default function HomePage() {
     <div className="flex min-h-dvh flex-col">
       <SiteHeader />
       <main id="main-content" className="flex-1">
-        <section className="border-b bg-gradient-to-b from-background to-muted/40">
+        <section className="from-background to-muted/40 border-b bg-gradient-to-b">
           <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 md:py-24 lg:grid-cols-[1fr_480px]">
             <div className="space-y-6">
-              <p className="inline-flex items-center gap-2 rounded-full border border-dashed px-3 py-1 text-sm text-muted-foreground">
+              <p className="text-muted-foreground inline-flex items-center gap-2 rounded-full border border-dashed px-3 py-1 text-sm">
                 <Sparkles className="h-4 w-4" aria-hidden /> Runs 100% in your browser
               </p>
               <h1 className="font-handwritten-bold text-4xl tracking-tight sm:text-5xl xl:text-6xl">
                 Where data meets creativity <span className="text-muted-foreground">(and a little laziness)</span>
               </h1>
-              <p className="max-w-xl text-lg text-muted-foreground">
+              <p className="text-muted-foreground max-w-xl text-lg">
                 A whimsical, handwritten-style notebook for exploring data. Upload a file, then stack cells to profile,
                 clean, chart, code in Python and train models — no server, no sign-up.
               </p>
@@ -77,7 +77,7 @@ export default function HomePage() {
                   <Link href="/docs">Read the docs</Link>
                 </Button>
               </div>
-              <p className="flex items-center gap-2 text-sm text-muted-foreground">
+              <p className="text-muted-foreground flex items-center gap-2 text-sm">
                 <ShieldCheck className="h-4 w-4" aria-hidden /> Files are parsed locally and saved only in this
                 browser&apos;s storage.
               </p>
@@ -97,7 +97,7 @@ export default function HomePage() {
               <li key={title} className="sketch-card p-6 transition-transform hover:-rotate-[0.4deg]">
                 <Icon className="mb-3 h-7 w-7" aria-hidden />
                 <h3 className="text-xl">{title}</h3>
-                <p className="mt-2 text-muted-foreground">{text}</p>
+                <p className="text-muted-foreground mt-2">{text}</p>
               </li>
             ))}
           </ul>

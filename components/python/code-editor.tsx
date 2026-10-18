@@ -19,7 +19,14 @@ interface CodeEditorProps {
  * Tab/Shift+Tab indentation, Shift/Ctrl/Cmd+Enter to run, and auto-growing height.
  * Escape blurs the editor so keyboard users are never trapped by Tab handling.
  */
-export function CodeEditor({ value, onChange, onRun, ariaLabel = "Python code", className, minRows = 4 }: CodeEditorProps) {
+export function CodeEditor({
+  value,
+  onChange,
+  onRun,
+  ariaLabel = "Python code",
+  className,
+  minRows = 4,
+}: CodeEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const pendingSelection = useRef<[number, number] | null>(null)
   const lineCount = useMemo(() => Math.max(minRows, value.split("\n").length), [value, minRows])
@@ -70,7 +77,10 @@ export function CodeEditor({ value, onChange, onRun, ariaLabel = "Python code", 
           return line.slice(n)
         })
         .join("\n")
-      replaceRange(lineStart, end, dedented, [Math.max(lineStart, start - removedFirst), Math.max(lineStart, end - removedTotal)])
+      replaceRange(lineStart, end, dedented, [
+        Math.max(lineStart, start - removedFirst),
+        Math.max(lineStart, end - removedTotal),
+      ])
       return
     }
 
@@ -86,10 +96,10 @@ export function CodeEditor({ value, onChange, onRun, ariaLabel = "Python code", 
   }
 
   return (
-    <div className={cn("flex overflow-hidden rounded-md border bg-muted/40 font-mono text-sm leading-6", className)}>
+    <div className={cn("bg-muted/40 flex overflow-hidden rounded-md border font-mono text-sm leading-6", className)}>
       <div
         aria-hidden="true"
-        className="select-none border-r bg-muted/60 px-2 py-2 text-right text-xs leading-6 text-muted-foreground tabular-nums"
+        className="bg-muted/60 text-muted-foreground border-r px-2 py-2 text-right text-xs leading-6 tabular-nums select-none"
       >
         {Array.from({ length: lineCount }, (_, i) => (
           <div key={i}>{i + 1}</div>
@@ -107,7 +117,7 @@ export function CodeEditor({ value, onChange, onRun, ariaLabel = "Python code", 
         autoCorrect="off"
         wrap="off"
         rows={minRows}
-        className="block min-w-0 flex-1 resize-none overflow-x-auto overflow-y-hidden whitespace-pre bg-transparent px-3 py-2 leading-6 text-foreground outline-hidden placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+        className="text-foreground placeholder:text-muted-foreground focus-visible:ring-ring block min-w-0 flex-1 resize-none overflow-x-auto overflow-y-hidden bg-transparent px-3 py-2 leading-6 whitespace-pre outline-hidden focus-visible:ring-2 focus-visible:ring-inset"
         placeholder="# Write Python here — df is your dataset"
       />
     </div>

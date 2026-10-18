@@ -1,5 +1,12 @@
 import { type CellValue, type DataRow, isMissing } from "@/lib/data/types"
-import { algorithmsFor, createEstimator, defaultHyperparameters, type Estimator, getAlgorithm, restoreEstimator } from "./algorithms"
+import {
+  algorithmsFor,
+  createEstimator,
+  defaultHyperparameters,
+  type Estimator,
+  getAlgorithm,
+  restoreEstimator,
+} from "./algorithms"
 import { classificationMetrics, regressionMetrics, silhouette } from "./metrics"
 import { fitPipeline, type PipelineState, sourceFeature, transformRows } from "./pipeline"
 import { createRng, shuffleInPlace, trainTestSplit } from "./random"
@@ -66,7 +73,7 @@ function prepare(rows: readonly DataRow[], config: TrainingConfig): Prepared {
   return { pipeline, X: transformRows(pipeline, usable), y, classes, rawTarget }
 }
 
-function score(task: TaskType, est: Estimator, X: number[][], y: number[], nClasses: number): number {
+function score(task: TaskType, est: Estimator, X: number[][], y: number[]): number {
   const pred = est.predict(X)
   if (task === "classification") return pred.filter((p, i) => p === y[i]).length / y.length
   return regressionMetrics(y, pred).r2Score
@@ -79,15 +86,20 @@ function permutationImportance(
   pipeline: PipelineState,
   X: number[][],
   y: number[],
-  nClasses: number,
   seed: number,
 ): FeatureImportance[] {
   if (X.length === 0) return []
   const rng = createRng(seed + 1)
-  const sample = X.length > 500 ? shuffleInPlace(X.map((_, i) => i), rng).slice(0, 500) : X.map((_, i) => i)
+  const sample =
+    X.length > 500
+      ? shuffleInPlace(
+          X.map((_, i) => i),
+          rng,
+        ).slice(0, 500)
+      : X.map((_, i) => i)
   const Xs = sample.map((i) => X[i])
   const ys = sample.map((i) => y[i])
-  const base = score(task, est, Xs, ys, nClasses)
+  const base = score(task, est, Xs, ys)
 
   const groups = new Map<string, number[]>()
   pipeline.outputNames.forEach((_, j) => {
@@ -97,13 +109,16 @@ function permutationImportance(
 
   const result: FeatureImportance[] = []
   for (const [feature, cols] of groups) {
-    const perm = shuffleInPlace(Xs.map((_, i) => i), rng)
+    const perm = shuffleInPlace(
+      Xs.map((_, i) => i),
+      rng,
+    )
     const Xp = Xs.map((row, i) => {
       const copy = [...row]
       for (const c of cols) copy[c] = Xs[perm[i]][c]
       return copy
     })
-    result.push({ feature, importance: Math.max(0, base - score(task, est, Xp, ys, nClasses)) })
+    result.push({ feature, importance: Math.max(0, base - score(task, est, Xp, ys)) })
   }
   const total = result.reduce((a, r) => a + r.importance, 0)
   return result
@@ -165,7 +180,7 @@ export function trainModel(rows: readonly DataRow[], config: TrainingConfig): Tr
       metrics = regressionMetrics(yte, pred)
       evaluation = { actual: test.map((i) => rawTarget[i]), predicted: pred }
     }
-    featureImportance = permutationImportance(config.task, estimator, pipeline, Xte, yte, nClasses, seed)
+    featureImportance = permutationImportance(config.task, estimator, pipeline, Xte, yte, seed)
   }
 
   return {
@@ -245,11 +260,20 @@ export async function runAutoML(rows: readonly DataRow[], options: AutoMLOptions
   const metric = primaryMetric(options.task)
   const candidates: TrainingConfig[] = []
   for (const algo of algorithmsFor(options.task)) {
-    const base = { task: options.task, algorithm: algo.id, features: options.features, target: options.target, testSize: options.testSize, seed: options.seed }
+    const base = {
+      task: options.task,
+      algorithm: algo.id,
+      features: options.features,
+      target: options.target,
+      testSize: options.testSize,
+      seed: options.seed,
+    }
     candidates.push(base)
-    if (algo.id === "random_forest") candidates.push({ ...base, hyperparameters: { nEstimators: 100, maxDepth: 15 }, name: "Random Forest (deep)" })
+    if (algo.id === "random_forest")
+      candidates.push({ ...base, hyperparameters: { nEstimators: 100, maxDepth: 15 }, name: "Random Forest (deep)" })
     if (algo.id === "knn") candidates.push({ ...base, hyperparameters: { k: 15 }, name: "k-Nearest Neighbours (k=15)" })
-    if (algo.id === "kmeans") for (const k of [2, 4, 5]) candidates.push({ ...base, hyperparameters: { k }, name: `k-Means (k=${k})` })
+    if (algo.id === "kmeans")
+      for (const k of [2, 4, 5]) candidates.push({ ...base, hyperparameters: { k }, name: `k-Means (k=${k})` })
   }
 
   const leaderboard: TrainedModel[] = []
@@ -267,7 +291,9 @@ export async function runAutoML(rows: readonly DataRow[], options: AutoMLOptions
     }
   }
 
-  leaderboard.sort((a, b) => ((b.metrics[metric] as number) ?? -Infinity) - ((a.metrics[metric] as number) ?? -Infinity))
+  leaderboard.sort(
+    (a, b) => ((b.metrics[metric] as number) ?? -Infinity) - ((a.metrics[metric] as number) ?? -Infinity),
+  )
   return { leaderboard, failures, best: leaderboard[0], primaryMetric: metric }
 }
 

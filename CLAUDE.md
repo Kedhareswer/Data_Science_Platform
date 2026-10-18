@@ -53,6 +53,7 @@ lib/
   dashboard.ts            dashboard state types; dashboard-data.ts holds the pure aggregation logic
   storage.ts              tiny IndexedDB key-value wrapper
 public/samples/iris.csv   bundled sample dataset (also used by tests)
+docs/images/              README screenshots
 scripts/                  check-python-helpers.mjs
 ```
 
@@ -69,7 +70,7 @@ scripts/                  check-python-helpers.mjs
   `components/notebook/cell-registry.tsx`. Persist per-cell UI state with `useCellContent(cellId, fallback)` (never
   local-only state for things users expect to keep). Make a cell runnable with `useCellRunner(cellId, fn)` and
   `runnable: true` in `CELL_META` — it then participates in **Run all**.
-- **Preprocessing** is a list of `TransformStep`s applied with `applyPipeline(data, steps)` from the *original* data,
+- **Preprocessing** is a list of `TransformStep`s applied with `applyPipeline(data, steps)` from the _original_ data,
   so re-applying is idempotent. Add new step types in `lib/data/transform.ts` (+ `describeStep`, tests, UI).
 - **ML**: `trainModel(rows, config)` returns a serializable `TrainedModel` with held-out `metrics`, `evaluation`
   (real test-set predictions used by insight charts) and permutation `featureImportance`. Never fabricate metrics or
@@ -80,10 +81,12 @@ scripts/                  check-python-helpers.mjs
   names or data into Python source — pass data as JSON through `globals` (see `worker.ts`/`bootstrap-py.ts`). Helper
   functions callable from TS must be named `_dn_*` and listed in `PythonHelper` in `client.ts`. "Stop" = terminate
   the worker (`restart()`). Pyodide URL: `NEXT_PUBLIC_PYODIDE_INDEX_URL` (default jsDelivr, see `protocol.ts`).
+  Before running a cell the worker loads bundled packages from the code's imports and tries `micropip` for any
+  remaining missing imports (e.g. seaborn); Pyodide's loader chatter is silenced via `QUIET` in `worker.ts`.
 - **UI**: keep the handwritten aesthetic (`font-handwritten*`, `sketch-card`, Kalam everywhere; `font-mono` for code
   and numbers in editors). Use theme tokens (`bg-card`, `text-muted-foreground`, `text-destructive`, `text-success`,
   `var(--color-chart-N)`) — never raw `bg-white`/`text-gray-*` without dark variants. Toasts: `import { toast } from
-  "sonner"`. Icons: `lucide-react` (brand icons were removed from lucide — inline an SVG if needed). Icon-only buttons
+"sonner"`. Icons: `lucide-react` (brand icons were removed from lucide — inline an SVG if needed). Icon-only buttons
   need `aria-label`.
 - **Markdown** is rendered with `react-markdown` + `remark-gfm` without raw HTML. Never use `dangerouslySetInnerHTML`
   with user content.
@@ -101,3 +104,5 @@ scripts/                  check-python-helpers.mjs
   the `*-py.ts` string modules so that script can extract it.
 - Large datasets: memoize derived data, render only the visible page of tables, and sample for scatter/heatmaps.
 - `next/font/google` downloads fonts at build time (network needed for `npm run build`).
+- `<Analytics />` (Vercel Web Analytics) only renders when `process.env.VERCEL` is set, to avoid 404s elsewhere.
+- `NEXT_PUBLIC_*` variables are inlined at build time — rebuild after changing them.

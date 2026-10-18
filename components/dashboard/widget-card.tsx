@@ -48,7 +48,13 @@ interface WidgetCardProps {
   isDragging?: boolean
 }
 
-function WidgetBody({ widget, rows, allRows, columns, columnTypes }: Pick<WidgetCardProps, "widget" | "rows" | "allRows" | "columns" | "columnTypes">) {
+function WidgetBody({
+  widget,
+  rows,
+  allRows,
+  columns,
+  columnTypes,
+}: Pick<WidgetCardProps, "widget" | "rows" | "allRows" | "columns" | "columnTypes">) {
   switch (widget.type) {
     case "metric":
       return <MetricWidgetView widget={widget} rows={rows} allRows={allRows} columnTypes={columnTypes} />
@@ -81,7 +87,7 @@ function WidgetCardImpl({
       className={cn(
         "sketch-card flex h-full flex-col p-4 transition-shadow",
         editMode && "border-primary/40",
-        isDragging && "shadow-xl ring-2 ring-primary/40",
+        isDragging && "ring-primary/40 shadow-xl ring-2",
       )}
     >
       <header className="mb-3 flex items-start gap-2">
@@ -89,18 +95,27 @@ function WidgetCardImpl({
           <span
             {...dragHandleProps}
             aria-label={`Drag to reorder “${widget.title}”. Press space to lift, arrow keys to move.`}
-            className="-ml-1 mt-0.5 cursor-grab rounded-sm p-0.5 text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring active:cursor-grabbing"
+            className="text-muted-foreground hover:text-foreground focus-visible:outline-ring mt-0.5 -ml-1 cursor-grab rounded-sm p-0.5 focus-visible:outline-2 active:cursor-grabbing"
           >
             <GripVertical className="size-4" aria-hidden />
           </span>
         )}
-        <h2 id={titleId} className="min-w-0 flex-1 truncate font-handwritten-bold text-lg leading-tight" title={widget.title}>
+        <h2
+          id={titleId}
+          className="font-handwritten-bold min-w-0 flex-1 truncate text-lg leading-tight"
+          title={widget.title}
+        >
           {widget.title}
         </h2>
         {editMode && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="-mr-2 -mt-1 size-8" aria-label={`Widget options for “${widget.title}”`}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="-mt-1 -mr-2 size-8"
+                aria-label={`Widget options for “${widget.title}”`}
+              >
                 <MoreVertical />
               </Button>
             </DropdownMenuTrigger>

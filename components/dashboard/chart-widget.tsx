@@ -76,7 +76,11 @@ function ChartWidgetViewImpl({ widget, rows, columnTypes }: ChartWidgetViewProps
 
   if (!x) return <WidgetMessage>Pick a column for the X axis in the widget settings.</WidgetMessage>
   if (missing.length > 0) {
-    return <WidgetMessage>Column{missing.length > 1 ? "s" : ""} {missing.map((c) => `“${c}”`).join(", ")} not in the current data.</WidgetMessage>
+    return (
+      <WidgetMessage>
+        Column{missing.length > 1 ? "s" : ""} {missing.map((c) => `“${c}”`).join(", ")} not in the current data.
+      </WidgetMessage>
+    )
   }
   if (isScatter && !y) return <WidgetMessage>A scatter plot needs a Y column.</WidgetMessage>
 
@@ -90,15 +94,30 @@ function ChartWidgetViewImpl({ widget, rows, columnTypes }: ChartWidgetViewProps
           <ResponsiveContainer width="100%" height="100%">
             <ScatterChart margin={{ top: 8, right: 12, bottom: 4, left: 0 }}>
               <CartesianGrid strokeDasharray="4 4" stroke="var(--color-border)" />
-              <XAxis type="number" dataKey="x" name={x} tick={AXIS_TICK} tickFormatter={formatTick} stroke="var(--color-border)" />
-              <YAxis type="number" dataKey="y" name={y} tick={AXIS_TICK} tickFormatter={formatTick} width={48} stroke="var(--color-border)" />
+              <XAxis
+                type="number"
+                dataKey="x"
+                name={x}
+                tick={AXIS_TICK}
+                tickFormatter={formatTick}
+                stroke="var(--color-border)"
+              />
+              <YAxis
+                type="number"
+                dataKey="y"
+                name={y}
+                tick={AXIS_TICK}
+                tickFormatter={formatTick}
+                width={48}
+                stroke="var(--color-border)"
+              />
               <Tooltip {...TOOLTIP_STYLE} formatter={tooltipValue} cursor={{ strokeDasharray: "3 3" }} />
               <Scatter data={scatter.points} fill={CHART_COLORS[1]} fillOpacity={0.6} isAnimationActive={false} />
             </ScatterChart>
           </ResponsiveContainer>
         </div>
         {scatter.total > scatter.points.length && (
-          <figcaption className="pt-1 text-xs text-muted-foreground">
+          <figcaption className="text-muted-foreground pt-1 text-xs">
             Showing a sample of {scatter.points.length.toLocaleString()} of {scatter.total.toLocaleString()} points.
           </figcaption>
         )}
@@ -106,7 +125,8 @@ function ChartWidgetViewImpl({ widget, rows, columnTypes }: ChartWidgetViewProps
     )
   }
 
-  if (!grouped || grouped.points.length === 0) return <WidgetMessage>No data to chart for the current filters.</WidgetMessage>
+  if (!grouped || grouped.points.length === 0)
+    return <WidgetMessage>No data to chart for the current filters.</WidgetMessage>
 
   const data = grouped.points
   const summary = data
@@ -136,7 +156,10 @@ function ChartWidgetViewImpl({ widget, rows, columnTypes }: ChartWidgetViewProps
           isAnimationActive={false}
         >
           {slices.map((p, i) => (
-            <Cell key={p.label} fill={p.label === OTHER_LABEL ? "var(--color-muted-foreground)" : CHART_COLORS[i % CHART_COLORS.length]} />
+            <Cell
+              key={p.label}
+              fill={p.label === OTHER_LABEL ? "var(--color-muted-foreground)" : CHART_COLORS[i % CHART_COLORS.length]}
+            />
           ))}
         </Pie>
         <Tooltip {...TOOLTIP_STYLE} formatter={tooltipValue} />
@@ -218,7 +241,7 @@ function ChartWidgetViewImpl({ widget, rows, columnTypes }: ChartWidgetViewProps
           {body}
         </ResponsiveContainer>
       </div>
-      <figcaption className="pt-1 text-xs text-muted-foreground">
+      <figcaption className="text-muted-foreground pt-1 text-xs">
         <span className="sr-only">{summary}. </span>
         {caption}
       </figcaption>

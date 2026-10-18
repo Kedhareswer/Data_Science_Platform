@@ -8,8 +8,11 @@ export function NotebookOutline() {
   const { notebookCells } = useData()
   if (notebookCells.length < 2) return null
   return (
-    <nav aria-label="Notebook outline" className="sticky top-20 hidden max-h-[calc(100dvh-6rem)] overflow-y-auto xl:block">
-      <p className="mb-2 font-handwritten-bold text-sm text-muted-foreground">Outline</p>
+    <nav
+      aria-label="Notebook outline"
+      className="sticky top-20 hidden max-h-[calc(100dvh-6rem)] overflow-y-auto xl:block"
+    >
+      <p className="font-handwritten-bold text-muted-foreground mb-2 text-sm">Outline</p>
       <ol className="space-y-1 text-sm">
         {notebookCells.map((cell, i) => {
           const Icon = CELL_ICONS[cell.type]
@@ -17,7 +20,7 @@ export function NotebookOutline() {
             <li key={cell.id}>
               <a
                 href={`#${cell.id}`}
-                className="flex items-center gap-2 rounded-sm px-2 py-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+                className="text-muted-foreground hover:bg-accent hover:text-foreground flex items-center gap-2 rounded-sm px-2 py-1"
               >
                 <span className="w-5 text-right text-xs">{i + 1}</span>
                 <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden />

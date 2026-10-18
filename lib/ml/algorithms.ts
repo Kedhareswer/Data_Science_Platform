@@ -20,7 +20,9 @@ export const ALGORITHMS: AlgorithmInfo[] = [
     name: "Linear Regression (Ridge)",
     tasks: ["regression"],
     description: "Least-squares fit with optional L2 regularisation. Fast and interpretable.",
-    hyperparameters: [{ key: "alpha", label: "L2 penalty (α)", type: "number", default: 0, min: 0, max: 100, step: 0.1 }],
+    hyperparameters: [
+      { key: "alpha", label: "L2 penalty (α)", type: "number", default: 0, min: 0, max: 100, step: 0.1 },
+    ],
   },
   {
     id: "logistic_regression",
@@ -354,7 +356,8 @@ function buildTree(X: number[][], y: number[], idx: number[], depth: number, opt
 
   let best = { gain: 0, f: -1, t: 0 }
   const n = idx.length
-  const parentStats = opts.task === "classification" ? leafValue(y, idx, opts).map((p) => p * n) : [idx.reduce((a, i) => a + y[i], 0)]
+  const parentStats =
+    opts.task === "classification" ? leafValue(y, idx, opts).map((p) => p * n) : [idx.reduce((a, i) => a + y[i], 0)]
   const parentSq = opts.task === "regression" ? idx.reduce((a, i) => a + y[i] * y[i], 0) : undefined
   const parentImp = impurity(parentStats, n, opts.task, parentSq)
 
@@ -610,7 +613,12 @@ export function createEstimator(
     case "linear_regression":
       return new LinearRegression(num(hp, "alpha", 0))
     case "logistic_regression":
-      return new LogisticRegression(nClasses, num(hp, "learningRate", 0.1), num(hp, "epochs", 300), num(hp, "l2", 0.001))
+      return new LogisticRegression(
+        nClasses,
+        num(hp, "learningRate", 0.1),
+        num(hp, "epochs", 300),
+        num(hp, "l2", 0.001),
+      )
     case "knn":
       return new KNN(task, num(hp, "k", 5), nClasses)
     case "decision_tree":

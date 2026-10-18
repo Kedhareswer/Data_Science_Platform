@@ -58,7 +58,8 @@ function TableWidgetViewImpl({ widget, rows, columns, columnTypes }: TableWidget
   const current = Math.min(page, pageCount - 1)
   const pageRows = sorted.slice(current * pageSize, current * pageSize + pageSize)
 
-  if (visibleColumns.length === 0) return <WidgetMessage>None of the selected columns are in the current data.</WidgetMessage>
+  if (visibleColumns.length === 0)
+    return <WidgetMessage>None of the selected columns are in the current data.</WidgetMessage>
   if (rows.length === 0) return <WidgetMessage>No rows match the current filters.</WidgetMessage>
 
   const toggleSort = (column: string) => {
@@ -72,7 +73,7 @@ function TableWidgetViewImpl({ widget, rows, columns, columnTypes }: TableWidget
     <div className="flex h-full flex-col gap-2">
       <div className="min-h-0 flex-1 overflow-auto rounded-md border">
         <Table>
-          <TableHeader className="sticky top-0 bg-muted/80 backdrop-blur-sm">
+          <TableHeader className="bg-muted/80 sticky top-0 backdrop-blur-sm">
             <TableRow>
               {visibleColumns.map((column) => {
                 const active = sort?.column === column
@@ -85,7 +86,7 @@ function TableWidgetViewImpl({ widget, rows, columns, columnTypes }: TableWidget
                     <button
                       type="button"
                       onClick={() => toggleSort(column)}
-                      className="inline-flex items-center gap-1 rounded-sm font-semibold hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+                      className="hover:text-foreground focus-visible:outline-ring inline-flex items-center gap-1 rounded-sm font-semibold focus-visible:outline-2"
                     >
                       {column}
                       {active &&
@@ -119,10 +120,10 @@ function TableWidgetViewImpl({ widget, rows, columns, columnTypes }: TableWidget
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+      <div className="text-muted-foreground flex items-center justify-between gap-2 text-xs">
         <span>
-          {(current * pageSize + 1).toLocaleString()}–{Math.min(sorted.length, (current + 1) * pageSize).toLocaleString()} of{" "}
-          {sorted.length.toLocaleString()}
+          {(current * pageSize + 1).toLocaleString()}–
+          {Math.min(sorted.length, (current + 1) * pageSize).toLocaleString()} of {sorted.length.toLocaleString()}
         </span>
         <div className="flex items-center gap-1">
           <Button

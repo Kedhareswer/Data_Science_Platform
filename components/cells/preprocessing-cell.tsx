@@ -15,7 +15,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useCellContent, useCellRunner, useData } from "@/lib/data-context"
 import { describeRows } from "@/lib/data/infer"
-import { applyPipeline, describeStep, FILTER_OPERATORS, type FilterOperator, type TransformStep } from "@/lib/data/transform"
+import {
+  applyPipeline,
+  describeStep,
+  FILTER_OPERATORS,
+  type FilterOperator,
+  type TransformStep,
+} from "@/lib/data/transform"
 import type { CellValue, ColumnType, ColumnTypes, DataRow } from "@/lib/data/types"
 
 type StepType = TransformStep["type"]
@@ -71,7 +77,8 @@ const SINGLE_COLUMN_STEPS = new Set<StepType>([
 const COLUMN_TYPES: readonly ColumnType[] = ["number", "string", "boolean", "date"]
 
 function readContent(raw: unknown): PreprocessingContent {
-  if (raw && typeof raw === "object" && Array.isArray((raw as PreprocessingContent).steps)) return raw as PreprocessingContent
+  if (raw && typeof raw === "object" && Array.isArray((raw as PreprocessingContent).steps))
+    return raw as PreprocessingContent
   return EMPTY_CONTENT
 }
 
@@ -140,10 +147,19 @@ export function PreprocessingCell({ cellId }: CellProps) {
   }
 
   return (
-    <div className="space-y-5 font-handwritten">
+    <div className="font-handwritten space-y-5">
       <div className="grid gap-4 lg:grid-cols-2">
-        <StepBuilder columns={schema.columns} columnTypes={schema.columnTypes} onAdd={(step) => setSteps([...steps, step])} />
-        <StepList steps={steps} onMove={move} onRemove={(i) => setSteps(steps.filter((_, j) => j !== i))} onClear={() => setSteps([])} />
+        <StepBuilder
+          columns={schema.columns}
+          columnTypes={schema.columnTypes}
+          onAdd={(step) => setSteps([...steps, step])}
+        />
+        <StepList
+          steps={steps}
+          onMove={move}
+          onRemove={(i) => setSteps(steps.filter((_, j) => j !== i))}
+          onClear={() => setSteps([])}
+        />
       </div>
 
       <PreviewPanel
@@ -166,7 +182,9 @@ export function PreprocessingCell({ cellId }: CellProps) {
           <ClipboardCopy aria-hidden="true" /> Copy as pandas code
         </Button>
         {content.appliedAt && (
-          <span className="text-xs text-muted-foreground">Last applied {new Date(content.appliedAt).toLocaleString()}</span>
+          <span className="text-muted-foreground text-xs">
+            Last applied {new Date(content.appliedAt).toLocaleString()}
+          </span>
         )}
       </div>
     </div>
@@ -188,7 +206,16 @@ interface Draft {
   k: string
 }
 
-const INITIAL_DRAFT: Draft = { column: "", columns: [], operator: "eq", value: "", method: "median", to: "", castTo: "number", k: "1.5" }
+const INITIAL_DRAFT: Draft = {
+  column: "",
+  columns: [],
+  operator: "eq",
+  value: "",
+  method: "median",
+  to: "",
+  castTo: "number",
+  k: "1.5",
+}
 
 function buildStep(type: StepType, draft: Draft, column: string, columns: readonly string[]): TransformStep | string {
   if (SINGLE_COLUMN_STEPS.has(type) && !column) return "Pick a column."
@@ -199,7 +226,9 @@ function buildStep(type: StepType, draft: Draft, column: string, columns: readon
       return draft.columns.length ? { type, columns: draft.columns } : { type }
     case "fill_missing":
       if (draft.method === "constant" && draft.value === "") return "Enter a fill value."
-      return draft.method === "constant" ? { type, column, method: "constant", value: draft.value } : { type, column, method: draft.method }
+      return draft.method === "constant"
+        ? { type, column, method: "constant", value: draft.value }
+        : { type, column, method: draft.method }
     case "drop_duplicates":
       return { type }
     case "drop_columns":
@@ -240,7 +269,9 @@ function StepBuilder({ columns, columnTypes, onAdd }: StepBuilderProps) {
   const [error, setError] = useState<string | null>(null)
 
   const allowedTypes = STEP_COLUMN_TYPES[type]
-  const columnOptions = allowedTypes ? columns.filter((c) => allowedTypes.includes(columnTypes[c] ?? "string")) : columns
+  const columnOptions = allowedTypes
+    ? columns.filter((c) => allowedTypes.includes(columnTypes[c] ?? "string"))
+    : columns
   const column = columnOptions.includes(draft.column) ? draft.column : (columnOptions[0] ?? "")
   const patch = (p: Partial<Draft>) => {
     setDraft((d) => ({ ...d, ...p }))
@@ -248,11 +279,20 @@ function StepBuilder({ columns, columnTypes, onAdd }: StepBuilderProps) {
   }
 
   const add = () => {
-    if (type === "fill_missing" && (draft.method === "mean" || draft.method === "median") && columnTypes[column] !== "number") {
+    if (
+      type === "fill_missing" &&
+      (draft.method === "mean" || draft.method === "median") &&
+      columnTypes[column] !== "number"
+    ) {
       setError("Mean/median need a numeric column.")
       return
     }
-    const step = buildStep(type, { ...draft, columns: draft.columns.filter((c) => columns.includes(c)) }, column, columns)
+    const step = buildStep(
+      type,
+      { ...draft, columns: draft.columns.filter((c) => columns.includes(c)) },
+      column,
+      columns,
+    )
     if (typeof step === "string") {
       setError(step)
       return
@@ -265,7 +305,7 @@ function StepBuilder({ columns, columnTypes, onAdd }: StepBuilderProps) {
 
   return (
     <section className="sketch-card space-y-3 p-4" aria-labelledby="step-builder-heading">
-      <h3 id="step-builder-heading" className="text-base font-handwritten-bold">
+      <h3 id="step-builder-heading" className="font-handwritten-bold text-base">
         Add a step
       </h3>
       <div className="space-y-1">
@@ -292,7 +332,7 @@ function StepBuilder({ columns, columnTypes, onAdd }: StepBuilderProps) {
 
       {SINGLE_COLUMN_STEPS.has(type) &&
         (columnOptions.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             No {allowedTypes?.join("/") ?? ""} columns are available for this operation.
           </p>
         ) : (
@@ -305,7 +345,7 @@ function StepBuilder({ columns, columnTypes, onAdd }: StepBuilderProps) {
               <SelectContent>
                 {columnOptions.map((c) => (
                   <SelectItem key={c} value={c}>
-                    {c} <span className="text-xs text-muted-foreground">· {columnTypes[c]}</span>
+                    {c} <span className="text-muted-foreground text-xs">· {columnTypes[c]}</span>
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -313,10 +353,16 @@ function StepBuilder({ columns, columnTypes, onAdd }: StepBuilderProps) {
           </div>
         ))}
 
-      <StepFields type={type} draft={draft} columns={columns} columnIsNumeric={columnTypes[column] === "number"} onChange={patch} />
+      <StepFields
+        type={type}
+        draft={draft}
+        columns={columns}
+        columnIsNumeric={columnTypes[column] === "number"}
+        onChange={patch}
+      />
 
       {error && (
-        <p className="text-sm text-destructive" role="alert">
+        <p className="text-destructive text-sm" role="alert">
           {error}
         </p>
       )}
@@ -394,7 +440,9 @@ function StepFields({ type, draft, columns, columnIsNumeric, onChange }: StepFie
             </div>
           )}
           {!columnIsNumeric && (draft.method === "mean" || draft.method === "median") && (
-            <p className="col-span-2 text-xs text-warning">Mean/median only work on numeric columns — choose another method.</p>
+            <p className="text-warning col-span-2 text-xs">
+              Mean/median only work on numeric columns — choose another method.
+            </p>
           )}
         </div>
       )
@@ -437,7 +485,14 @@ function StepFields({ type, draft, columns, columnIsNumeric, onChange }: StepFie
       return (
         <div className="space-y-1">
           <Label htmlFor="step-k">IQR multiplier</Label>
-          <Input id="step-k" type="number" min={0.1} step={0.1} value={draft.k} onChange={(e) => onChange({ k: e.target.value })} />
+          <Input
+            id="step-k"
+            type="number"
+            min={0.1}
+            step={0.1}
+            value={draft.k}
+            onChange={(e) => onChange({ k: e.target.value })}
+          />
         </div>
       )
     default:
@@ -467,7 +522,9 @@ function ColumnChecklist({
               <Checkbox
                 id={id}
                 checked={selected.includes(c)}
-                onCheckedChange={(checked) => onChange(checked === true ? [...selected, c] : selected.filter((s) => s !== c))}
+                onCheckedChange={(checked) =>
+                  onChange(checked === true ? [...selected, c] : selected.filter((s) => s !== c))
+                }
               />
               <Label htmlFor={id} className="truncate font-normal">
                 {c}
@@ -498,7 +555,7 @@ function StepList({
   return (
     <section className="sketch-card space-y-3 p-4" aria-labelledby="pipeline-heading">
       <div className="flex items-center justify-between gap-2">
-        <h3 id="pipeline-heading" className="text-base font-handwritten-bold">
+        <h3 id="pipeline-heading" className="font-handwritten-bold text-base">
           Pipeline <Badge variant="outline">{steps.length}</Badge>
         </h3>
         {steps.length > 0 && (
@@ -508,16 +565,26 @@ function StepList({
         )}
       </div>
       {steps.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No steps yet. Steps run in order on the original data.</p>
+        <p className="text-muted-foreground text-sm">No steps yet. Steps run in order on the original data.</p>
       ) : (
         <ol className="space-y-1.5">
           {steps.map((step, i) => {
             const label = describeStep(step)
             return (
-              <li key={`${i}-${label}`} className="flex items-center gap-2 rounded-md border bg-muted/40 px-2 py-1.5 text-sm">
-                <span className="w-5 shrink-0 text-right text-muted-foreground">{i + 1}.</span>
+              <li
+                key={`${i}-${label}`}
+                className="bg-muted/40 flex items-center gap-2 rounded-md border px-2 py-1.5 text-sm"
+              >
+                <span className="text-muted-foreground w-5 shrink-0 text-right">{i + 1}.</span>
                 <span className="min-w-0 flex-1 break-words">{label}</span>
-                <Button variant="ghost" size="icon" className="h-7 w-7" aria-label={`Move step ${i + 1} up`} disabled={i === 0} onClick={() => onMove(i, -1)}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  aria-label={`Move step ${i + 1} up`}
+                  disabled={i === 0}
+                  onClick={() => onMove(i, -1)}
+                >
                   <ArrowUp aria-hidden="true" />
                 </Button>
                 <Button
@@ -530,7 +597,13 @@ function StepList({
                 >
                   <ArrowDown aria-hidden="true" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7" aria-label={`Remove step ${i + 1}: ${label}`} onClick={() => onRemove(i)}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  aria-label={`Remove step ${i + 1}: ${label}`}
+                  onClick={() => onRemove(i)}
+                >
                   <X aria-hidden="true" />
                 </Button>
               </li>
@@ -543,7 +616,8 @@ function StepList({
 }
 
 function formatCell(value: CellValue | undefined) {
-  if (value === null || value === undefined || value === "") return <span className="text-muted-foreground italic">null</span>
+  if (value === null || value === undefined || value === "")
+    return <span className="text-muted-foreground italic">null</span>
   if (typeof value === "number") return formatNumber(value)
   return String(value)
 }
@@ -567,23 +641,24 @@ function PreviewPanel({
   return (
     <section className="space-y-2" aria-labelledby="preview-heading" aria-busy={pending}>
       <div className="flex flex-wrap items-center gap-3">
-        <h3 id="preview-heading" className="text-base font-handwritten-bold">
+        <h3 id="preview-heading" className="font-handwritten-bold text-base">
           Preview
         </h3>
-        <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
-          {beforeRows.toLocaleString()} rows × {beforeColumns} cols <ArrowRight className="h-3.5 w-3.5" aria-label="becomes" />
+        <span className="text-muted-foreground flex items-center gap-1.5 text-sm">
+          {beforeRows.toLocaleString()} rows × {beforeColumns} cols{" "}
+          <ArrowRight className="h-3.5 w-3.5" aria-label="becomes" />
           <span className="text-foreground">
             {rows.length.toLocaleString()} rows × {columns.length} cols
           </span>
         </span>
-        {pending && <span className="text-xs text-muted-foreground">updating…</span>}
+        {pending && <span className="text-muted-foreground text-xs">updating…</span>}
       </div>
       {error ? (
-        <p className="text-sm text-destructive" role="alert">
+        <p className="text-destructive text-sm" role="alert">
           {error}
         </p>
       ) : rows.length === 0 ? (
-        <p className="text-sm text-warning">The pipeline removes every row.</p>
+        <p className="text-warning text-sm">The pipeline removes every row.</p>
       ) : (
         <div className="rounded-md border">
           <Table>
@@ -600,7 +675,7 @@ function PreviewPanel({
               {rows.slice(0, PREVIEW_ROWS).map((row, i) => (
                 <TableRow key={i}>
                   {shownColumns.map((c) => (
-                    <TableCell key={c} className="max-w-[12rem] truncate whitespace-nowrap py-1.5">
+                    <TableCell key={c} className="max-w-[12rem] truncate py-1.5 whitespace-nowrap">
                       {formatCell(row[c])}
                     </TableCell>
                   ))}
@@ -609,7 +684,9 @@ function PreviewPanel({
             </TableBody>
           </Table>
           {columns.length > shownColumns.length && (
-            <p className="px-3 py-1 text-xs text-muted-foreground">+ {columns.length - shownColumns.length} more columns</p>
+            <p className="text-muted-foreground px-3 py-1 text-xs">
+              + {columns.length - shownColumns.length} more columns
+            </p>
           )}
         </div>
       )}
@@ -696,7 +773,11 @@ function stepToPandas(step: TransformStep, types: ColumnTypes): string[] {
     case "remove_outliers": {
       const col = `df[${py(step.column)}]`
       const k = step.k ?? 1.5
-      return [`_q1, _q3 = ${col}.quantile([0.25, 0.75])`, `_iqr = _q3 - _q1`, `df = df[${col}.between(_q1 - ${k} * _iqr, _q3 + ${k} * _iqr) | ${col}.isna()]`]
+      return [
+        `_q1, _q3 = ${col}.quantile([0.25, 0.75])`,
+        `_iqr = _q3 - _q1`,
+        `df = df[${col}.between(_q1 - ${k} * _iqr, _q3 + ${k} * _iqr) | ${col}.isna()]`,
+      ]
     }
     case "label_encode": {
       const col = `df[${py(step.column)}]`
@@ -706,7 +787,9 @@ function stepToPandas(step: TransformStep, types: ColumnTypes): string[] {
       ]
     }
     case "one_hot":
-      return [`df = pd.get_dummies(df, columns=[${py(step.column)}], prefix=[${py(step.column)}], prefix_sep="_", dtype=int)`]
+      return [
+        `df = pd.get_dummies(df, columns=[${py(step.column)}], prefix=[${py(step.column)}], prefix_sep="_", dtype=int)`,
+      ]
     case "trim_text": {
       const col = `df[${py(step.column)}]`
       return [`${col} = ${col}.map(lambda v: v.strip() if isinstance(v, str) else v)`]

@@ -66,7 +66,8 @@ export function NotesCell({ cellId }: CellProps) {
     }
     if (!mod) return
     const key = event.key.toLowerCase()
-    const action: MarkdownAction | undefined = key === "b" ? "bold" : key === "i" ? "italic" : key === "k" ? "link" : undefined
+    const action: MarkdownAction | undefined =
+      key === "b" ? "bold" : key === "i" ? "italic" : key === "k" ? "link" : undefined
     if (action) {
       event.preventDefault()
       format(action)
@@ -97,7 +98,7 @@ export function NotesCell({ cellId }: CellProps) {
           type="button"
           variant={editing ? "secondary" : "ghost"}
           size="sm"
-          className="ml-auto font-handwritten"
+          className="font-handwritten ml-auto"
           onClick={() => (editing ? setEditing(false) : startEditing())}
         >
           {editing ? <Check aria-hidden="true" /> : <Pencil aria-hidden="true" />}
@@ -114,18 +115,19 @@ export function NotesCell({ cellId }: CellProps) {
             onKeyDown={handleKeyDown}
             aria-label="Markdown notes"
             placeholder={"# My findings\n\nWrite notes in **markdown** — lists, tables, `code` and links all work."}
-            className="block w-full resize-none rounded-md border bg-muted/30 p-3 font-mono text-sm leading-6 text-foreground outline-hidden placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+            className="bg-muted/30 text-foreground placeholder:text-muted-foreground focus-visible:ring-ring block w-full resize-none rounded-md border p-3 font-mono text-sm leading-6 outline-hidden focus-visible:ring-2"
             autoFocus={markdown.trim() === ""}
           />
-          <p className="font-handwritten text-xs text-muted-foreground">
-            Markdown supported · <kbd className="font-mono">Esc</kbd> or <kbd className="font-mono">Ctrl/⌘+Enter</kbd> to preview
+          <p className="font-handwritten text-muted-foreground text-xs">
+            Markdown supported · <kbd className="font-mono">Esc</kbd> or <kbd className="font-mono">Ctrl/⌘+Enter</kbd>{" "}
+            to preview
           </p>
         </div>
       ) : markdown.trim() ? (
         <div
           onDoubleClick={startEditing}
           title="Double-click to edit"
-          className="cursor-text rounded-md p-2 hover:bg-muted/30"
+          className="hover:bg-muted/30 cursor-text rounded-md p-2"
         >
           <MarkdownView markdown={markdown} />
         </div>
@@ -133,7 +135,7 @@ export function NotesCell({ cellId }: CellProps) {
         <button
           type="button"
           onClick={startEditing}
-          className="flex w-full flex-col items-center gap-1 rounded-md border-2 border-dashed p-6 text-center font-handwritten text-muted-foreground transition-colors hover:bg-muted/30 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+          className="font-handwritten text-muted-foreground hover:bg-muted/30 focus-visible:ring-ring flex w-full flex-col items-center gap-1 rounded-md border-2 border-dashed p-6 text-center transition-colors focus-visible:ring-2 focus-visible:outline-hidden"
         >
           <Pencil className="h-5 w-5" aria-hidden="true" />
           <span>Nothing here yet — click to jot down some notes.</span>

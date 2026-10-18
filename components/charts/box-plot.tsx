@@ -103,7 +103,7 @@ export function BoxPlot({ boxes, xLabel, yLabel, height = 360 }: BoxPlotProps) {
       role="img"
       aria-label={`Box plot of ${yLabel ?? "values"}${xLabel ? ` by ${xLabel}` : ""}`}
       viewBox={`0 0 ${WIDTH} ${height}`}
-      className="h-auto w-full font-handwritten"
+      className="font-handwritten h-auto w-full"
     >
       {ticks.map((t) => (
         <g key={t}>
@@ -115,7 +115,14 @@ export function BoxPlot({ boxes, xLabel, yLabel, height = 360 }: BoxPlotProps) {
             strokeDasharray="3 3"
             style={{ stroke: "var(--color-border)" }}
           />
-          <text x={MARGIN.left - 8} y={y(t)} textAnchor="end" dominantBaseline="middle" fontSize={12} style={{ fill: "var(--color-muted-foreground)" }}>
+          <text
+            x={MARGIN.left - 8}
+            y={y(t)}
+            textAnchor="end"
+            dominantBaseline="middle"
+            fontSize={12}
+            style={{ fill: "var(--color-muted-foreground)" }}
+          >
             {formatNumber(t)}
           </text>
         </g>
@@ -130,8 +137,20 @@ export function BoxPlot({ boxes, xLabel, yLabel, height = 360 }: BoxPlotProps) {
             </title>
             <line x1={cx} x2={cx} y1={y(b.upperWhisker)} y2={y(b.q3)} style={{ stroke: "var(--color-foreground)" }} />
             <line x1={cx} x2={cx} y1={y(b.q1)} y2={y(b.lowerWhisker)} style={{ stroke: "var(--color-foreground)" }} />
-            <line x1={cx - boxWidth / 4} x2={cx + boxWidth / 4} y1={y(b.upperWhisker)} y2={y(b.upperWhisker)} style={{ stroke: "var(--color-foreground)" }} />
-            <line x1={cx - boxWidth / 4} x2={cx + boxWidth / 4} y1={y(b.lowerWhisker)} y2={y(b.lowerWhisker)} style={{ stroke: "var(--color-foreground)" }} />
+            <line
+              x1={cx - boxWidth / 4}
+              x2={cx + boxWidth / 4}
+              y1={y(b.upperWhisker)}
+              y2={y(b.upperWhisker)}
+              style={{ stroke: "var(--color-foreground)" }}
+            />
+            <line
+              x1={cx - boxWidth / 4}
+              x2={cx + boxWidth / 4}
+              y1={y(b.lowerWhisker)}
+              y2={y(b.lowerWhisker)}
+              style={{ stroke: "var(--color-foreground)" }}
+            />
             <rect
               x={cx - boxWidth / 2}
               y={y(b.q3)}
@@ -142,19 +161,43 @@ export function BoxPlot({ boxes, xLabel, yLabel, height = 360 }: BoxPlotProps) {
               strokeWidth={1.5}
               style={{ fill: color, stroke: "var(--color-foreground)" }}
             />
-            <line x1={cx - boxWidth / 2} x2={cx + boxWidth / 2} y1={y(b.median)} y2={y(b.median)} strokeWidth={2.5} style={{ stroke: "var(--color-foreground)" }} />
-            <circle cx={cx} cy={y(b.mean)} r={3} style={{ fill: "var(--color-background)", stroke: "var(--color-foreground)" }} />
+            <line
+              x1={cx - boxWidth / 2}
+              x2={cx + boxWidth / 2}
+              y1={y(b.median)}
+              y2={y(b.median)}
+              strokeWidth={2.5}
+              style={{ stroke: "var(--color-foreground)" }}
+            />
+            <circle
+              cx={cx}
+              cy={y(b.mean)}
+              r={3}
+              style={{ fill: "var(--color-background)", stroke: "var(--color-foreground)" }}
+            />
             {b.outliers.map((v, k) => (
               <circle key={k} cx={cx + ((k % 5) - 2) * 2} cy={y(v)} r={2.5} fillOpacity={0.6} style={{ fill: color }} />
             ))}
-            <text x={cx} y={height - MARGIN.bottom + 18} textAnchor="middle" fontSize={12} style={{ fill: "var(--color-muted-foreground)" }}>
+            <text
+              x={cx}
+              y={height - MARGIN.bottom + 18}
+              textAnchor="middle"
+              fontSize={12}
+              style={{ fill: "var(--color-muted-foreground)" }}
+            >
               {truncateLabel(b.label, Math.max(6, Math.floor(band / 8)))}
             </text>
           </g>
         )
       })}
       {xLabel && (
-        <text x={MARGIN.left + innerW / 2} y={height - 12} textAnchor="middle" fontSize={13} style={{ fill: "var(--color-muted-foreground)" }}>
+        <text
+          x={MARGIN.left + innerW / 2}
+          y={height - 12}
+          textAnchor="middle"
+          fontSize={13}
+          style={{ fill: "var(--color-muted-foreground)" }}
+        >
           {xLabel}
         </text>
       )}

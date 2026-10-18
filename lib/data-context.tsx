@@ -112,7 +112,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [dashboard, setDashboard] = useState<DashboardState>(EMPTY_DASHBOARD)
   const runners = useRef(new Map<string, CellRunner>())
   const cellsRef = useRef(notebookCells)
-  cellsRef.current = notebookCells
+  useEffect(() => {
+    cellsRef.current = notebookCells
+  }, [notebookCells])
 
   const applyRows = useCallback((rows: DataRow[], known?: Pick<Dataset, "columns" | "columnTypes">) => {
     setProcessedRows(rows)
@@ -162,7 +164,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   }, [isHydrated, fileName, data, processedData, notebookCells, trainedModels, dashboard])
 
   const addCell = useCallback((type: CellType, insertIndex?: number): string => {
-    const cell: NotebookCell = { id: newCellId(), type, title: CELL_META[type].title, createdAt: new Date().toISOString() }
+    const cell: NotebookCell = {
+      id: newCellId(),
+      type,
+      title: CELL_META[type].title,
+      createdAt: new Date().toISOString(),
+    }
     setNotebookCells((prev) => {
       if (insertIndex === undefined || insertIndex < 0 || insertIndex > prev.length) return [...prev, cell]
       const next = [...prev]
@@ -178,7 +185,14 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       applyRows(dataset.rows, dataset)
       setFileName(name)
       setError(null)
-      setNotebookCells((prev) => (prev.some((c) => c.type === "data") ? prev : [{ id: newCellId(), type: "data", title: CELL_META.data.title, createdAt: new Date().toISOString() }, ...prev]))
+      setNotebookCells((prev) =>
+        prev.some((c) => c.type === "data")
+          ? prev
+          : [
+              { id: newCellId(), type: "data", title: CELL_META.data.title, createdAt: new Date().toISOString() },
+              ...prev,
+            ],
+      )
     },
     [applyRows],
   )
@@ -332,7 +346,10 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   )
 
   const addTrainedModel = useCallback((model: TrainedModel) => setTrainedModels((prev) => [...prev, model]), [])
-  const removeTrainedModel = useCallback((id: string) => setTrainedModels((prev) => prev.filter((m) => m.id !== id)), [])
+  const removeTrainedModel = useCallback(
+    (id: string) => setTrainedModels((prev) => prev.filter((m) => m.id !== id)),
+    [],
+  )
   const importModel = useCallback(
     (model: TrainedModel) => setTrainedModels((prev) => [...prev.filter((m) => m.id !== model.id), model]),
     [],
@@ -440,7 +457,9 @@ export function useCellContent<T>(cellId: string, fallback: T): [T, (next: T | (
   const { notebookCells, updateCellContent } = useData()
   const content = (notebookCells.find((c) => c.id === cellId)?.content as T | undefined) ?? fallback
   const ref = useRef(content)
-  ref.current = content
+  useEffect(() => {
+    ref.current = content
+  }, [content])
   const set = useCallback(
     (next: T | ((prev: T) => T)) => {
       const value = typeof next === "function" ? (next as (prev: T) => T)(ref.current) : next
@@ -456,7 +475,9 @@ export function useCellContent<T>(cellId: string, fallback: T): [T, (next: T | (
 export function useCellRunner(cellId: string | undefined, runner: CellRunner) {
   const { registerRunner } = useData()
   const ref = useRef(runner)
-  ref.current = runner
+  useEffect(() => {
+    ref.current = runner
+  })
   useEffect(() => {
     if (!cellId) return
     return registerRunner(cellId, () => ref.current())

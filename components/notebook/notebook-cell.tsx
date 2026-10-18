@@ -2,7 +2,18 @@
 
 import { memo, useState } from "react"
 import type { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd"
-import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, Copy, GripVertical, Loader2, MoreHorizontal, Play, Trash2 } from "lucide-react"
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronDown,
+  ChevronRight,
+  Copy,
+  GripVertical,
+  Loader2,
+  MoreHorizontal,
+  Play,
+  Trash2,
+} from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
@@ -42,7 +53,7 @@ function CellTitle({ cell }: { cell: NotebookCellModel }) {
         autoFocus
         value={draft}
         aria-label="Cell title"
-        className="h-8 max-w-sm font-handwritten-bold"
+        className="font-handwritten-bold h-8 max-w-sm"
         onChange={(e) => setDraft(e.target.value)}
         onBlur={commit}
         onKeyDown={(e) => {
@@ -59,7 +70,7 @@ function CellTitle({ cell }: { cell: NotebookCellModel }) {
   return (
     <button
       type="button"
-      className="truncate rounded-sm text-left font-handwritten-bold text-lg hover:underline hover:decoration-dashed focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden"
+      className="font-handwritten-bold focus-visible:ring-ring truncate rounded-sm text-left text-lg hover:underline hover:decoration-dashed focus-visible:ring-2 focus-visible:outline-hidden"
       title="Rename cell"
       onClick={() => {
         setDraft(cell.title)
@@ -71,8 +82,15 @@ function CellTitle({ cell }: { cell: NotebookCellModel }) {
   )
 }
 
-export const NotebookCell = memo(function NotebookCell({ cell, index, total, dragHandleProps, isRunning }: NotebookCellProps) {
-  const { removeCell, duplicateCell, reorderCells, runCell, updateCell, notebookCells, importNotebook, trainedModels } = useData()
+export const NotebookCell = memo(function NotebookCell({
+  cell,
+  index,
+  total,
+  dragHandleProps,
+  isRunning,
+}: NotebookCellProps) {
+  const { removeCell, duplicateCell, reorderCells, runCell, updateCell, notebookCells, importNotebook, trainedModels } =
+    useData()
   const [running, setRunning] = useState(false)
   const meta = CELL_META[cell.type]
   const Icon = CELL_ICONS[cell.type]
@@ -96,7 +114,14 @@ export const NotebookCell = memo(function NotebookCell({ cell, index, total, dra
     toast(`Deleted “${cell.title}”`, {
       action: {
         label: "Undo",
-        onClick: () => importNotebook({ format: "datanotebook", version: 2, exportedAt: "", cells: snapshot, models: trainedModels }),
+        onClick: () =>
+          importNotebook({
+            format: "datanotebook",
+            version: 2,
+            exportedAt: "",
+            cells: snapshot,
+            models: trainedModels,
+          }),
       },
     })
   }
@@ -105,12 +130,16 @@ export const NotebookCell = memo(function NotebookCell({ cell, index, total, dra
     <article
       id={cell.id}
       aria-labelledby={`${cell.id}-label`}
-      className={cn("sketch-card scroll-mt-20 border-l-4 shadow-xs", CATEGORY_ACCENT[meta.category], busy && "ring-2 ring-ring/40")}
+      className={cn(
+        "sketch-card scroll-mt-20 border-l-4 shadow-xs",
+        CATEGORY_ACCENT[meta.category],
+        busy && "ring-ring/40 ring-2",
+      )}
     >
       <header className="flex items-center gap-2 border-b border-dashed px-3 py-2">
         <span
           {...dragHandleProps}
-          className="cursor-grab rounded-sm p-1 text-muted-foreground hover:bg-accent active:cursor-grabbing"
+          className="text-muted-foreground hover:bg-accent cursor-grab rounded-sm p-1 active:cursor-grabbing"
           aria-label={`Drag to reorder cell ${index + 1}`}
         >
           <GripVertical className="h-4 w-4" aria-hidden />
@@ -125,11 +154,11 @@ export const NotebookCell = memo(function NotebookCell({ cell, index, total, dra
         >
           {cell.collapsed ? <ChevronRight aria-hidden /> : <ChevronDown aria-hidden />}
         </Button>
-        <Icon className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+        <Icon className="text-muted-foreground h-4 w-4 shrink-0" aria-hidden />
         <span id={`${cell.id}-label`} className="min-w-0 flex-1">
           <CellTitle cell={cell} />
         </span>
-        <span className="hidden text-xs text-muted-foreground sm:inline">[{index + 1}]</span>
+        <span className="text-muted-foreground hidden text-xs sm:inline">[{index + 1}]</span>
 
         {meta.runnable && (
           <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Run cell" onClick={run} disabled={busy}>

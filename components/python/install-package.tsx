@@ -58,7 +58,7 @@ export function InstallPackage({ disabled }: { disabled?: boolean }) {
             <Label htmlFor={inputId} className="font-handwritten-bold">
               Install a Python package
             </Label>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Uses micropip. Works for pure-Python wheels from PyPI and packages bundled with Pyodide.
             </p>
           </div>
@@ -74,7 +74,7 @@ export function InstallPackage({ disabled }: { disabled?: boolean }) {
             aria-invalid={error ? true : undefined}
           />
           {error && (
-            <p role="alert" className="text-xs text-destructive">
+            <p role="alert" className="text-destructive text-xs">
               {error}
             </p>
           )}

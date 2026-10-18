@@ -113,7 +113,7 @@
   }
 
   body {
-    @apply bg-background font-sans text-foreground antialiased;
+    @apply bg-background text-foreground font-sans antialiased;
     line-height: 1.5;
   }
 
@@ -158,11 +158,11 @@
 
 /* A slightly "sketched" card used on the dashboard and profiler. */
 @utility sketch-card {
-  @apply rounded-lg border-2 border-dashed bg-card text-card-foreground;
+  @apply bg-card text-card-foreground rounded-lg border-2 border-dashed;
 }
 
 @utility skip-link {
-  @apply sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:bg-background focus:px-4 focus:py-2 focus:text-foreground focus:shadow-lg;
+  @apply focus:bg-background focus:text-foreground sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:shadow-lg;
 }
 
 @media (prefers-reduced-motion: reduce) {

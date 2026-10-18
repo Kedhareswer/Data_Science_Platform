@@ -98,7 +98,7 @@ export function FileUpload({ onLoaded, compact = false, className }: FileUploadP
           "aria-busy": working,
         })}
         className={cn(
-          "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed text-center transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          "focus-visible:ring-ring flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed text-center transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden",
           compact ? "p-5" : "p-10",
           isDragReject
             ? "border-destructive bg-destructive/5"
@@ -111,7 +111,7 @@ export function FileUpload({ onLoaded, compact = false, className }: FileUploadP
         <input {...getInputProps()} />
         <div className={cn("rounded-full p-3", isDragReject ? "bg-destructive/10" : "bg-primary/10")}>
           {working ? (
-            <Loader2 className="h-6 w-6 animate-spin text-primary" aria-hidden="true" />
+            <Loader2 className="text-primary h-6 w-6 animate-spin" aria-hidden="true" />
           ) : (
             <Upload className={cn("h-6 w-6", isDragReject ? "text-destructive" : "text-primary")} aria-hidden="true" />
           )}
@@ -125,12 +125,12 @@ export function FileUpload({ onLoaded, compact = false, className }: FileUploadP
                 ? "Drop it like it's hot!"
                 : "Drag & drop a data file, or click to browse"}
         </p>
-        <p className="font-handwritten text-sm text-muted-foreground">
+        <p className="font-handwritten text-muted-foreground text-sm">
           {EXTENSION_LIST} · up to {MAX_MB} MB · stays in your browser
         </p>
       </div>
 
-      <div className="flex flex-wrap items-center justify-center gap-2 font-handwritten text-sm text-muted-foreground">
+      <div className="font-handwritten text-muted-foreground flex flex-wrap items-center justify-center gap-2 text-sm">
         <span>No data handy?</span>
         <Button
           type="button"

@@ -45,12 +45,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <a href="#main-content" className="skip-link">
             Skip to main content
           </a>
-            <DataProvider>
-              {children}
-              <Toaster />
-            </DataProvider>
+          <DataProvider>
+            {children}
+            <Toaster />
+          </DataProvider>
         </ThemeProvider>
-        <Analytics />
+        {process.env.VERCEL && <Analytics />}
       </body>
     </html>
   )

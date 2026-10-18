@@ -20,7 +20,7 @@ import type { CellProps } from "@/components/cells/types"
 import type { CellType } from "@/lib/notebook"
 
 function CellLoading() {
-  return <div className="h-32 animate-pulse rounded-md bg-muted" aria-label="Loading cell" />
+  return <div className="bg-muted h-32 animate-pulse rounded-md" aria-label="Loading cell" />
 }
 
 // Cells are code-split so the notebook loads fast and heavy cells (charts, ML) load on demand.

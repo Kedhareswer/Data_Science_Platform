@@ -13,31 +13,36 @@ export function RunOutput({ output }: RunOutputProps) {
   return (
     <div className="space-y-3" aria-live="polite">
       {output.stdout && (
-        <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-md bg-muted/50 p-3 font-mono text-xs leading-5 text-foreground">
+        <pre className="bg-muted/50 text-foreground max-h-96 overflow-auto rounded-md p-3 font-mono text-xs leading-5 break-words whitespace-pre-wrap">
           {output.stdout}
         </pre>
       )}
       {output.stderr && (
         <pre
           aria-label="Warnings"
-          className="max-h-64 overflow-auto whitespace-pre-wrap break-words rounded-md border border-warning/40 bg-warning/10 p-3 font-mono text-xs leading-5 text-foreground"
+          className="border-warning/40 bg-warning/10 text-foreground max-h-64 overflow-auto rounded-md border p-3 font-mono text-xs leading-5 break-words whitespace-pre-wrap"
         >
           {output.stderr}
         </pre>
       )}
       {output.stopped ? (
-        <div role="status" className="flex items-center gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 font-handwritten text-sm text-destructive">
+        <div
+          role="status"
+          className="border-destructive/40 bg-destructive/10 font-handwritten text-destructive flex items-center gap-2 rounded-md border p-3 text-sm"
+        >
           <OctagonX className="h-4 w-4" aria-hidden="true" />
           Execution stopped. Python state was reset — the next run restarts the runtime.
         </div>
       ) : (
         output.error && (
-          <div role="alert" className="rounded-md border border-destructive/40 bg-destructive/10 p-3">
-            <div className="mb-1 flex items-center gap-2 font-handwritten-bold text-sm text-destructive">
+          <div role="alert" className="border-destructive/40 bg-destructive/10 rounded-md border p-3">
+            <div className="font-handwritten-bold text-destructive mb-1 flex items-center gap-2 text-sm">
               <AlertTriangle className="h-4 w-4" aria-hidden="true" />
               Error
             </div>
-            <pre className="max-h-96 overflow-auto whitespace-pre font-mono text-xs leading-5 text-destructive">{output.error}</pre>
+            <pre className="text-destructive max-h-96 overflow-auto font-mono text-xs leading-5 whitespace-pre">
+              {output.error}
+            </pre>
           </div>
         )
       )}
@@ -45,7 +50,7 @@ export function RunOutput({ output }: RunOutputProps) {
         <OutputTable table={output.table} />
       ) : (
         output.result && (
-          <pre className="max-h-96 overflow-auto whitespace-pre rounded-md border bg-card p-3 font-mono text-xs leading-5 text-foreground">
+          <pre className="bg-card text-foreground max-h-96 overflow-auto rounded-md border p-3 font-mono text-xs leading-5 whitespace-pre">
             {output.result}
           </pre>
         )
@@ -58,7 +63,7 @@ export function RunOutput({ output }: RunOutputProps) {
           className="max-w-full rounded-md border"
         />
       ))}
-      <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+      <div className="text-muted-foreground flex flex-wrap items-center gap-3 text-xs">
         {!hasError && output.durationMs > 0 && (
           <span className="inline-flex items-center gap-1">
             <Clock className="h-3 w-3" aria-hidden="true" />
@@ -76,10 +81,14 @@ function OutputTable({ table }: { table: NonNullable<StoredOutput["table"]> }) {
     <div className="space-y-1">
       <div className="max-h-[28rem] overflow-auto rounded-md border">
         <table className="w-full border-collapse font-mono text-xs">
-          <thead className="sticky top-0 bg-muted">
+          <thead className="bg-muted sticky top-0">
             <tr>
               {table.columns.map((column, i) => (
-                <th key={`${column}-${i}`} scope="col" className="whitespace-nowrap border-b px-3 py-1.5 text-left font-semibold text-foreground">
+                <th
+                  key={`${column}-${i}`}
+                  scope="col"
+                  className="text-foreground border-b px-3 py-1.5 text-left font-semibold whitespace-nowrap"
+                >
                   {column}
                 </th>
               ))}
@@ -91,9 +100,9 @@ function OutputTable({ table }: { table: NonNullable<StoredOutput["table"]> }) {
                 {table.columns.map((column, c) => {
                   const value = row[column]
                   return (
-                    <td key={c} className="whitespace-nowrap border-b px-3 py-1 text-foreground">
+                    <td key={c} className="text-foreground border-b px-3 py-1 whitespace-nowrap">
                       {value === null || value === undefined ? (
-                        <span className="italic text-muted-foreground">null</span>
+                        <span className="text-muted-foreground italic">null</span>
                       ) : (
                         formatValue(value)
                       )}
@@ -105,7 +114,7 @@ function OutputTable({ table }: { table: NonNullable<StoredOutput["table"]> }) {
           </tbody>
         </table>
       </div>
-      <p className="font-handwritten text-xs text-muted-foreground">
+      <p className="font-handwritten text-muted-foreground text-xs">
         {table.totalRows > table.rows.length
           ? `Showing ${table.rows.length.toLocaleString()} of ${table.totalRows.toLocaleString()} rows`
           : `${table.totalRows.toLocaleString()} rows`}{" "}

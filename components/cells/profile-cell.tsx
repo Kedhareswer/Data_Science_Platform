@@ -1,7 +1,18 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
-import { AlertTriangle, Columns3, Copy, Gauge, HardDrive, Loader2, Percent, RefreshCw, Rows3, SearchX } from "lucide-react"
+import {
+  AlertTriangle,
+  Columns3,
+  Copy,
+  Gauge,
+  HardDrive,
+  Loader2,
+  Percent,
+  RefreshCw,
+  Rows3,
+  SearchX,
+} from "lucide-react"
 import type { CellProps } from "@/components/cells/types"
 import { CorrelationHeatmap } from "@/components/charts/correlation-heatmap"
 import { formatNumber, truncateLabel } from "@/components/charts/theme"
@@ -36,12 +47,17 @@ export function ProfileCell({ cellId }: CellProps) {
   useCellRunner(cellId, () => generateDataProfile())
 
   if (processedData.length === 0) {
-    return <DataUploadPrompt title="Nothing to profile yet" description="Load a dataset to see its profile, data quality and correlations." />
+    return (
+      <DataUploadPrompt
+        title="Nothing to profile yet"
+        description="Load a dataset to see its profile, data quality and correlations."
+      />
+    )
   }
 
   if (!dataProfile) {
     return (
-      <div className="flex flex-col items-center justify-center gap-3 py-12 text-muted-foreground" role="status">
+      <div className="text-muted-foreground flex flex-col items-center justify-center gap-3 py-12" role="status">
         {isProfileLoading ? (
           <>
             <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />
@@ -59,7 +75,14 @@ export function ProfileCell({ cellId }: CellProps) {
     )
   }
 
-  return <ProfileView profile={dataProfile} rows={processedData} isLoading={isProfileLoading} onRefresh={() => void generateDataProfile()} />
+  return (
+    <ProfileView
+      profile={dataProfile}
+      rows={processedData}
+      isLoading={isProfileLoading}
+      onRefresh={() => void generateDataProfile()}
+    />
+  )
 }
 
 interface ProfileViewProps {
@@ -72,9 +95,9 @@ interface ProfileViewProps {
 function ProfileView({ profile, rows, isLoading, onRefresh }: ProfileViewProps) {
   const correlationColumns = useMemo(() => Object.keys(profile.correlations), [profile.correlations])
   return (
-    <div className="space-y-4 font-handwritten">
+    <div className="font-handwritten space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Generated {new Date(profile.generatedAt).toLocaleString()} · {profile.dataQuality.length} quality note
           {profile.dataQuality.length === 1 ? "" : "s"}
         </p>
@@ -122,15 +145,15 @@ function OverviewTiles({ overview }: { overview: DataProfile["overview"] }) {
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {tiles.map(({ label, value, icon: Icon }) => (
           <div key={label} className="sketch-card p-3">
-            <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <dt className="text-muted-foreground flex items-center gap-1.5 text-xs">
               <Icon className="h-3.5 w-3.5" aria-hidden="true" /> {label}
             </dt>
-            <dd className="mt-1 text-xl font-handwritten-bold">{value}</dd>
+            <dd className="font-handwritten-bold mt-1 text-xl">{value}</dd>
           </div>
         ))}
       </dl>
       <div>
-        <div className="mb-1 flex justify-between text-xs text-muted-foreground">
+        <div className="text-muted-foreground mb-1 flex justify-between text-xs">
           <span>Data completeness</span>
           <span>{overview.completeness}%</span>
         </div>
@@ -149,23 +172,26 @@ const SEVERITY_CLASS: Record<DataQualityIssue["severity"], string> = {
 function QualityIssues({ issues }: { issues: DataQualityIssue[] }) {
   if (issues.length === 0) {
     return (
-      <div className="sketch-card flex items-center gap-2 p-4 text-success">
+      <div className="sketch-card text-success flex items-center gap-2 p-4">
         <Percent className="h-4 w-4" aria-hidden="true" /> No data quality issues detected. Nice and tidy!
       </div>
     )
   }
   return (
     <section aria-labelledby="quality-heading" className="space-y-2">
-      <h3 id="quality-heading" className="flex items-center gap-2 text-base font-handwritten-bold">
-        <AlertTriangle className="h-4 w-4 text-warning" aria-hidden="true" /> Data quality
+      <h3 id="quality-heading" className="font-handwritten-bold flex items-center gap-2 text-base">
+        <AlertTriangle className="text-warning h-4 w-4" aria-hidden="true" /> Data quality
       </h3>
       <ul className="space-y-2">
         {issues.map((issue, i) => (
-          <li key={`${issue.type}-${issue.column ?? "all"}-${i}`} className="sketch-card flex flex-col gap-1 p-3 sm:flex-row sm:items-start sm:gap-3">
+          <li
+            key={`${issue.type}-${issue.column ?? "all"}-${i}`}
+            className="sketch-card flex flex-col gap-1 p-3 sm:flex-row sm:items-start sm:gap-3"
+          >
             <Badge className={cn("w-fit shrink-0 capitalize", SEVERITY_CLASS[issue.severity])}>{issue.severity}</Badge>
             <div className="min-w-0">
               <p className="text-sm">{issue.description}</p>
-              <p className="text-xs text-muted-foreground">💡 {issue.suggestion}</p>
+              <p className="text-muted-foreground text-xs">💡 {issue.suggestion}</p>
             </div>
           </li>
         ))}
@@ -218,7 +244,7 @@ function ColumnBrowser({ profile, rows }: { profile: DataProfile; rows: DataRow[
         </Select>
       </div>
       {filtered.length === 0 ? (
-        <p className="py-6 text-center text-sm text-muted-foreground">No columns match.</p>
+        <p className="text-muted-foreground py-6 text-center text-sm">No columns match.</p>
       ) : (
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {visible.map((column) => (
@@ -249,7 +275,7 @@ function ColumnCard({ column, rows }: { column: ColumnProfile; rows: DataRow[] }
   return (
     <article className="sketch-card space-y-3 p-3" aria-label={`Column ${column.name}`}>
       <header className="flex items-start justify-between gap-2">
-        <h4 className="min-w-0 truncate font-handwritten-bold" title={column.name}>
+        <h4 className="font-handwritten-bold min-w-0 truncate" title={column.name}>
           {column.name}
         </h4>
         <Badge variant="outline" className="shrink-0">
@@ -258,13 +284,17 @@ function ColumnCard({ column, rows }: { column: ColumnProfile; rows: DataRow[] }
       </header>
 
       <div>
-        <div className="mb-1 flex justify-between text-xs text-muted-foreground">
+        <div className="text-muted-foreground mb-1 flex justify-between text-xs">
           <span>Missing</span>
           <span>
             {column.missing.toLocaleString()} ({column.missingPercentage}%)
           </span>
         </div>
-        <Progress value={column.missingPercentage} aria-label={`${column.missingPercentage}% missing`} className="h-2" />
+        <Progress
+          value={column.missingPercentage}
+          aria-label={`${column.missingPercentage}% missing`}
+          className="h-2"
+        />
       </div>
 
       <dl className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-sm">
@@ -293,14 +323,14 @@ function ColumnCard({ column, rows }: { column: ColumnProfile; rows: DataRow[] }
       </dl>
 
       {allMissing ? (
-        <p className="text-xs text-muted-foreground">Every value in this column is missing.</p>
+        <p className="text-muted-foreground text-xs">Every value in this column is missing.</p>
       ) : column.type === "number" ? (
         <MiniHistogram rows={rows} column={column.name} />
       ) : (
         <TopValues column={column} />
       )}
 
-      {column.anomalies?.length ? <p className="text-xs text-warning">⚠ {column.anomalies.join(" · ")}</p> : null}
+      {column.anomalies?.length ? <p className="text-warning text-xs">⚠ {column.anomalies.join(" · ")}</p> : null}
     </article>
   )
 }
@@ -315,13 +345,13 @@ function MiniHistogram({ rows, column }: { rows: DataRow[]; column: string }) {
         {bins.map((bin, i) => (
           <div
             key={i}
-            className="flex-1 rounded-t-sm bg-chart-2"
+            className="bg-chart-2 flex-1 rounded-t-sm"
             style={{ height: `${Math.max(2, (bin.count / max) * 100)}%` }}
             title={`${formatNumber(bin.start)} – ${formatNumber(bin.end)}: ${bin.count.toLocaleString()}`}
           />
         ))}
       </div>
-      <figcaption className="mt-1 flex justify-between text-[10px] text-muted-foreground">
+      <figcaption className="text-muted-foreground mt-1 flex justify-between text-[10px]">
         <span>{formatNumber(bins[0].start)}</span>
         <span>{formatNumber(bins[bins.length - 1].end)}</span>
       </figcaption>
@@ -341,12 +371,12 @@ function TopValues({ column }: { column: ColumnProfile }) {
             <span className="truncate" title={String(t.value)}>
               {truncateLabel(t.value, 28)}
             </span>
-            <span className="shrink-0 text-muted-foreground">
+            <span className="text-muted-foreground shrink-0">
               {t.count.toLocaleString()} · {t.percentage}%
             </span>
           </div>
-          <div className="h-1.5 rounded-full bg-muted">
-            <div className="h-1.5 rounded-full bg-chart-1" style={{ width: `${(t.percentage / max) * 100}%` }} />
+          <div className="bg-muted h-1.5 rounded-full">
+            <div className="bg-chart-1 h-1.5 rounded-full" style={{ width: `${(t.percentage / max) * 100}%` }} />
           </div>
         </li>
       ))}
@@ -372,20 +402,22 @@ function CorrelationSection({ columns, matrix }: { columns: string[]; matrix: Da
   }, [columns, matrix])
 
   if (columns.length < 2) {
-    return <p className="py-6 text-center text-sm text-muted-foreground">Correlations need at least two numeric columns.</p>
+    return (
+      <p className="text-muted-foreground py-6 text-center text-sm">Correlations need at least two numeric columns.</p>
+    )
   }
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
       <div>
         <CorrelationHeatmap columns={shown} matrix={matrix} label="Pearson correlation between numeric columns" />
         {columns.length > shown.length && (
-          <p className="mt-2 text-xs text-muted-foreground">
+          <p className="text-muted-foreground mt-2 text-xs">
             Showing the first {shown.length} of {columns.length} numeric columns.
           </p>
         )}
       </div>
       <section aria-labelledby="strongest-heading">
-        <h3 id="strongest-heading" className="mb-2 text-base font-handwritten-bold">
+        <h3 id="strongest-heading" className="font-handwritten-bold mb-2 text-base">
           Strongest relationships
         </h3>
         <ol className="space-y-1 text-sm">

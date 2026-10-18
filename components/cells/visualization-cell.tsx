@@ -135,7 +135,10 @@ export function VisualizationCell({ cellId }: CellProps) {
     if (!chartRef.current) return
     setExporting(true)
     try {
-      await exportChartPng(chartRef.current, fileStem, { title: config.title || undefined, legend: legendEntries(result) })
+      await exportChartPng(chartRef.current, fileStem, {
+        title: config.title || undefined,
+        legend: legendEntries(result),
+      })
       toast.success("Chart exported as PNG")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not export chart")
@@ -155,17 +158,23 @@ export function VisualizationCell({ cellId }: CellProps) {
   }
 
   return (
-    <div className="space-y-4 font-handwritten">
+    <div className="font-handwritten space-y-4">
       <ChartTypePicker value={config.chartType} onChange={(chartType) => update({ chartType })} />
-      <ChartControls config={config} columns={columns} columnTypes={columnTypes} onChange={update} onReset={() => setStored(null)} />
+      <ChartControls
+        config={config}
+        columns={columns}
+        columnTypes={columnTypes}
+        onChange={update}
+        onReset={() => setStored(null)}
+      />
 
       <div className="sketch-card p-3">
-        {config.title && <h3 className="mb-2 text-center text-lg font-handwritten-bold">{config.title}</h3>}
+        {config.title && <h3 className="font-handwritten-bold mb-2 text-center text-lg">{config.title}</h3>}
         <div ref={chartRef} className={cn("transition-opacity", deferredConfig !== config && "opacity-60")}>
           <ChartView result={result} config={deferredConfig} xLabel={labels.x} yLabel={labels.y} />
         </div>
         {result.kind !== "empty" && result.notes.length > 0 && (
-          <ul className="mt-2 space-y-0.5 text-xs text-muted-foreground">
+          <ul className="text-muted-foreground mt-2 space-y-0.5 text-xs">
             {result.notes.map((note) => (
               <li key={note}>ℹ {note}</li>
             ))}
@@ -177,7 +186,12 @@ export function VisualizationCell({ cellId }: CellProps) {
         <Button variant="outline" size="sm" onClick={exportCsv} disabled={result.kind === "empty"}>
           <Download aria-hidden="true" /> Data as CSV
         </Button>
-        <Button variant="outline" size="sm" onClick={() => void exportPng()} disabled={result.kind === "empty" || exporting}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => void exportPng()}
+          disabled={result.kind === "empty" || exporting}
+        >
           <ImageDown aria-hidden="true" /> {exporting ? "Exporting…" : "Chart as PNG"}
         </Button>
       </div>
@@ -186,8 +200,10 @@ export function VisualizationCell({ cellId }: CellProps) {
 }
 
 function legendEntries(result: ChartResult): LegendEntry[] {
-  if (result.kind === "categorical" && result.series.length > 1) return result.series.map((s, i) => ({ label: s.name, color: seriesColor(i) }))
-  if (result.kind === "scatter" && result.series.length > 1) return result.series.map((s, i) => ({ label: s.name, color: seriesColor(i) }))
+  if (result.kind === "categorical" && result.series.length > 1)
+    return result.series.map((s, i) => ({ label: s.name, color: seriesColor(i) }))
+  if (result.kind === "scatter" && result.series.length > 1)
+    return result.series.map((s, i) => ({ label: s.name, color: seriesColor(i) }))
   return []
 }
 
@@ -224,7 +240,9 @@ interface ChartControlsProps {
 
 function ChartControls({ config, columns, columnTypes, onChange, onReset }: ChartControlsProps) {
   const { chartType } = config
-  const roles = (["x", "y", "groupBy"] as const).filter((role) => ROLE_TYPES[chartType][role] !== null && ROLE_LABEL[chartType][role] !== "")
+  const roles = (["x", "y", "groupBy"] as const).filter(
+    (role) => ROLE_TYPES[chartType][role] !== null && ROLE_LABEL[chartType][role] !== "",
+  )
   const hasAgg = usesAggregation(chartType)
 
   return (
@@ -255,7 +273,11 @@ function ChartControls({ config, columns, columnTypes, onChange, onReset }: Char
             </SelectTrigger>
             <SelectContent>
               {AGGREGATIONS.map((a) => (
-                <SelectItem key={a} value={a} disabled={a !== "count" && columnsForRole(chartType, "y", columns, columnTypes).length === 0}>
+                <SelectItem
+                  key={a}
+                  value={a}
+                  disabled={a !== "count" && columnsForRole(chartType, "y", columns, columnTypes).length === 0}
+                >
                   {a === "count" ? "Count rows" : a}
                 </SelectItem>
               ))}
@@ -314,12 +336,22 @@ function ChartControls({ config, columns, columnTypes, onChange, onReset }: Char
       )}
 
       <Field id="viz-title" label="Title">
-        <Input id="viz-title" value={config.title} placeholder="Untitled chart" onChange={(e) => onChange({ title: e.target.value })} />
+        <Input
+          id="viz-title"
+          value={config.title}
+          placeholder="Untitled chart"
+          onChange={(e) => onChange({ title: e.target.value })}
+        />
       </Field>
       {chartType !== "pie" && chartType !== "heatmap" && (
         <>
           <Field id="viz-xlabel" label="X axis label">
-            <Input id="viz-xlabel" value={config.xLabel} placeholder={config.x ?? "auto"} onChange={(e) => onChange({ xLabel: e.target.value })} />
+            <Input
+              id="viz-xlabel"
+              value={config.xLabel}
+              placeholder={config.x ?? "auto"}
+              onChange={(e) => onChange({ xLabel: e.target.value })}
+            />
           </Field>
           <Field id="viz-ylabel" label="Y axis label">
             <Input
@@ -362,7 +394,11 @@ interface ColumnSelectProps {
 function ColumnSelect({ id, label, value, options, columnTypes, optional, onChange }: ColumnSelectProps) {
   return (
     <Field id={id} label={label}>
-      <Select value={value ?? NONE} onValueChange={(v) => onChange(v === NONE ? null : v)} disabled={options.length === 0}>
+      <Select
+        value={value ?? NONE}
+        onValueChange={(v) => onChange(v === NONE ? null : v)}
+        disabled={options.length === 0}
+      >
         <SelectTrigger id={id}>
           <SelectValue placeholder="No suitable columns" />
         </SelectTrigger>
@@ -370,7 +406,7 @@ function ColumnSelect({ id, label, value, options, columnTypes, optional, onChan
           {optional && <SelectItem value={NONE}>None</SelectItem>}
           {options.map((c) => (
             <SelectItem key={c} value={c}>
-              {c} <span className="text-xs text-muted-foreground">· {columnTypes[c]}</span>
+              {c} <span className="text-muted-foreground text-xs">· {columnTypes[c]}</span>
             </SelectItem>
           ))}
         </SelectContent>
@@ -402,7 +438,7 @@ const legendProps = { wrapperStyle: { color: "var(--color-foreground)", fontSize
 function ChartView({ result, config, xLabel, yLabel }: ChartViewProps) {
   switch (result.kind) {
     case "empty":
-      return <p className="flex h-48 items-center justify-center text-sm text-muted-foreground">{result.reason}</p>
+      return <p className="text-muted-foreground flex h-48 items-center justify-center text-sm">{result.reason}</p>
     case "categorical":
       return config.chartType === "pie" ? (
         <PieView result={result} />
@@ -414,9 +450,17 @@ function ChartView({ result, config, xLabel, yLabel }: ChartViewProps) {
     case "histogram":
       return <HistogramView result={result} xLabel={xLabel} yLabel={yLabel} />
     case "box":
-      return <BoxPlot boxes={result.boxes} xLabel={config.x ? xLabel : undefined} yLabel={yLabel} height={CHART_HEIGHT} />
+      return (
+        <BoxPlot boxes={result.boxes} xLabel={config.x ? xLabel : undefined} yLabel={yLabel} height={CHART_HEIGHT} />
+      )
     case "heatmap":
-      return <CorrelationHeatmap columns={result.columns} matrix={result.matrix} label="Correlation heatmap of numeric columns" />
+      return (
+        <CorrelationHeatmap
+          columns={result.columns}
+          matrix={result.matrix}
+          label="Correlation heatmap of numeric columns"
+        />
+      )
   }
 }
 
@@ -425,7 +469,9 @@ function XAxisLabel({ value }: { value: string }) {
 }
 
 function YAxisLabel({ value }: { value: string }) {
-  return <ChartLabel value={value} angle={-90} position="insideLeft" style={{ ...AXIS_LABEL_STYLE, textAnchor: "middle" }} />
+  return (
+    <ChartLabel value={value} angle={-90} position="insideLeft" style={{ ...AXIS_LABEL_STYLE, textAnchor: "middle" }} />
+  )
 }
 
 function CategoricalView({
@@ -458,7 +504,13 @@ function CategoricalView({
     </XAxis>
   )
   const yAxis = (
-    <YAxis tick={AXIS_TICK} axisLine={AXIS_LINE} tickLine={AXIS_LINE} tickFormatter={(v: number) => formatNumber(v)} width={64}>
+    <YAxis
+      tick={AXIS_TICK}
+      axisLine={AXIS_LINE}
+      tickLine={AXIS_LINE}
+      tickFormatter={(v: number) => formatNumber(v)}
+      width={64}
+    >
       {yLabel && <YAxisLabel value={yLabel} />}
     </YAxis>
   )
@@ -539,8 +591,12 @@ function CategoricalView({
 function PieView({ result }: { result: Extract<ChartResult, { kind: "categorical" }> }) {
   const series = result.series[0]
   const data = result.data.filter((d) => typeof d[series.key] === "number" && (d[series.key] as number) > 0)
-  if (data.length === 0) return <p className="flex h-48 items-center justify-center text-sm text-muted-foreground">No positive values to show.</p>
-  const renderLabel = ({ name, percent }: PieLabelRenderProps) => `${truncateLabel(name, 12)} ${((percent ?? 0) * 100).toFixed(0)}%`
+  if (data.length === 0)
+    return (
+      <p className="text-muted-foreground flex h-48 items-center justify-center text-sm">No positive values to show.</p>
+    )
+  const renderLabel = ({ name, percent }: PieLabelRenderProps) =>
+    `${truncateLabel(name, 12)} ${((percent ?? 0) * 100).toFixed(0)}%`
   return (
     <div style={{ height: CHART_HEIGHT }} role="img" aria-label={`Pie chart of ${series.name}`}>
       <ResponsiveContainer width="100%" height="100%">
@@ -570,7 +626,15 @@ function PieView({ result }: { result: Extract<ChartResult, { kind: "categorical
   )
 }
 
-function ScatterView({ result, xLabel, yLabel }: { result: Extract<ChartResult, { kind: "scatter" }>; xLabel: string; yLabel: string }) {
+function ScatterView({
+  result,
+  xLabel,
+  yLabel,
+}: {
+  result: Extract<ChartResult, { kind: "scatter" }>
+  xLabel: string
+  yLabel: string
+}) {
   const formatX = (v: number) => (result.xIsDate ? new Date(v).toLocaleDateString() : formatNumber(v))
   return (
     <div style={{ height: CHART_HEIGHT }} role="img" aria-label={`Scatter plot of ${yLabel} against ${xLabel}`}>
@@ -614,7 +678,14 @@ function ScatterView({ result, xLabel, yLabel }: { result: Extract<ChartResult, 
           />
           {result.series.length > 1 && <Legend {...legendProps} />}
           {result.series.map((s, i) => (
-            <Scatter key={s.name} name={s.name} data={s.points} fill={seriesColor(i)} fillOpacity={0.7} isAnimationActive={false} />
+            <Scatter
+              key={s.name}
+              name={s.name}
+              data={s.points}
+              fill={seriesColor(i)}
+              fillOpacity={0.7}
+              isAnimationActive={false}
+            />
           ))}
         </ScatterChart>
       </ResponsiveContainer>
@@ -622,13 +693,28 @@ function ScatterView({ result, xLabel, yLabel }: { result: Extract<ChartResult, 
   )
 }
 
-function HistogramView({ result, xLabel, yLabel }: { result: Extract<ChartResult, { kind: "histogram" }>; xLabel: string; yLabel: string }) {
+function HistogramView({
+  result,
+  xLabel,
+  yLabel,
+}: {
+  result: Extract<ChartResult, { kind: "histogram" }>
+  xLabel: string
+  yLabel: string
+}) {
   return (
     <div style={{ height: CHART_HEIGHT }} role="img" aria-label={`Histogram of ${xLabel}`}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={result.data} margin={{ top: 8, right: 16, bottom: 24, left: 16 }} barCategoryGap={1}>
           <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} vertical={false} />
-          <XAxis dataKey="label" tick={AXIS_TICK} axisLine={AXIS_LINE} tickLine={AXIS_LINE} interval="preserveStartEnd" height={40}>
+          <XAxis
+            dataKey="label"
+            tick={AXIS_TICK}
+            axisLine={AXIS_LINE}
+            tickLine={AXIS_LINE}
+            interval="preserveStartEnd"
+            height={40}
+          >
             {xLabel && <XAxisLabel value={xLabel} />}
           </XAxis>
           <YAxis tick={AXIS_TICK} axisLine={AXIS_LINE} tickLine={AXIS_LINE} allowDecimals={false} width={64}>

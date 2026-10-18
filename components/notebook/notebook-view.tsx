@@ -24,25 +24,25 @@ export function NotebookView() {
       <div className="min-w-0 space-y-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="flex items-center gap-2 font-handwritten-bold text-3xl">
+            <h1 className="font-handwritten-bold flex items-center gap-2 text-3xl">
               <BookOpen className="h-7 w-7" aria-hidden /> Notebook
             </h1>
             {fileName ? (
-              <p className="mt-1 flex flex-wrap items-center gap-2 text-muted-foreground">
+              <p className="text-muted-foreground mt-1 flex flex-wrap items-center gap-2">
                 <Database className="h-4 w-4" aria-hidden />
                 <span className="font-handwritten-bold text-foreground">{fileName}</span>
                 <Badge variant="secondary">{processedData.length.toLocaleString()} rows</Badge>
                 <Badge variant="secondary">{columns.length} columns</Badge>
               </p>
             ) : (
-              <p className="mt-1 text-muted-foreground">Load a dataset, then add cells to analyse it.</p>
+              <p className="text-muted-foreground mt-1">Load a dataset, then add cells to analyse it.</p>
             )}
           </div>
           <NotebookToolbar onRunningCell={setRunningCell} />
         </div>
 
         {!isHydrated ? (
-          <div className="flex items-center gap-2 text-muted-foreground" role="status">
+          <div className="text-muted-foreground flex items-center gap-2" role="status">
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Restoring your workspace…
           </div>
         ) : (
@@ -65,7 +65,12 @@ export function NotebookView() {
             <DragDropContext onDragEnd={onDragEnd}>
               <Droppable droppableId="notebook">
                 {(provided) => (
-                  <ol ref={provided.innerRef} {...provided.droppableProps} className="space-y-2" aria-label="Notebook cells">
+                  <ol
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className="space-y-2"
+                    aria-label="Notebook cells"
+                  >
                     {notebookCells.map((cell, index) => (
                       <Draggable key={cell.id} draggableId={cell.id} index={index}>
                         {(drag) => (

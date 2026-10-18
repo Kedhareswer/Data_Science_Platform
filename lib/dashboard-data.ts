@@ -117,7 +117,11 @@ export function applyFilters(rows: readonly DataRow[], filters: readonly Dashboa
 }
 
 /** Distinct categorical values of a column, most frequent first. */
-export function distinctValues(rows: readonly DataRow[], column: string, limit = 500): { value: string; count: number }[] {
+export function distinctValues(
+  rows: readonly DataRow[],
+  column: string,
+  limit = 500,
+): { value: string; count: number }[] {
   const counts = new Map<string, number>()
   for (const row of rows) {
     const key = categoryKey(row[column])
@@ -189,13 +193,22 @@ export interface MetricResult {
   rowCount: number
 }
 
-export function computeMetric(rows: readonly DataRow[], widget: Pick<MetricWidget, "column" | "aggregation">): MetricResult {
+export function computeMetric(
+  rows: readonly DataRow[],
+  widget: Pick<MetricWidget, "column" | "aggregation">,
+): MetricResult {
   const { column, aggregation } = widget
   if (!column) {
     // Without a column only row counting is meaningful.
     return { value: aggregation === "count" ? rows.length : null, rowCount: rows.length }
   }
-  return { value: aggregate(rows.map((row) => row[column]), aggregation), rowCount: rows.length }
+  return {
+    value: aggregate(
+      rows.map((row) => row[column]),
+      aggregation,
+    ),
+    rowCount: rows.length,
+  }
 }
 
 /** Human description such as "Average of price" or "Row count". */
@@ -489,7 +502,9 @@ export function suggestWidgets(
       return k >= 2 && k <= Math.max(50, sample.length * 0.2)
     })
     categorical = good.length > 0 ? good : categorical
-    categorical.sort((a, b) => (cardinality.get(a) ?? 0) - (cardinality.get(b) ?? 0) || columns.indexOf(a) - columns.indexOf(b))
+    categorical.sort(
+      (a, b) => (cardinality.get(a) ?? 0) - (cardinality.get(b) ?? 0) || columns.indexOf(a) - columns.indexOf(b),
+    )
     // Prefer something with more than two groups for the bar chart when available.
     const multi = categorical.find((c) => (cardinality.get(c) ?? 0) > 2)
     if (multi) categorical = [multi, ...categorical.filter((c) => c !== multi)]
@@ -528,7 +543,16 @@ export function suggestWidgets(
           aggregation: "mean",
           limit: 10,
         }
-      : { id: newWidgetId(), type: "chart", title: `Rows by ${cat}`, size: "md", chart: "bar", x: cat, aggregation: "count", limit: 10 }
+      : {
+          id: newWidgetId(),
+          type: "chart",
+          title: `Rows by ${cat}`,
+          size: "md",
+          chart: "bar",
+          x: cat,
+          aggregation: "count",
+          limit: 10,
+        }
     widgets.push(chart)
   }
 

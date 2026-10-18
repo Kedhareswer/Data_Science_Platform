@@ -36,9 +36,8 @@ export default function DocsPage() {
           chart, preprocessing, Python and ML cells.
         </li>
         <li>
-          Drag cells by their handle to reorder them, rename them by clicking the title and use{" "}
-          <strong>Run all</strong> to re-execute runnable cells (preprocessing, Python, profiles and model training)
-          from top to bottom.
+          Drag cells by their handle to reorder them, rename them by clicking the title and use <strong>Run all</strong>{" "}
+          to re-execute runnable cells (preprocessing, Python, profiles and model training) from top to bottom.
         </li>
       </ol>
 
@@ -48,12 +47,12 @@ export default function DocsPage() {
           <strong>CSV / TSV / TXT</strong> — delimiter auto-detected, quoted fields and embedded newlines supported.
         </li>
         <li>
-          <strong>JSON</strong> — an array of records, an object wrapping one (e.g. <code>{"{ \"data\": [...] }"}</code>
+          <strong>JSON</strong> — an array of records, an object wrapping one (e.g. <code>{'{ "data": [...] }'}</code>
           ), column-oriented objects, or a single record. Nested objects are flattened to dotted column names.
         </li>
         <li>
-          <strong>Excel</strong> — <code>.xlsx</code> (first sheet). Legacy <code>.xls</code> must be re-saved as
-          .xlsx or CSV.
+          <strong>Excel</strong> — <code>.xlsx</code> (first sheet). Legacy <code>.xls</code> must be re-saved as .xlsx
+          or CSV.
         </li>
       </ul>
       <p>
@@ -68,8 +67,8 @@ export default function DocsPage() {
         <dd>Search, sort and page through the current data; download it as CSV or JSON.</dd>
         <dt>Data Profile</dt>
         <dd>
-          Per-column statistics (mean, median, quartiles, standard deviation, skewness, kurtosis), top values,
-          outliers (IQR rule), duplicate rows, completeness, data-quality warnings and a correlation heatmap.
+          Per-column statistics (mean, median, quartiles, standard deviation, skewness, kurtosis), top values, outliers
+          (IQR rule), duplicate rows, completeness, data-quality warnings and a correlation heatmap.
         </dd>
         <dt>Missing Data</dt>
         <dd>Missing-value counts and patterns with one-click imputation or row removal.</dd>
@@ -88,8 +87,8 @@ export default function DocsPage() {
       <h2 id="python">Python cells</h2>
       <p>
         Python runs locally through <a href="https://pyodide.org">Pyodide</a> (CPython compiled to WebAssembly) in a
-        background worker. The first run downloads the runtime (roughly 10&nbsp;MB, then cached). The current dataset
-        is available as a pandas DataFrame named <code>df</code>.
+        background worker. The first run downloads the runtime (roughly 10&nbsp;MB, then cached). The current dataset is
+        available as a pandas DataFrame named <code>df</code>.
       </p>
       <ul>
         <li>
@@ -98,12 +97,11 @@ export default function DocsPage() {
         </li>
         <li>matplotlib figures are captured and shown below the cell. The value of the last line is displayed.</li>
         <li>
-          <strong>Use df as notebook data</strong> sends your modified DataFrame back to the notebook so the other
-          cells use it.
+          <strong>Use df as notebook data</strong> sends your modified DataFrame back to the notebook so the other cells
+          use it.
         </li>
         <li>
-          <strong>Stop</strong> terminates the interpreter; variables are lost and the runtime restarts on the next
-          run.
+          <strong>Stop</strong> terminates the interpreter; variables are lost and the runtime restarts on the next run.
         </li>
       </ul>
       <p>
@@ -125,8 +123,8 @@ export default function DocsPage() {
       </ul>
       <p>
         Numeric features are median-imputed and standardised; text features are one-hot encoded. Every model is
-        evaluated on a stratified held-out test split (20% by default), so the reported accuracy, F1, ROC AUC, RMSE
-        and R² are honest estimates. Feature importance is computed by permutation on the test set.
+        evaluated on a stratified held-out test split (20% by default), so the reported accuracy, F1, ROC AUC, RMSE and
+        R² are honest estimates. Feature importance is computed by permutation on the test set.
       </p>
       <ul>
         <li>
@@ -140,8 +138,8 @@ export default function DocsPage() {
           <strong>Predictor</strong> — predict a single row or the whole dataset and download the predictions.
         </li>
         <li>
-          <strong>Model Insights</strong> — compare models and inspect confusion matrices, ROC/PR curves, residuals
-          and feature importance.
+          <strong>Model Insights</strong> — compare models and inspect confusion matrices, ROC/PR curves, residuals and
+          feature importance.
         </li>
       </ul>
       <p>
@@ -151,10 +149,9 @@ export default function DocsPage() {
 
       <h2 id="dashboard">Dashboards</h2>
       <p>
-        The <Link href="/dashboard">dashboard</Link> turns the current data into metric tiles, charts, tables and
-        notes. Use <strong>Auto-generate</strong> for a starting point, <strong>Edit</strong> to add, resize and
-        reorder widgets, and the filter bar to slice every widget at once. Dashboards can be exported and imported as
-        JSON.
+        The <Link href="/dashboard">dashboard</Link> turns the current data into metric tiles, charts, tables and notes.
+        Use <strong>Auto-generate</strong> for a starting point, <strong>Edit</strong> to add, resize and reorder
+        widgets, and the filter bar to slice every widget at once. Dashboards can be exported and imported as JSON.
       </p>
 
       <h2 id="saving">Saving &amp; sharing</h2>
@@ -166,10 +163,10 @@ export default function DocsPage() {
 
       <h2 id="privacy">Privacy &amp; limits</h2>
       <p>
-        Files are never uploaded: parsing, statistics, charts, Python and model training all happen on your device.
-        The browser downloads the Python runtime from a CDN on first use. Very large datasets (hundreds of thousands
-        of rows) work but some cells sample data for charts and the in-browser models are designed for small to
-        medium data. See the <Link href="/privacy">privacy policy</Link> for details.
+        Files are never uploaded: parsing, statistics, charts, Python and model training all happen on your device. The
+        browser downloads the Python runtime from a CDN on first use. Very large datasets (hundreds of thousands of
+        rows) work but some cells sample data for charts and the in-browser models are designed for small to medium
+        data. See the <Link href="/privacy">privacy policy</Link> for details.
       </p>
 
       <h2 id="shortcuts">Keyboard shortcuts</h2>

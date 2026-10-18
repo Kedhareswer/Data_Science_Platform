@@ -56,7 +56,15 @@ describe("splitting", () => {
   })
 
   it("solves linear systems", () => {
-    expect(solveLinearSystem([[2, 1], [1, 3]], [3, 5]).map((v) => +v.toFixed(6))).toEqual([0.8, 1.4])
+    expect(
+      solveLinearSystem(
+        [
+          [2, 1],
+          [1, 3],
+        ],
+        [3, 5],
+      ).map((v) => +v.toFixed(6)),
+    ).toEqual([0.8, 1.4])
   })
 })
 
@@ -64,21 +72,33 @@ describe("classification on iris", () => {
   const algorithms: AlgorithmId[] = ["logistic_regression", "knn", "decision_tree", "random_forest", "naive_bayes"]
   for (const algorithm of algorithms) {
     it(`${algorithm} reaches > 85% held-out accuracy`, () => {
-      const model = trainModel(iris.rows, { task: "classification", algorithm, features: irisFeatures, target: "variety" })
+      const model = trainModel(iris.rows, {
+        task: "classification",
+        algorithm,
+        features: irisFeatures,
+        target: "variety",
+      })
       expect(model.classes).toEqual(["Setosa", "Versicolor", "Virginica"])
       expect(model.testRows).toBe(30)
       expect(model.metrics.accuracy).toBeGreaterThan(0.85)
       expect(model.featureImportance.length).toBe(4)
       // round-trips through JSON (export/import)
       const restored = JSON.parse(JSON.stringify(model))
-      const [p] = predictWithModel(restored, [{ "sepal.length": 5.1, "sepal.width": 3.5, "petal.length": 1.4, "petal.width": 0.2 }])
+      const [p] = predictWithModel(restored, [
+        { "sepal.length": 5.1, "sepal.width": 3.5, "petal.length": 1.4, "petal.width": 0.2 },
+      ])
       expect(p.value).toBe("Setosa")
       expect(p.confidence).toBeGreaterThan(0.5)
     })
   }
 
   it("ranks petal features as most important", () => {
-    const model = trainModel(iris.rows, { task: "classification", algorithm: "random_forest", features: irisFeatures, target: "variety" })
+    const model = trainModel(iris.rows, {
+      task: "classification",
+      algorithm: "random_forest",
+      features: irisFeatures,
+      target: "variety",
+    })
     expect(model.featureImportance[0].feature).toMatch(/^petal/)
   })
 })
@@ -86,7 +106,12 @@ describe("classification on iris", () => {
 describe("regression", () => {
   it("recovers a linear relationship including a categorical feature", () => {
     const rows = linearRows()
-    const model = trainModel(rows, { task: "regression", algorithm: "linear_regression", features: ["a", "b", "color"], target: "y" })
+    const model = trainModel(rows, {
+      task: "regression",
+      algorithm: "linear_regression",
+      features: ["a", "b", "color"],
+      target: "y",
+    })
     expect(model.metrics.r2Score).toBeGreaterThan(0.999)
     const [p] = predictWithModel(model, [{ a: 1, b: 1, color: "red" }])
     expect(p.value as number).toBeCloseTo(6, 0)
@@ -103,7 +128,12 @@ describe("regression", () => {
 
 describe("clustering & automl", () => {
   it("k-means finds three iris clusters", () => {
-    const model = trainModel(iris.rows, { task: "clustering", algorithm: "kmeans", features: irisFeatures, hyperparameters: { k: 3 } })
+    const model = trainModel(iris.rows, {
+      task: "clustering",
+      algorithm: "kmeans",
+      features: irisFeatures,
+      hyperparameters: { k: 3 },
+    })
     expect(model.metrics.clusterSizes).toHaveLength(3)
     expect(model.metrics.silhouette).toBeGreaterThan(0.3)
   })
@@ -117,8 +147,17 @@ describe("clustering & automl", () => {
   })
 
   it("validates configuration", () => {
-    expect(() => trainModel(iris.rows, { task: "regression", algorithm: "linear_regression", features: irisFeatures, target: "variety" })).toThrow(TrainingError)
-    expect(() => trainModel(iris.rows, { task: "classification", algorithm: "knn", features: [], target: "variety" })).toThrow(/feature/)
+    expect(() =>
+      trainModel(iris.rows, {
+        task: "regression",
+        algorithm: "linear_regression",
+        features: irisFeatures,
+        target: "variety",
+      }),
+    ).toThrow(TrainingError)
+    expect(() =>
+      trainModel(iris.rows, { task: "classification", algorithm: "knn", features: [], target: "variety" }),
+    ).toThrow(/feature/)
     expect(suggestTask(iris.rows, "variety")).toBe("classification")
     expect(suggestTask(linearRows(), "y")).toBe("regression")
   })

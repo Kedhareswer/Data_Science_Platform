@@ -217,12 +217,16 @@ describe("formatValue", () => {
 
 describe("suggestWidgets", () => {
   it("builds a starter dashboard", () => {
-    const widgets = suggestWidgets(["city", "price", "sold", "day"], {
-      city: "string",
-      price: "number",
-      sold: "boolean",
-      day: "date",
-    }, rows)
+    const widgets = suggestWidgets(
+      ["city", "price", "sold", "day"],
+      {
+        city: "string",
+        price: "number",
+        sold: "boolean",
+        day: "date",
+      },
+      rows,
+    )
     const types = widgets.map((w) => w.type)
     expect(widgets[0]).toMatchObject({ type: "metric", aggregation: "count" })
     expect(types).toContain("table")

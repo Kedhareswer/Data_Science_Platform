@@ -1,442 +1,151 @@
 <div align="center">
 
-# 🌟 DataNotebook Platform 🔬
+# ✏️ DataNotebook
 
-*A whimsical, handwritten-style data analysis platform*
+_A whimsical, handwritten-style data analysis notebook that runs entirely in your browser._
 
-[![Next.js](https://img.shields.io/badge/Next.js-14+-000000?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4+-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![React](https://img.shields.io/badge/React-18+-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
+### _“Where data meets creativity (and a little laziness)”_
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](http://makeapullrequest.com)
-[![Build Status](https://img.shields.io/badge/Build-Passing-success?style=for-the-badge)](https://github.com/Kedhareswer/Data_Science_Platform)
-[![Deployment](https://img.shields.io/badge/Deployment-Live-success?style=for-the-badge)](https://your-deployment-url.com)
+[![CI](https://github.com/Kedhareswer/Data_Science_Platform/actions/workflows/ci.yml/badge.svg)](https://github.com/Kedhareswer/Data_Science_Platform/actions/workflows/ci.yml)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16-000?logo=next.js)](https://nextjs.org/)
+[![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=000)](https://react.dev/)
+[![TypeScript 6](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=fff)](https://www.typescriptlang.org/)
+[![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4-38B2AC?logo=tailwind-css&logoColor=fff)](https://tailwindcss.com/)
+[![Pyodide](https://img.shields.io/badge/Python-Pyodide-3776AB?logo=python&logoColor=fff)](https://pyodide.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-</div>
-
----
-
-<div align="center">
-
-### 🎨 *"Where data meets creativity and lazy"*
-
-**Transform your data into actionable insights through an intuitive, beautifully crafted notebook interface with a unique handwritten aesthetic.**
+![DataNotebook landing page](docs/images/home.png)
 
 </div>
 
-## 🎯 Platform Overview
+Drop in a CSV, TSV, JSON or Excel file and stack **cells** to profile it, clean it, chart it, write real **Python**
+(pandas, scikit-learn, matplotlib, seaborn) and train **machine-learning models** — then turn the results into a
+**dashboard**. There is no backend: parsing, statistics, Python and model training all happen on your device, and
+your workspace is saved in your browser.
 
-```mermaid
-graph LR
-    A[📊 Data Upload] --> B[🔍 Data Exploration]
-    B --> C[📈 Visualization]
-    C --> D[🧮 Analysis]
-    D --> E[📝 Documentation]
-    E --> F[📤 Export & Share]
-    
-    style A fill:#e1f5fe
-    style B fill:#f3e5f5
-    style C fill:#e8f5e8
-    style D fill:#fff3e0
-    style E fill:#fce4ec
-    style F fill:#f1f8e9
-```
+## ✨ Features
 
-## ✨ Current Features
+| Cell / page           | What it does                                                                                                                         |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| 📋 **Data Table**     | Search, typed sorting, pagination, CSV/JSON export of the current view                                                               |
+| 🔍 **Data Profile**   | Mean, median, quartiles, std, skewness, kurtosis, top values, IQR outliers, duplicates, completeness, quality warnings, correlations |
+| 🕳️ **Missing Data**   | Missing-value counts, missingness matrix, co-missing pairs and one-click fixes                                                       |
+| 📈 **Visualization**  | Bar, line, area, scatter, pie, histogram, box plot and correlation heatmap with aggregation, grouping and PNG/CSV export             |
+| 🪄 **Preprocessing**  | Replayable pipeline (filter, impute, de-duplicate, drop/rename/cast, scale, encode, remove outliers), exportable as pandas code      |
+| 📝 **Notes**          | GitHub-flavoured Markdown                                                                                                            |
+| 🐍 **Python**         | Pyodide in a Web Worker; your data is `df`; figures, tables, live output, Stop, auto-install of pure-Python packages                 |
+| 🧠 **Model Trainer**  | TypeScript engine or real scikit-learn; held-out metrics, confusion matrix, permutation feature importance                           |
+| ✨ **AutoML**         | Trains every applicable algorithm on the same split and ranks them                                                                   |
+| 🎯 **Predictor**      | Single-row or batch predictions with class probabilities; CSV download; model JSON import/export                                     |
+| 🔬 **Model Insights** | Model comparison, ROC & PR curves, residuals, cluster sizes — all from real test-set predictions                                     |
+| 📊 **Dashboard**      | Auto-generated, editable dashboard of metrics, charts, tables and notes with global filters                                          |
 
-<div align="center">
+Plus: drag-and-drop cell reordering, **Run all**, notebook export/import (`.dnb.json`, optionally with data), automatic
+persistence to IndexedDB, light/dark/system themes and keyboard-accessible UI.
 
-| 🎨 Feature | 📝 Description | 🚀 Status |
-|------------|----------------|-----------|
-| 📊 **Interactive Notebooks** | Create, organize, and share analysis notebooks with rich text editing | ✅ **Live** |
-| 📈 **Data Visualization** | Create stunning visualizations with multiple chart types | ✅ **Live** |
-| 📥 **Data Import** | Support for CSV, Excel, JSON file formats | ✅ **Live** |
-| 🧮 **Data Processing** | Built-in tools for data cleaning and transformation | ✅ **Live** |
-| 👨‍💻 **Code Editor** | Syntax highlighting and autocompletion | ✅ **Live** |
-| 🌓 **Theme Support** | Dark and light mode with handwritten aesthetics | ✅ **Live** |
-| 📱 **Responsive Design** | Optimized for desktop and tablet devices | ✅ **Live** |
-| 🔐 **Privacy & Terms** | Professional legal pages with comprehensive coverage | ✅ **Live** |
+<table>
+  <tr>
+    <td><img src="docs/images/profile.png" alt="Data profile cell" /></td>
+    <td><img src="docs/images/visualization.png" alt="Visualization cell" /></td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/python.png" alt="Python cell running seaborn in the browser" /></td>
+    <td><img src="docs/images/model-trainer.png" alt="Model trainer cell with confusion matrix and feature importance" /></td>
+  </tr>
+</table>
 
-</div>
+![Dashboard in dark mode](docs/images/dashboard-dark.png)
 
-## 🤖 Machine Learning Features
-
-<div align="center">
-
-> 🚧 **Coming Soon** - ML features are currently under active development!
-
-</div>
-
-```mermaid
-gantt
-    title ML Feature Development Timeline
-    dateFormat  YYYY-MM-DD
-    section Phase 1
-    Architecture Design    :done, arch, 2024-01-01, 2024-02-15
-    section Phase 2
-    Core Implementation    :active, impl, 2024-02-16, 2024-04-30
-    section Phase 3
-    Testing & Optimization :test, 2024-05-01, 2024-06-15
-    section Phase 4
-    Release & Deployment   :release, 2024-06-16, 2024-07-01
-```
-
-### 🔮 Planned ML Capabilities
-
-| 🧠 Feature | 📋 Description | 📅 Timeline |
-|------------|----------------|-------------|
-| 🏗️ **ML Model Trainer** | Train various ML models with customizable parameters | Q2 2024 |
-| 🎯 **ML Predictor** | Make predictions using trained models | Q2 2024 |
-| 🔄 **Auto ML Trainer** | Automatically train and compare multiple models | Q3 2024 |
-| 📊 **Model Insights** | Feature importance and model interpretability | Q3 2024 |
-| 🏆 **Model Comparison** | Compare and analyze different ML models | Q3 2024 |
-
-## 🛠️ Tech Stack
-
-<div align="center">
-
-### 🎨 *Built with love using modern technologies*
-
-</div>
-
-```mermaid
-graph TB
-    subgraph "🎨 Frontend Layer"
-        A[Next.js 14+]
-        B[React 18+]
-        C[TypeScript 5.0+]
-        D[Tailwind CSS]
-    end
-    
-    subgraph "🎭 UI Components"
-        E[Radix UI]
-        F[Lucide Icons]
-        G[Handwritten Fonts]
-    end
-    
-    subgraph "📊 Data Layer"
-        H[React Context]
-        I[PapaParse]
-        J[XLSX Parser]
-        K[Recharts]
-    end
-    
-    subgraph "🔧 Development"
-        L[ESLint]
-        M[Prettier]
-        N[Vercel Analytics]
-    end
-    
-    A --> B
-    B --> C
-    C --> D
-    E --> F
-    F --> G
-    H --> I
-    I --> J
-    J --> K
-    
-    style A fill:#000000,color:#ffffff
-    style B fill:#61DAFB,color:#000000
-    style C fill:#3178C6,color:#ffffff
-    style D fill:#38B2AC,color:#ffffff
-```
-
-<details>
-<summary>📋 <strong>Detailed Technology Breakdown</strong></summary>
-
-| 🏷️ Category | 🛠️ Technologies | 📝 Purpose |
-|-------------|-----------------|------------|
-| **🎨 Frontend** | Next.js 14+, React 18+, TypeScript 5.0+ | Modern web framework with type safety |
-| **🎭 UI/UX** | Radix UI, Tailwind CSS, Lucide Icons | Accessible components with handwritten aesthetics |
-| **📊 Data** | React Context API, PapaParse, XLSX | State management and file processing |
-| **📈 Visualization** | Recharts, Custom Charts | Interactive data visualization |
-| **🔧 Development** | ESLint, Prettier, Vercel Analytics | Code quality and performance monitoring |
-| **🎨 Styling** | Comic Sans MS, Brush Script MT, Lucida Handwriting, Bradley Hand, Segoe Print, cursive | Unique handwritten font experience |
-
-</details>
-
-## 🏗️ System Architecture
-
-```mermaid
-graph TB
-    subgraph "🌐 Client Layer"
-        A[Web Browser]
-        B[Mobile Browser]
-    end
-    
-    subgraph "⚡ Application Layer"
-        C[Next.js App Router]
-        D[React Components]
-        E[TypeScript Logic]
-    end
-    
-    subgraph "🎨 UI Layer"
-        F[Handwritten Theme]
-        G[Responsive Design]
-        H[Dark/Light Mode]
-    end
-    
-    subgraph "📊 Data Layer"
-        I[File Upload Handler]
-        J[Data Processing Engine]
-        K[Visualization Engine]
-        L[Export System]
-    end
-    
-    subgraph "🔮 Future ML Layer"
-        M[Model Training - Coming Soon]
-        N[Prediction Engine - Coming Soon]
-        O[AutoML - Coming Soon]
-    end
-    
-    A --> C
-    B --> C
-    C --> D
-    D --> E
-    E --> F
-    F --> G
-    G --> H
-    E --> I
-    I --> J
-    J --> K
-    K --> L
-    J -.-> M
-    J -.-> N
-    J -.-> O
-    
-    style A fill:#e3f2fd
-    style B fill:#e3f2fd
-    style C fill:#000000,color:#ffffff
-    style F fill:#fff3e0
-    style M fill:#ffebee,stroke-dasharray: 5 5
-    style N fill:#ffebee,stroke-dasharray: 5 5
-    style O fill:#ffebee,stroke-dasharray: 5 5
-```
-
-## 🚀 Quick Start
-
-<div align="center">
-
-### 🎯 *Get up and running in minutes!*
-
-</div>
-
-```mermaid
-graph LR
-    A[📋 Prerequisites] --> B[📥 Clone Repo]
-    B --> C[📦 Install Dependencies]
-    C --> D[⚙️ Setup Environment]
-    D --> E[🚀 Start Server]
-    E --> F[🎉 Ready to Use!]
-    
-    style A fill:#e8f5e8
-    style B fill:#e3f2fd
-    style C fill:#fff3e0
-    style D fill:#f3e5f5
-    style E fill:#fce4ec
-    style F fill:#e0f2f1
-```
-
-### 📋 Prerequisites
-
-<div align="center">
-
-| 🛠️ Requirement | 📊 Version | 🔗 Download |
-|----------------|------------|-------------|
-| **Node.js** | ≥18.0.0 | [nodejs.org](https://nodejs.org/) |
-| **npm/yarn** | Latest | Included with Node.js |
-| **Git** | Latest | [git-scm.com](https://git-scm.com/) |
-
-</div>
-
-### 🎯 Installation Flow
+## 🚀 Quick start
 
 ```bash
-# 📥 Step 1: Clone the magical repository
 git clone https://github.com/Kedhareswer/Data_Science_Platform.git
 cd Data_Science_Platform
-
-# 📦 Step 2: Install the enchanted dependencies
-npm install
-# ✨ or with yarn magic
-yarn install
-
-# ⚙️ Step 3: Setup your environment spells
-cp .env.example .env.local
-
-# 🚀 Step 4: Launch your data adventure!
-npm run dev
-# 🌟 or with yarn power
-yarn dev
+npm install        # Node.js >= 20.9
+npm run dev        # http://localhost:3000
 ```
 
-<div align="center">
+Open the notebook and click **Try the Iris sample**, or drop in your own file.
 
-### 🎉 **Success!** 
-Visit [http://localhost:3000](http://localhost:3000) to enter your handwritten data wonderland!
+### Scripts
 
-</div>
+| Command                | Description                                                      |
+| ---------------------- | ---------------------------------------------------------------- |
+| `npm run dev`          | Development server (Turbopack)                                   |
+| `npm run build`        | Production build — type errors and lint failures are not ignored |
+| `npm start`            | Serve the production build                                       |
+| `npm run lint`         | ESLint (flat config, Next.js + React Compiler rules)             |
+| `npm run typecheck`    | `tsc --noEmit`                                                   |
+| `npm test`             | Vitest unit tests for the data, ML and dashboard libraries       |
+| `npm run check`        | lint + typecheck + test                                          |
+| `npm run check:python` | Runs the in-browser Python helpers under CPython + scikit-learn  |
+| `npm run format`       | Prettier                                                         |
 
-## 📁 Project Structure
+### Configuration
 
-<div align="center">
+Everything works with zero configuration. Optionally copy `.env.example` to `.env.local`:
 
-### 🏗️ *Beautifully organized, handwritten-style architecture*
+| Variable                        | Purpose                                                                                  |
+| ------------------------------- | ---------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_PYODIDE_INDEX_URL` | Load Pyodide from your own host instead of jsDelivr (folder with `pyodide.mjs` + wheels) |
 
-</div>
+Deploys as a fully static site on Vercel (Web Analytics is enabled automatically there) or any Node host.
+
+## 🏗️ How it works
 
 ```mermaid
-graph TD
-    A[🏠 DataNotebook Platform] --> B[📱 app/]
-    A --> C[🧩 components/]
-    A --> D[📚 lib/]
-    A --> E[🌍 public/]
-    
-    B --> B1[🏠 page.tsx - Landing]
-    B --> B2[📊 notebook/ - Analysis Interface]
-    B --> B3[📖 docs/ - Documentation]
-    B --> B4[📜 terms/ - Terms of Service]
-    B --> B5[🔒 privacy/ - Privacy Policy]
-    
-    C --> C1[🎨 ui/ - Reusable Components]
-    C --> C2[📈 charts/ - Visualizations]
-    C --> C3[📝 forms/ - Input Forms]
-    C --> C4[🧭 navigation/ - Navigation]
-    
-    D --> D1[🎣 hooks/ - Custom Hooks]
-    D --> D2[🛠️ utils/ - Helper Functions]
-    D --> D3[📋 types/ - TypeScript Types]
-    D --> D4[🗂️ contexts/ - State Management]
-    
-    E --> E1[🖼️ images/ - Static Assets]
-    E --> E2[📄 docs/ - Documentation Assets]
-    
-    style A fill:#e1f5fe
-    style B fill:#f3e5f5
-    style C fill:#e8f5e8
-    style D fill:#fff3e0
-    style E fill:#fce4ec
+flowchart LR
+    F[File: CSV · TSV · JSON · XLSX] -->|lib/data/parse| D[(DataProvider<br/>data · processedData<br/>cells · models · dashboard)]
+    D <-->|IndexedDB| S[(Browser storage)]
+    D --> C[Notebook cells]
+    D --> B[Dashboard]
+    C -->|lib/data/stats & transform| C
+    C -->|lib/ml engine| M[TypeScript models]
+    C -->|postMessage| W[Pyodide Web Worker<br/>pandas · scikit-learn · matplotlib]
+    W -->|results, figures, df| C
 ```
 
-## ⚙️ Available Scripts
+- **`lib/data`** — pure, tested data layer: parsing (PapaParse, read-excel-file), whole-column type inference,
+  pandas-compatible statistics and profiling, serializable preprocessing steps.
+- **`lib/ml`** — pure, tested ML engine: ridge regression, softmax logistic regression, k-NN, CART decision trees,
+  random forests, Gaussian naive Bayes and k-means, with a seeded stratified split, an impute/scale/one-hot pipeline,
+  metrics, permutation importance and AutoML. Models are plain JSON.
+- **`lib/python`** — Pyodide runtime in a Web Worker. User code and data are never interpolated into Python source;
+  Stop terminates the worker.
+- **`components/cells`** — one component per cell type, each persisting its state with `useCellContent`.
 
-<div align="center">
+See [`CLAUDE.md`](./CLAUDE.md) for the full architecture guide and conventions.
 
-| 🎯 Command | 📝 Description | 🚀 Usage |
-|------------|----------------|----------|
-| `npm run dev` | 🔥 Start development server | Hot reload enabled |
-| `npm run build` | 🏗️ Build for production | Optimized bundle |
-| `npm start` | ▶️ Start production server | Production ready |
-| `npm run lint` | 🔍 Run ESLint | Code quality check |
-| `npm run type-check` | 📋 TypeScript validation | Type safety |
+### Tech stack
 
-</div>
+Next.js 16 (App Router, Turbopack) · React 19 · TypeScript 6 · Tailwind CSS 4 · Radix UI primitives · Recharts 3 ·
+Pyodide · PapaParse · read-excel-file · react-markdown · Sonner · Vitest · ESLint 9 · Prettier · GitHub Actions.
+Typography: Kalam (handwritten) and Fira Code via `next/font`.
 
+## 🔒 Privacy
+
+Your files never leave your browser — there are no API routes. The Python runtime is downloaded from a CDN the first
+time you use it (no data is sent), and pure-Python packages you import are fetched from PyPI. See the in-app
+[privacy page](app/privacy/page.tsx).
+
+## 🗺️ What changed in v2
+
+v2 is a ground-up modernization of the original v0.dev prototype:
+
+- **Security** — removed the server endpoint that executed arbitrary Python and `pip install` on the host (remote code
+  execution); Python now runs sandboxed in the browser.
+- **Honesty** — removed simulated features (random ML metrics/predictions, timer-driven “Run all” and progress bars);
+  every number shown is computed.
+- **Correctness** — proper CSV parsing, Excel support, whole-column type inference, fixed statistics (median,
+  correlations, duplicates, completeness) and ML bugs; unit tests for the data, ML and dashboard libraries plus a CPython check of the Python helpers.
+- **Platform** — Next.js 16, React 19, TypeScript 6, Tailwind 4, pinned dependencies, strict builds, CI.
+- **Product** — persistent workspace, notebook import/export, real Run all, a working dashboard, scikit-learn engine,
+  AutoML, rebuilt navigation and accessibility fixes.
 
 ## 🤝 Contributing
 
-<div align="center">
-
-### 🎨 *Join our handwritten data adventure!*
-
-**We welcome contributions from developers who love beautiful, functional code**
-
-</div>
-
-<details>
-<summary>🚀 <strong>Contribution Flow</strong></summary>
-
-```bash
-# 🍴 Step 1: Fork the magical repository
-# Click the "Fork" button on GitHub
-
-# 📥 Step 2: Clone your enchanted fork
-git clone https://github.com/YOUR_USERNAME/Data_Science_Platform.git
-cd Data_Science_Platform
-
-# 🌿 Step 3: Create your feature branch
-git checkout -b feature/AmazingHandwrittenFeature
-
-# ✨ Step 4: Make your magical changes
-# Add your beautiful, handwritten-style code
-
-# 💾 Step 5: Commit your spells
-git commit -m '✨ Add some AmazingHandwrittenFeature'
-
-# 🚀 Step 6: Push to your branch
-git push origin feature/AmazingHandwrittenFeature
-
-# 🎉 Step 7: Open a Pull Request
-# Create a PR with a detailed description
-```
-
-</details>
-
-<div align="center">
-
-### 🎯 **Contribution Guidelines**
-
-| 🎨 Area | 📝 Focus | 🌟 Priority |
-|---------|----------|-------------|
-| **🎭 UI/UX** | Handwritten aesthetics, accessibility | High |
-| **📊 Data Features** | New visualization types, data processing | High |
-| **🤖 ML Features** | Help us build the ML capabilities! | Very High |
-| **📚 Documentation** | Improve guides, add examples | Medium |
-| **🐛 Bug Fixes** | Fix issues, improve performance | High |
-
-</div>
+Contributions are welcome — read [`CONTRIBUTING.md`](./CONTRIBUTING.md) and run `npm run check` before opening a PR.
 
 ## 📄 License
 
-<div align="center">
-
-**MIT License** - *Freedom to create, modify, and share*
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-</div>
-
-## 🙏 Acknowledgments
-
-<div align="center">
-
-### 💝 *Built with love using amazing open-source tools*
-
-</div>
-
-<div align="center">
-
-| 🛠️ Technology | 🎯 Purpose | 🔗 Link |
-|---------------|------------|---------|
-| **Next.js** | React Framework | [nextjs.org](https://nextjs.org/) |
-| **Radix UI** | UI Component System | [radix-ui.com](https://www.radix-ui.com/) |
-| **Tailwind CSS** | Utility-First CSS | [tailwindcss.com](https://tailwindcss.com/) |
-| **Recharts** | Data Visualization | [recharts.org](https://recharts.org/) |
-| **Lucide** | Beautiful Icons | [lucide.dev](https://lucide.dev/) |
-| **TypeScript** | Type Safety | [typescriptlang.org](https://www.typescriptlang.org/) |
-
-</div>
-
----
-
-## ⭐ Star History
-
-<div align="center">
-
-**Help us reach more data enthusiasts by starring the repository**
-
-
-[![Star History Chart](https://api.star-history.com/svg?repos=Kedhareswer/Data_Science_Platform&type=Date)](https://star-history.com/#Kedhareswer/Data_Science_Platform&Date)
-
-**If you find this project helpful, please consider giving it a ⭐**
-
-[![GitHub stars](https://img.shields.io/github/stars/Kedhareswer/Data_Science_Platform?style=for-the-badge&logo=github&color=gold)](https://github.com/Kedhareswer/Data_Science_Platform/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/Kedhareswer/Data_Science_Platform?style=for-the-badge&logo=github)](https://github.com/Kedhareswer/Data_Science_Platform/network)
-[![GitHub watchers](https://img.shields.io/github/watchers/Kedhareswer/Data_Science_Platform?style=for-the-badge&logo=github)](https://github.com/Kedhareswer/Data_Science_Platform/watchers)
-
-</div>
+[MIT](./LICENSE) © Kedhareswer

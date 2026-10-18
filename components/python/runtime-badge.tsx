@@ -29,7 +29,7 @@ export function RuntimeBadge() {
       variant="outline"
       role="status"
       title={message}
-      className={cn("gap-1 font-handwritten font-normal", STYLES[status])}
+      className={cn("font-handwritten gap-1 font-normal", STYLES[status])}
     >
       {(status === "loading" || status === "busy") && <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />}
       {LABELS[status]}

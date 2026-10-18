@@ -20,7 +20,10 @@ export function quantileSorted(sorted: readonly number[], q: number): number {
 }
 
 export function quantile(values: readonly number[], q: number): number {
-  return quantileSorted([...values].sort((a, b) => a - b), q)
+  return quantileSorted(
+    [...values].sort((a, b) => a - b),
+    q,
+  )
 }
 
 export function median(values: readonly number[]): number {
@@ -246,7 +249,9 @@ export function profileColumn(rows: readonly DataRow[], column: string, type: Co
     uniquePercentage: pct(unique, present.length),
     duplicates: present.length - unique,
     mode: sortedCounts[0]?.[0] ?? null,
-    topValues: sortedCounts.slice(0, 10).map(([value, count]) => ({ value, count, percentage: pct(count, present.length) })),
+    topValues: sortedCounts
+      .slice(0, 10)
+      .map(([value, count]) => ({ value, count, percentage: pct(count, present.length) })),
   }
 
   if (type === "number") {
@@ -288,7 +293,10 @@ export function profileColumn(rows: readonly DataRow[], column: string, type: Co
   return profile
 }
 
-export function correlationMatrix(rows: readonly DataRow[], columns: readonly string[]): Record<string, Record<string, number>> {
+export function correlationMatrix(
+  rows: readonly DataRow[],
+  columns: readonly string[],
+): Record<string, Record<string, number>> {
   const series = Object.fromEntries(columns.map((c) => [c, rows.map((r) => r[c])]))
   const matrix: Record<string, Record<string, number>> = {}
   for (const a of columns) matrix[a] = {}
@@ -382,7 +390,11 @@ export function detectQualityIssues(
   return issues.sort((a, b) => order[a.severity] - order[b.severity])
 }
 
-export function generateProfile(rows: readonly DataRow[], columns: readonly string[], columnTypes: ColumnTypes): DataProfile {
+export function generateProfile(
+  rows: readonly DataRow[],
+  columns: readonly string[],
+  columnTypes: ColumnTypes,
+): DataProfile {
   const columnProfiles: Record<string, ColumnProfile> = {}
   let missingCells = 0
   for (const column of columns) {

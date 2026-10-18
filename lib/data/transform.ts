@@ -36,7 +36,9 @@ export const FILTER_OPERATORS: Record<FilterOperator, string> = {
 
 function matches(cell: CellValue, operator: FilterOperator, raw: string): boolean {
   if (operator === "contains" || operator === "not_contains") {
-    const has = String(cell ?? "").toLowerCase().includes(raw.toLowerCase())
+    const has = String(cell ?? "")
+      .toLowerCase()
+      .includes(raw.toLowerCase())
     return operator === "contains" ? has : !has
   }
   const asNumber = Number(raw)
@@ -150,13 +152,27 @@ export function applyStep(rows: readonly DataRow[], step: TransformStep): DataRo
     }
 
     case "label_encode": {
-      const labels = [...new Set(rows.map((r) => r[step.column]).filter((v) => !isMissing(v)).map(String))].sort()
+      const labels = [
+        ...new Set(
+          rows
+            .map((r) => r[step.column])
+            .filter((v) => !isMissing(v))
+            .map(String),
+        ),
+      ].sort()
       const index = new Map(labels.map((l, i) => [l, i]))
       return mapColumn(rows, step.column, (v) => (isMissing(v) ? null : (index.get(String(v)) ?? null)))
     }
 
     case "one_hot": {
-      const labels = [...new Set(rows.map((r) => r[step.column]).filter((v) => !isMissing(v)).map(String))].sort()
+      const labels = [
+        ...new Set(
+          rows
+            .map((r) => r[step.column])
+            .filter((v) => !isMissing(v))
+            .map(String),
+        ),
+      ].sort()
       return rows.map((row) => {
         const { [step.column]: value, ...rest } = row
         const encoded: DataRow = { ...rest }

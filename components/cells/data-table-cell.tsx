@@ -2,15 +2,21 @@
 
 import { memo, useDeferredValue, useId, useMemo, useState } from "react"
 import Papa from "papaparse"
-import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download, Search, X } from "lucide-react"
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Download,
+  Search,
+  X,
+} from "lucide-react"
 import { DataUploadPrompt } from "@/components/data-upload-prompt"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useCellContent, useData } from "@/lib/data-context"
@@ -72,7 +78,8 @@ function sortRows(rows: DataRow[], sort: SortState, type: ColumnType | undefined
 }
 
 function formatCell(value: CellValue): string {
-  if (typeof value === "number") return Number.isInteger(value) ? value.toLocaleString() : String(Number(value.toPrecision(8)))
+  if (typeof value === "number")
+    return Number.isInteger(value) ? value.toLocaleString() : String(Number(value.toPrecision(8)))
   return String(value)
 }
 
@@ -84,7 +91,9 @@ export function DataTableCell({ cellId }: CellProps) {
   const searchId = useId()
   const deferredQuery = useDeferredValue(query.trim().toLowerCase())
 
-  const pageSize = PAGE_SIZES.includes(settings.pageSize as (typeof PAGE_SIZES)[number]) ? settings.pageSize : FALLBACK.pageSize
+  const pageSize = PAGE_SIZES.includes(settings.pageSize as (typeof PAGE_SIZES)[number])
+    ? settings.pageSize
+    : FALLBACK.pageSize
   const sort = settings.sort && columns.includes(settings.sort.column) ? settings.sort : null
 
   // One lowercase haystack per row, built once per dataset.
@@ -104,7 +113,8 @@ export function DataTableCell({ cellId }: CellProps) {
   const filtered = useMemo(() => {
     if (!deferredQuery) return processedData
     const out: DataRow[] = []
-    for (let i = 0; i < processedData.length; i++) if (searchIndex[i].includes(deferredQuery)) out.push(processedData[i])
+    for (let i = 0; i < processedData.length; i++)
+      if (searchIndex[i].includes(deferredQuery)) out.push(processedData[i])
     return out
   }, [processedData, searchIndex, deferredQuery])
 
@@ -121,7 +131,12 @@ export function DataTableCell({ cellId }: CellProps) {
   )
 
   if (processedData.length === 0) {
-    return <DataUploadPrompt title="No data to show yet" description="Load a dataset and it will appear here as a searchable, sortable table." />
+    return (
+      <DataUploadPrompt
+        title="No data to show yet"
+        description="Load a dataset and it will appear here as a searchable, sortable table."
+      />
+    )
   }
 
   const toggleSort = (column: string) => {
@@ -150,7 +165,10 @@ export function DataTableCell({ cellId }: CellProps) {
           <label htmlFor={searchId} className="sr-only">
             Search all columns
           </label>
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+          <Search
+            className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2"
+            aria-hidden="true"
+          />
           <Input
             id={searchId}
             type="search"
@@ -160,14 +178,14 @@ export function DataTableCell({ cellId }: CellProps) {
               setPage(0)
             }}
             placeholder="Search every column…"
-            className="h-9 pl-8 pr-8 font-handwritten"
+            className="font-handwritten h-9 pr-8 pl-8"
           />
           {query && (
             <button
               type="button"
               onClick={() => setQuery("")}
               aria-label="Clear search"
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm text-muted-foreground hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+              className="text-muted-foreground hover:text-foreground focus-visible:ring-ring absolute top-1/2 right-2 -translate-y-1/2 rounded-sm focus-visible:ring-2 focus-visible:outline-hidden"
             >
               <X className="h-4 w-4" aria-hidden="true" />
             </button>
@@ -181,8 +199,12 @@ export function DataTableCell({ cellId }: CellProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onSelect={() => download("csv")}>CSV ({sorted.length.toLocaleString()} rows)</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => download("json")}>JSON ({sorted.length.toLocaleString()} rows)</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => download("csv")}>
+              CSV ({sorted.length.toLocaleString()} rows)
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => download("json")}>
+              JSON ({sorted.length.toLocaleString()} rows)
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -192,7 +214,7 @@ export function DataTableCell({ cellId }: CellProps) {
           <caption className="sr-only">
             {fileName ?? "Dataset"} — page {currentPage + 1} of {pageCount}
           </caption>
-          <thead className="sticky top-0 z-10 bg-muted">
+          <thead className="bg-muted sticky top-0 z-10">
             <tr>
               {columns.map((column) => (
                 <HeaderCell key={column} column={column} type={columnTypes[column]} sort={sort} onSort={toggleSort} />
@@ -202,11 +224,11 @@ export function DataTableCell({ cellId }: CellProps) {
           <TableBody rows={pageRows} columns={columns} columnTypes={columnTypes} />
         </table>
         {sorted.length === 0 && (
-          <p className="p-6 text-center font-handwritten text-muted-foreground">No rows match “{query}”.</p>
+          <p className="font-handwritten text-muted-foreground p-6 text-center">No rows match “{query}”.</p>
         )}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 font-handwritten text-sm text-muted-foreground">
+      <div className="font-handwritten text-muted-foreground flex flex-wrap items-center justify-between gap-2 text-sm">
         <p aria-live="polite">
           {sorted.length === 0
             ? "0 rows"
@@ -234,19 +256,47 @@ export function DataTableCell({ cellId }: CellProps) {
             </SelectContent>
           </Select>
           <nav aria-label="Table pagination" className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setPage(0)} disabled={currentPage === 0} aria-label="First page">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setPage(0)}
+              disabled={currentPage === 0}
+              aria-label="First page"
+            >
               <ChevronsLeft aria-hidden="true" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 0} aria-label="Previous page">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setPage(currentPage - 1)}
+              disabled={currentPage === 0}
+              aria-label="Previous page"
+            >
               <ChevronLeft aria-hidden="true" />
             </Button>
             <span className="min-w-20 text-center text-xs tabular-nums">
               {currentPage + 1} / {pageCount}
             </span>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setPage(currentPage + 1)} disabled={currentPage >= pageCount - 1} aria-label="Next page">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setPage(currentPage + 1)}
+              disabled={currentPage >= pageCount - 1}
+              aria-label="Next page"
+            >
               <ChevronRight aria-hidden="true" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setPage(pageCount - 1)} disabled={currentPage >= pageCount - 1} aria-label="Last page">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setPage(pageCount - 1)}
+              disabled={currentPage >= pageCount - 1}
+              aria-label="Last page"
+            >
               <ChevronsRight aria-hidden="true" />
             </Button>
           </nav>
@@ -274,21 +324,27 @@ function HeaderCell({
     <th
       scope="col"
       aria-sort={active === "asc" ? "ascending" : active === "desc" ? "descending" : "none"}
-      className="whitespace-nowrap border-b p-0 text-left font-semibold text-foreground"
+      className="text-foreground border-b p-0 text-left font-semibold whitespace-nowrap"
     >
       <button
         type="button"
         onClick={() => onSort(column)}
-        className="flex w-full items-center gap-1.5 px-3 py-2 hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+        className="hover:bg-accent focus-visible:ring-ring flex w-full items-center gap-1.5 px-3 py-2 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-inset"
         title={`Sort by ${column}`}
       >
         <span className="font-handwritten-bold">{column}</span>
         {badge && (
-          <span className={cn("rounded px-1 font-mono text-[10px] font-normal", badge.className)} title={`${type} column`}>
+          <span
+            className={cn("rounded px-1 font-mono text-[10px] font-normal", badge.className)}
+            title={`${type} column`}
+          >
             {badge.label}
           </span>
         )}
-        <SortIcon className={cn("ml-auto h-3.5 w-3.5", active ? "text-foreground" : "text-muted-foreground/60")} aria-hidden="true" />
+        <SortIcon
+          className={cn("ml-auto h-3.5 w-3.5", active ? "text-foreground" : "text-muted-foreground/60")}
+          aria-hidden="true"
+        />
       </button>
     </th>
   )
@@ -306,13 +362,23 @@ const TableBody = memo(function TableBody({
   return (
     <tbody>
       {rows.map((row, r) => (
-        <tr key={r} className="border-b last:border-0 odd:bg-card even:bg-muted/30 hover:bg-accent/40">
+        <tr key={r} className="odd:bg-card even:bg-muted/30 hover:bg-accent/40 border-b last:border-0">
           {columns.map((column) => {
             const value = row[column]
             const numeric = columnTypes[column] === "number"
             return (
-              <td key={column} className={cn("max-w-xs truncate whitespace-nowrap px-3 py-1.5", numeric && "text-right font-mono tabular-nums")}>
-                {isMissing(value) ? <span className="font-mono text-xs italic text-muted-foreground">null</span> : formatCell(value)}
+              <td
+                key={column}
+                className={cn(
+                  "max-w-xs truncate px-3 py-1.5 whitespace-nowrap",
+                  numeric && "text-right font-mono tabular-nums",
+                )}
+              >
+                {isMissing(value) ? (
+                  <span className="text-muted-foreground font-mono text-xs italic">null</span>
+                ) : (
+                  formatCell(value)
+                )}
               </td>
             )
           })}

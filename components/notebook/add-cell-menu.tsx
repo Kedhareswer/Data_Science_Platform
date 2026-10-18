@@ -3,7 +3,14 @@
 import { useState } from "react"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { useData } from "@/lib/data-context"
 import { CELL_META, type CellMeta, type CellType } from "@/lib/notebook"
 import { cn } from "@/lib/utils"
@@ -37,7 +44,12 @@ export function AddCellMenu({ index, variant = "default" }: AddCellMenuProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {variant === "inline" ? (
-          <Button variant="ghost" size="sm" className="h-7 border border-dashed text-muted-foreground" aria-label="Insert cell here">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground h-7 border border-dashed"
+            aria-label="Insert cell here"
+          >
             <Plus aria-hidden /> Add cell
           </Button>
         ) : (
@@ -56,7 +68,7 @@ export function AddCellMenu({ index, variant = "default" }: AddCellMenuProps) {
         <div className="space-y-5">
           {CATEGORIES.map((category) => (
             <section key={category.id} aria-label={category.label}>
-              <h3 className="mb-2 text-sm text-muted-foreground">{category.label}</h3>
+              <h3 className="text-muted-foreground mb-2 text-sm">{category.label}</h3>
               <div className="grid gap-2 sm:grid-cols-2">
                 {(Object.entries(CELL_META) as Array<[CellType, CellMeta]>)
                   .filter(([, meta]) => meta.category === category.id)
@@ -70,14 +82,14 @@ export function AddCellMenu({ index, variant = "default" }: AddCellMenuProps) {
                         disabled={disabled}
                         onClick={() => add(type)}
                         className={cn(
-                          "flex items-start gap-3 rounded-md border border-l-4 p-3 text-left transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50",
+                          "hover:bg-accent focus-visible:ring-ring flex items-start gap-3 rounded-md border border-l-4 p-3 text-left transition-colors focus-visible:ring-2 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50",
                           CATEGORY_ACCENT[meta.category],
                         )}
                       >
                         <Icon className="mt-0.5 h-5 w-5 shrink-0" aria-hidden />
                         <span>
-                          <span className="block font-handwritten-bold">{meta.title}</span>
-                          <span className="block text-sm text-muted-foreground">{meta.description}</span>
+                          <span className="font-handwritten-bold block">{meta.title}</span>
+                          <span className="text-muted-foreground block text-sm">{meta.description}</span>
                         </span>
                       </button>
                     )

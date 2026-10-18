@@ -18,20 +18,26 @@ export function ProsePage({ title, lead, toc, children }: ProsePageProps) {
   return (
     <div className="flex min-h-dvh flex-col">
       <SiteHeader />
-      <main id="main-content" className="mx-auto grid w-full max-w-7xl flex-1 gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[220px_1fr]">
+      <main
+        id="main-content"
+        className="mx-auto grid w-full max-w-7xl flex-1 gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[220px_1fr]"
+      >
         <nav aria-label="On this page" className="lg:sticky lg:top-20 lg:self-start">
-          <p className="mb-2 font-handwritten-bold text-sm text-muted-foreground">On this page</p>
+          <p className="font-handwritten-bold text-muted-foreground mb-2 text-sm">On this page</p>
           <ol className="flex flex-wrap gap-x-4 gap-y-1 text-sm lg:block lg:space-y-1">
             {toc.map((entry) => (
               <li key={entry.id}>
-                <a href={`#${entry.id}`} className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
+                <a
+                  href={`#${entry.id}`}
+                  className="text-muted-foreground hover:text-foreground underline-offset-4 hover:underline"
+                >
                   {entry.title}
                 </a>
               </li>
             ))}
           </ol>
         </nav>
-        <article className="prose prose-neutral max-w-3xl dark:prose-invert prose-headings:font-handwritten-bold prose-h2:scroll-mt-20 prose-code:before:content-none prose-code:after:content-none">
+        <article className="prose prose-neutral dark:prose-invert prose-headings:font-handwritten-bold prose-h2:scroll-mt-20 prose-code:before:content-none prose-code:after:content-none max-w-3xl">
           <h1>{title}</h1>
           {lead && <p className="lead">{lead}</p>}
           {children}

@@ -59,5 +59,9 @@ export async function trainSklearnModel(rows: readonly DataRow[], config: Traini
 
 export async function predictSklearn(model: TrainedModel, rows: readonly DataRow[]): Promise<Prediction[]> {
   const slim = rows.map((r) => Object.fromEntries(model.features.map((c) => [c, r[c] ?? null])))
-  return getPythonRuntime().call<Prediction[]>("_dn_sklearn_predict", { modelId: model.id, rows: slim }, SKLEARN_PACKAGES)
+  return getPythonRuntime().call<Prediction[]>(
+    "_dn_sklearn_predict",
+    { modelId: model.id, rows: slim },
+    SKLEARN_PACKAGES,
+  )
 }

@@ -11,7 +11,7 @@ const components: Components = {
 /** Render user markdown safely: raw HTML is not allowed (react-markdown escapes it by default). */
 export function MarkdownView({ markdown }: { markdown: string }) {
   return (
-    <div className="prose prose-sm max-w-none font-handwritten dark:prose-invert prose-headings:font-handwritten-bold prose-pre:bg-muted prose-pre:text-foreground prose-code:before:content-none prose-code:after:content-none">
+    <div className="prose prose-sm font-handwritten dark:prose-invert prose-headings:font-handwritten-bold prose-pre:bg-muted prose-pre:text-foreground prose-code:before:content-none prose-code:after:content-none max-w-none">
       <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml components={components}>
         {markdown}
       </ReactMarkdown>

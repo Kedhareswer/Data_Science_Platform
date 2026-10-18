@@ -132,17 +132,35 @@ export function PythonCell({ cellId }: CellProps) {
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-1.5" role="toolbar" aria-label="Python cell actions">
         {running ? (
-          <Button size="sm" variant="destructive" onClick={stop} className="font-handwritten" aria-label="Stop execution (restarts Python)">
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={stop}
+            className="font-handwritten"
+            aria-label="Stop execution (restarts Python)"
+          >
             <Square aria-hidden="true" />
             Stop
           </Button>
         ) : (
-          <Button size="sm" onClick={() => void run()} disabled={!content.code.trim()} className="font-handwritten" aria-label="Run code (Shift+Enter)">
+          <Button
+            size="sm"
+            onClick={() => void run()}
+            disabled={!content.code.trim()}
+            className="font-handwritten"
+            aria-label="Run code (Shift+Enter)"
+          >
             <Play aria-hidden="true" />
             Run
           </Button>
         )}
-        <Button size="sm" variant="ghost" onClick={clearOutput} disabled={running || !content.output} className="font-handwritten">
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={clearOutput}
+          disabled={running || !content.output}
+          className="font-handwritten"
+        >
           <Eraser aria-hidden="true" />
           Clear
         </Button>
@@ -157,9 +175,13 @@ export function PythonCell({ cellId }: CellProps) {
             <DropdownMenuLabel className="font-handwritten-bold">Insert a snippet</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {PYTHON_SNIPPETS.map((snippet) => (
-              <DropdownMenuItem key={snippet.id} onSelect={() => insertSnippet(snippet.code)} className="flex-col items-start gap-0">
+              <DropdownMenuItem
+                key={snippet.id}
+                onSelect={() => insertSnippet(snippet.code)}
+                className="flex-col items-start gap-0"
+              >
                 <span className="font-handwritten">{snippet.label}</span>
-                <span className="font-mono text-xs text-muted-foreground">{snippet.description}</span>
+                <span className="text-muted-foreground font-mono text-xs">{snippet.description}</span>
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
@@ -183,22 +205,26 @@ export function PythonCell({ cellId }: CellProps) {
 
       <CodeEditor value={content.code} onChange={setCode} onRun={() => void run()} ariaLabel="Python code editor" />
 
-      <p className="font-handwritten text-xs text-muted-foreground">
-        <kbd className="font-mono">Shift+Enter</kbd> or <kbd className="font-mono">Ctrl/⌘+Enter</kbd> to run · <kbd className="font-mono">Esc</kbd> to leave the editor ·{" "}
+      <p className="font-handwritten text-muted-foreground text-xs">
+        <kbd className="font-mono">Shift+Enter</kbd> or <kbd className="font-mono">Ctrl/⌘+Enter</kbd> to run ·{" "}
+        <kbd className="font-mono">Esc</kbd> to leave the editor ·{" "}
         {processedData.length > 0
           ? `df has ${processedData.length.toLocaleString()} rows × ${columns.length} columns`
           : "no dataset loaded — df is empty"}
       </p>
 
       {running && status === "loading" && (
-        <div role="status" className="flex items-center gap-2 rounded-md border border-dashed bg-muted/40 p-3 font-handwritten text-sm text-muted-foreground">
+        <div
+          role="status"
+          className="bg-muted/40 font-handwritten text-muted-foreground flex items-center gap-2 rounded-md border border-dashed p-3 text-sm"
+        >
           <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
           {message ?? "Loading Python…"} The first run downloads about 10 MB; after that it is cached.
         </div>
       )}
 
       {output && (!live || live.stdout || live.stderr) && (
-        <section aria-label="Cell output" className="rounded-md border-l-4 border-primary/40 pl-3">
+        <section aria-label="Cell output" className="border-primary/40 rounded-md border-l-4 pl-3">
           <RunOutput output={output} />
         </section>
       )}

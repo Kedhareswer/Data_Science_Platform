@@ -6,7 +6,8 @@ const TRUE_TOKENS = new Set(["true", "yes", "y"])
 const FALSE_TOKENS = new Set(["false", "no", "n"])
 const NUMBER_RE = /^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/
 // ISO dates/datetimes, or d/m/y-style dates with 4-digit years.
-const DATE_RE = /^(\d{4}-\d{1,2}-\d{1,2}([T ]\d{1,2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?)?|\d{1,2}[/.-]\d{1,2}[/.-]\d{4})$/
+const DATE_RE =
+  /^(\d{4}-\d{1,2}-\d{1,2}([T ]\d{1,2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?)?|\d{1,2}[/.-]\d{1,2}[/.-]\d{4})$/
 
 function toText(value: unknown): string {
   return typeof value === "string" ? value.trim() : String(value)

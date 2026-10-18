@@ -8,7 +8,7 @@ export default function NotFound() {
       <SiteHeader />
       <main id="main-content" className="flex flex-col items-center gap-4 px-4 py-24 text-center">
         <p className="font-handwritten-bold text-6xl">404</p>
-        <p className="text-xl text-muted-foreground">This page wandered off the notebook.</p>
+        <p className="text-muted-foreground text-xl">This page wandered off the notebook.</p>
         <Button asChild>
           <Link href="/">Go home</Link>
         </Button>

@@ -3,11 +3,24 @@
 import { useId, useState, type ReactNode } from "react"
 import { AreaChart, BarChart3, FileText, Hash, LineChart, PieChart, ScatterChart, Table2 } from "lucide-react"
 import type { Aggregation, DashboardWidget, DateBucket, MetricWidget, WidgetChart, WidgetSize } from "@/lib/dashboard"
-import { AGGREGATION_LABELS, AGGREGATIONS, defaultWidgetTitle, NUMERIC_AGGREGATIONS, newWidgetId } from "@/lib/dashboard-data"
+import {
+  AGGREGATION_LABELS,
+  AGGREGATIONS,
+  defaultWidgetTitle,
+  NUMERIC_AGGREGATIONS,
+  newWidgetId,
+} from "@/lib/dashboard-data"
 import type { ColumnTypes } from "@/lib/data/types"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -83,7 +96,12 @@ function initialForm(widget: DashboardWidget | undefined, columns: readonly stri
   if (!widget) return form
   switch (widget.type) {
     case "metric":
-      return { ...form, metricColumn: widget.column, metricAggregation: widget.aggregation, format: widget.format ?? "number" }
+      return {
+        ...form,
+        metricColumn: widget.column,
+        metricAggregation: widget.aggregation,
+        format: widget.format ?? "number",
+      }
     case "chart":
       return {
         ...form,
@@ -175,14 +193,24 @@ export function WidgetEditor({ open, onOpenChange, widget, columns, columnTypes,
   )
 }
 
-function Field({ label, htmlFor, hint, children }: { label: string; htmlFor: string; hint?: string; children: ReactNode }) {
+function Field({
+  label,
+  htmlFor,
+  hint,
+  children,
+}: {
+  label: string
+  htmlFor: string
+  hint?: string
+  children: ReactNode
+}) {
   return (
     <div className="space-y-1.5">
       <Label htmlFor={htmlFor} className="font-handwritten-bold">
         {label}
       </Label>
       {children}
-      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+      {hint && <p className="text-muted-foreground text-xs">{hint}</p>}
     </div>
   )
 }
@@ -227,7 +255,7 @@ function ColumnSelect({
         )}
         {options.map((column) => (
           <SelectItem key={column} value={column}>
-            {column} <span className="text-xs text-muted-foreground">· {columnTypes[column]}</span>
+            {column} <span className="text-muted-foreground text-xs">· {columnTypes[column]}</span>
           </SelectItem>
         ))}
       </SelectContent>
@@ -394,7 +422,11 @@ function EditorForm({
               onChange={(metricAggregation) => set({ metricAggregation })}
             />
           </Field>
-          <Field label="Format" htmlFor={fid("format")} hint={form.format === "percent" ? "0.25 shows as 25%." : undefined}>
+          <Field
+            label="Format"
+            htmlFor={fid("format")}
+            hint={form.format === "percent" ? "0.25 shows as 25%." : undefined}
+          >
             <Select value={form.format} onValueChange={(v) => set({ format: v as ValueFormat })}>
               <SelectTrigger id={fid("format")}>
                 <SelectValue />
@@ -412,7 +444,7 @@ function EditorForm({
       {form.type === "chart" && (
         <div className="space-y-4">
           <fieldset>
-            <legend className="mb-1.5 text-sm font-handwritten-bold">Chart type</legend>
+            <legend className="font-handwritten-bold mb-1.5 text-sm">Chart type</legend>
             <div role="group" aria-label="Chart type" className="grid grid-cols-5 gap-2">
               {CHART_OPTIONS.map((c) => {
                 const selected = form.chart === c.value
@@ -423,8 +455,8 @@ function EditorForm({
                     aria-pressed={selected}
                     onClick={() => setChart(c.value)}
                     className={cn(
-                      "flex flex-col items-center gap-1 rounded-md border-2 px-2 py-2 text-xs transition-colors focus-visible:outline-2 focus-visible:outline-ring [&_svg]:size-5",
-                      selected ? "border-primary bg-primary/10" : "border-dashed hover:bg-accent",
+                      "focus-visible:outline-ring flex flex-col items-center gap-1 rounded-md border-2 px-2 py-2 text-xs transition-colors focus-visible:outline-2 [&_svg]:size-5",
+                      selected ? "border-primary bg-primary/10" : "hover:bg-accent border-dashed",
                     )}
                   >
                     {c.icon}
@@ -438,7 +470,9 @@ function EditorForm({
             <Field
               label={isScatter ? "X (numeric)" : "Group by (X)"}
               htmlFor={fid("x")}
-              hint={!isScatter && form.x && columnTypes[form.x] === "number" ? "Wide numeric ranges are binned." : undefined}
+              hint={
+                !isScatter && form.x && columnTypes[form.x] === "number" ? "Wide numeric ranges are binned." : undefined
+              }
             >
               <ColumnSelect
                 id={fid("x")}
@@ -524,12 +558,24 @@ function EditorForm({
         <div className="space-y-4">
           <fieldset className="space-y-2">
             <div className="flex items-center justify-between">
-              <legend className="text-sm font-handwritten-bold">Columns</legend>
+              <legend className="font-handwritten-bold text-sm">Columns</legend>
               <div className="flex gap-1">
-                <Button type="button" variant="ghost" size="sm" className="h-7 px-2" onClick={() => set({ tableColumns: [...columns] })}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => set({ tableColumns: [...columns] })}
+                >
                   All
                 </Button>
-                <Button type="button" variant="ghost" size="sm" className="h-7 px-2" onClick={() => set({ tableColumns: [] })}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => set({ tableColumns: [] })}
+                >
                   None
                 </Button>
               </div>
@@ -561,8 +607,10 @@ function EditorForm({
                 })}
               </ul>
             </ScrollArea>
-            <p className="text-xs text-muted-foreground">
-              {form.tableColumns.length === 0 ? "No columns picked — every column will be shown." : `${form.tableColumns.length} selected.`}
+            <p className="text-muted-foreground text-xs">
+              {form.tableColumns.length === 0
+                ? "No columns picked — every column will be shown."
+                : `${form.tableColumns.length} selected.`}
             </p>
           </fieldset>
           <Field label="Rows per page" htmlFor={fid("page-size")}>
@@ -583,7 +631,11 @@ function EditorForm({
       )}
 
       {form.type === "text" && (
-        <Field label="Markdown" htmlFor={fid("markdown")} hint="Supports **bold**, lists, links, tables (GFM). Raw HTML is not rendered.">
+        <Field
+          label="Markdown"
+          htmlFor={fid("markdown")}
+          hint="Supports **bold**, lists, links, tables (GFM). Raw HTML is not rendered."
+        >
           <Textarea
             id={fid("markdown")}
             value={form.markdown}
@@ -596,7 +648,7 @@ function EditorForm({
       )}
 
       {error && (
-        <p role="alert" className="text-sm text-destructive">
+        <p role="alert" className="text-destructive text-sm">
           {error}
         </p>
       )}

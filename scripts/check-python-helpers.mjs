@@ -84,7 +84,10 @@ const dir = mkdtempSync(join(tmpdir(), "dn-py-"))
 try {
   const script = join(dir, "check.py")
   const data = join(dir, "rows.json")
-  writeFileSync(script, [extract("lib/python/bootstrap-py.ts"), extract("lib/python/sklearn-py.ts"), harness].join("\n"))
+  writeFileSync(
+    script,
+    [extract("lib/python/bootstrap-py.ts"), extract("lib/python/sklearn-py.ts"), harness].join("\n"),
+  )
   writeFileSync(data, JSON.stringify(rows))
   execFileSync(python, ["-W", "ignore", script, data], { stdio: "inherit" })
   console.log("Python helpers OK")

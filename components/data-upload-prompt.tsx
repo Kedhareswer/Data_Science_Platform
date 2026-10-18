@@ -16,11 +16,11 @@ export function DataUploadPrompt({
   return (
     <section aria-label={title} className="sketch-card mx-auto max-w-xl space-y-4 p-5 text-center">
       <div className="space-y-1">
-        <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-          <Sparkles className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+        <div className="bg-muted mx-auto flex h-10 w-10 items-center justify-center rounded-full">
+          <Sparkles className="text-muted-foreground h-5 w-5" aria-hidden="true" />
         </div>
         <h3 className="font-handwritten-bold text-lg">{title}</h3>
-        <p className="font-handwritten text-sm text-muted-foreground">{description}</p>
+        <p className="font-handwritten text-muted-foreground text-sm">{description}</p>
       </div>
       <FileUpload compact />
     </section>

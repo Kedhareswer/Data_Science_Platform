@@ -88,7 +88,13 @@ function summarize(rows: readonly DataRow[], columns: readonly string[]): Missin
   for (let i = 0; i < k; i++) {
     for (let j = i + 1; j < k; j++) {
       const n = both[i * k + j]
-      if (n > 0) pairs.push({ a: tracked[i].column, b: tracked[j].column, both: n, overlap: n / Math.min(tracked[i].missing, tracked[j].missing) })
+      if (n > 0)
+        pairs.push({
+          a: tracked[i].column,
+          b: tracked[j].column,
+          both: n,
+          overlap: n / Math.min(tracked[i].missing, tracked[j].missing),
+        })
     }
   }
   pairs.sort((p, q) => q.both - p.both)
@@ -106,7 +112,9 @@ export function MissingDataCell(_props: CellProps) {
   const summary = useMemo(() => summarize(processedData, columns), [processedData, columns])
 
   if (processedData.length === 0) {
-    return <DataUploadPrompt title="No data to inspect" description="Load a dataset to explore where values are missing." />
+    return (
+      <DataUploadPrompt title="No data to inspect" description="Load a dataset to explore where values are missing." />
+    )
   }
 
   const totalCells = processedData.length * columns.length
@@ -123,16 +131,19 @@ export function MissingDataCell(_props: CellProps) {
   }
 
   return (
-    <div className="space-y-5 font-handwritten">
+    <div className="font-handwritten space-y-5">
       <dl className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <SummaryTile label="Missing cells" value={summary.totalMissing.toLocaleString()} />
-        <SummaryTile label="Of all cells" value={`${totalCells ? ((summary.totalMissing / totalCells) * 100).toFixed(1) : "0"}%`} />
+        <SummaryTile
+          label="Of all cells"
+          value={`${totalCells ? ((summary.totalMissing / totalCells) * 100).toFixed(1) : "0"}%`}
+        />
         <SummaryTile label="Rows with any missing" value={summary.rowsWithMissing.toLocaleString()} />
         <SummaryTile label="Complete rows" value={(processedData.length - summary.rowsWithMissing).toLocaleString()} />
       </dl>
 
       {incomplete.length === 0 ? (
-        <div className="sketch-card flex items-center gap-2 p-4 text-success">
+        <div className="sketch-card text-success flex items-center gap-2 p-4">
           <CheckCircle2 className="h-4 w-4" aria-hidden="true" /> No missing values. Every cell is filled in!
         </div>
       ) : (
@@ -150,8 +161,8 @@ export function MissingDataCell(_props: CellProps) {
 function SummaryTile({ label, value }: { label: string; value: string }) {
   return (
     <div className="sketch-card p-3">
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="text-xl font-handwritten-bold">{value}</dd>
+      <dt className="text-muted-foreground text-xs">{label}</dt>
+      <dd className="font-handwritten-bold text-xl">{value}</dd>
     </div>
   )
 }
@@ -160,8 +171,8 @@ function Section({ title, children, description }: { title: string; description?
   return (
     <section className="space-y-2">
       <div>
-        <h3 className="text-base font-handwritten-bold">{title}</h3>
-        {description && <p className="text-xs text-muted-foreground">{description}</p>}
+        <h3 className="font-handwritten-bold text-base">{title}</h3>
+        {description && <p className="text-muted-foreground text-xs">{description}</p>}
       </div>
       {children}
     </section>
@@ -175,17 +186,29 @@ function missingColor(percentage: number): string {
 }
 
 function MissingBarChart({ perColumn }: { perColumn: ColumnMissing[] }) {
-  const data = useMemo(() => [...perColumn].sort((a, b) => b.percentage - a.percentage).slice(0, CHART_COLUMNS), [perColumn])
+  const data = useMemo(
+    () => [...perColumn].sort((a, b) => b.percentage - a.percentage).slice(0, CHART_COLUMNS),
+    [perColumn],
+  )
   return (
     <Section
       title="Missing values by column"
-      description={perColumn.length > data.length ? `Top ${data.length} of ${perColumn.length} incomplete columns` : undefined}
+      description={
+        perColumn.length > data.length ? `Top ${data.length} of ${perColumn.length} incomplete columns` : undefined
+      }
     >
       <div style={{ height: data.length * 28 + 48 }} role="img" aria-label="Bar chart of missing percentage per column">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} layout="vertical" margin={{ top: 4, right: 24, bottom: 16, left: 8 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} horizontal={false} />
-            <XAxis type="number" domain={[0, 100]} unit="%" tick={AXIS_TICK} axisLine={AXIS_LINE} tickLine={AXIS_LINE} />
+            <XAxis
+              type="number"
+              domain={[0, 100]}
+              unit="%"
+              tick={AXIS_TICK}
+              axisLine={AXIS_LINE}
+              tickLine={AXIS_LINE}
+            />
             <YAxis
               type="category"
               dataKey="column"
@@ -247,13 +270,20 @@ function MissingMatrix({ rows, columns }: { rows: DataRow[]; columns: string[] }
     >
       <svg
         viewBox={`0 0 ${width} ${height + labelSpace}`}
-        className="h-auto w-full font-handwritten"
+        className="font-handwritten h-auto w-full"
         role="img"
         aria-label={`Missingness matrix: ${cells.length} missing cells among ${sample.length} sampled rows`}
       >
         <rect x={0} y={labelSpace} width={width} height={height} style={{ fill: "var(--color-muted)" }} />
         {cells.map(({ r, c }) => (
-          <rect key={`${r}-${c}`} x={c * cellW} y={labelSpace + r * cellH} width={Math.max(1, cellW - 1)} height={cellH} style={{ fill: "var(--color-foreground)" }} />
+          <rect
+            key={`${r}-${c}`}
+            x={c * cellW}
+            y={labelSpace + r * cellH}
+            width={Math.max(1, cellW - 1)}
+            height={cellH}
+            style={{ fill: "var(--color-foreground)" }}
+          />
         ))}
         {shownColumns.map((col, c) => (
           <text
@@ -275,7 +305,7 @@ function CoMissingPairs({ pairs }: { pairs: MissingPair[] }) {
   return (
     <Section title="Missing together" description="Column pairs whose values are often missing in the same rows.">
       {pairs.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No columns are missing together.</p>
+        <p className="text-muted-foreground text-sm">No columns are missing together.</p>
       ) : (
         <ul className="grid gap-2 sm:grid-cols-2">
           {pairs.map((p) => (
@@ -284,12 +314,12 @@ function CoMissingPairs({ pairs }: { pairs: MissingPair[] }) {
                 <span className="truncate" title={`${p.a} + ${p.b}`}>
                   {p.a} + {p.b}
                 </span>
-                <span className="shrink-0 text-muted-foreground">{p.both.toLocaleString()} rows</span>
+                <span className="text-muted-foreground shrink-0">{p.both.toLocaleString()} rows</span>
               </div>
-              <div className="mt-1 h-1.5 rounded-full bg-muted" aria-hidden="true">
-                <div className="h-1.5 rounded-full bg-chart-4" style={{ width: `${Math.round(p.overlap * 100)}%` }} />
+              <div className="bg-muted mt-1 h-1.5 rounded-full" aria-hidden="true">
+                <div className="bg-chart-4 h-1.5 rounded-full" style={{ width: `${Math.round(p.overlap * 100)}%` }} />
               </div>
-              <p className="mt-0.5 text-xs text-muted-foreground">{Math.round(p.overlap * 100)}% overlap</p>
+              <p className="text-muted-foreground mt-0.5 text-xs">{Math.round(p.overlap * 100)}% overlap</p>
             </li>
           ))}
         </ul>
@@ -336,10 +366,18 @@ function QuickActions({
         </Button>
         {numeric && (
           <>
-            <Button variant="outline" size="sm" onClick={() => onApply({ type: "fill_missing", column, method: "mean" })}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onApply({ type: "fill_missing", column, method: "mean" })}
+            >
               <Wand2 aria-hidden="true" /> Fill mean
             </Button>
-            <Button variant="outline" size="sm" onClick={() => onApply({ type: "fill_missing", column, method: "median" })}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onApply({ type: "fill_missing", column, method: "median" })}
+            >
               <Wand2 aria-hidden="true" /> Fill median
             </Button>
           </>

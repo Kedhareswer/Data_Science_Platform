@@ -55,8 +55,8 @@ export default function PrivacyPage() {
           dataset contents. Operators can self-host via <code>NEXT_PUBLIC_PYODIDE_INDEX_URL</code>.
         </li>
         <li>
-          <strong>Vercel Web Analytics</strong> — when deployed on Vercel with analytics enabled, anonymous,
-          cookie-less page-view metrics are collected. No dataset contents are sent.
+          <strong>Vercel Web Analytics</strong> — when deployed on Vercel with analytics enabled, anonymous, cookie-less
+          page-view metrics are collected. No dataset contents are sent.
         </li>
         <li>
           <strong>Fonts</strong> are bundled with the site at build time; no requests are made to font providers at

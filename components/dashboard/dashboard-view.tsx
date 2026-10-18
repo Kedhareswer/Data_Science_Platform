@@ -45,7 +45,16 @@ interface DashboardViewProps {
   onReorder: (from: number, to: number) => void
 }
 
-export function DashboardView({ widgets, rows, allRows, columns, columnTypes, editMode, onAction, onReorder }: DashboardViewProps) {
+export function DashboardView({
+  widgets,
+  rows,
+  allRows,
+  columns,
+  columnTypes,
+  editMode,
+  onAction,
+  onReorder,
+}: DashboardViewProps) {
   const handleDragEnd = useCallback(
     (result: DropResult) => {
       if (!result.destination || result.destination.index === result.source.index) return

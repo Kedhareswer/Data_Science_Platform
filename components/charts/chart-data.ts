@@ -12,7 +12,13 @@ export type ChartType = (typeof CHART_TYPES)[number]
 export const AGGREGATIONS = ["count", "sum", "mean", "median", "min", "max"] as const
 export type Aggregation = (typeof AGGREGATIONS)[number]
 
-export const SORT_ORDERS = { none: "Original order", x_asc: "X ascending", x_desc: "X descending", y_desc: "Value high → low", y_asc: "Value low → high" } as const
+export const SORT_ORDERS = {
+  none: "Original order",
+  x_asc: "X ascending",
+  x_desc: "X descending",
+  y_desc: "Value high → low",
+  y_asc: "Value low → high",
+} as const
 export type SortOrder = keyof typeof SORT_ORDERS
 
 export interface ChartConfig {
@@ -57,7 +63,8 @@ export function isRoleOptional(chart: ChartType, role: ColumnRole, aggregation: 
   return chart === "box"
 }
 
-export const usesAggregation = (chart: ChartType) => chart === "bar" || chart === "line" || chart === "area" || chart === "pie"
+export const usesAggregation = (chart: ChartType) =>
+  chart === "bar" || chart === "line" || chart === "area" || chart === "pie"
 export const usesSort = usesAggregation
 export const usesStacking = (chart: ChartType) => chart === "bar" || chart === "area"
 
@@ -68,7 +75,12 @@ export const MAX_BOXES = 12
 export const MAX_HEATMAP_COLUMNS = 12
 export const HEATMAP_SAMPLE_ROWS = 5000
 
-export function columnsForRole(chart: ChartType, role: ColumnRole, columns: readonly string[], types: ColumnTypes): string[] {
+export function columnsForRole(
+  chart: ChartType,
+  role: ColumnRole,
+  columns: readonly string[],
+  types: ColumnTypes,
+): string[] {
   const allowed = ROLE_TYPES[chart][role]
   if (!allowed) return []
   return columns.filter((c) => allowed.includes(types[c] ?? "string"))
@@ -93,7 +105,8 @@ export function defaultConfig(columns: readonly string[], types: ColumnTypes): C
     yLabel: "",
   }
   if (categorical.length && numeric.length) return { ...base, x: categorical[0], y: numeric[0], aggregation: "mean" }
-  if (dates.length && numeric.length) return { ...base, chartType: "line", x: dates[0], y: numeric[0], aggregation: "mean", sort: "x_asc", limit: 0 }
+  if (dates.length && numeric.length)
+    return { ...base, chartType: "line", x: dates[0], y: numeric[0], aggregation: "mean", sort: "x_asc", limit: 0 }
   if (numeric.length >= 2) return { ...base, chartType: "scatter", x: numeric[0], y: numeric[1] }
   if (numeric.length === 1) return { ...base, chartType: "histogram", x: numeric[0] }
   if (categorical.length) return { ...base, x: categorical[0] }
@@ -101,7 +114,11 @@ export function defaultConfig(columns: readonly string[], types: ColumnTypes): C
 }
 
 /** Merge a (possibly stale) stored config with defaults and repair invalid column choices. */
-export function resolveConfig(stored: Partial<ChartConfig> | null, columns: readonly string[], types: ColumnTypes): ChartConfig {
+export function resolveConfig(
+  stored: Partial<ChartConfig> | null,
+  columns: readonly string[],
+  types: ColumnTypes,
+): ChartConfig {
   const defaults = defaultConfig(columns, types)
   const merged: ChartConfig = { ...defaults, ...(stored && typeof stored === "object" ? stored : {}) }
   if (!CHART_TYPES.includes(merged.chartType)) merged.chartType = defaults.chartType
@@ -116,11 +133,18 @@ export function resolveConfig(stored: Partial<ChartConfig> | null, columns: read
     if (options.length === 0) {
       merged[role] = null
     } else if (current === null || !options.includes(current)) {
-      merged[role] = isRoleOptional(merged.chartType, role, merged.aggregation) ? null : (options.find((o) => o !== merged.x) ?? options[0])
+      merged[role] = isRoleOptional(merged.chartType, role, merged.aggregation)
+        ? null
+        : (options.find((o) => o !== merged.x) ?? options[0])
     }
   }
+  // Plotting a column against itself is rarely intended: pick a different Y when possible.
+  if (merged.chartType === "scatter" && merged.x !== null && merged.x === merged.y) {
+    merged.y = columnsForRole("scatter", "y", columns, types).find((c) => c !== merged.x) ?? merged.y
+  }
   // An aggregation other than count needs a numeric value column.
-  if (usesAggregation(merged.chartType) && merged.aggregation !== "count" && merged.y === null) merged.aggregation = "count"
+  if (usesAggregation(merged.chartType) && merged.aggregation !== "count" && merged.y === null)
+    merged.aggregation = "count"
   if (merged.groupBy !== null && merged.groupBy === merged.x) merged.groupBy = null
   return merged
 }
@@ -150,7 +174,12 @@ export type CategoricalRow = { x: string } & Record<string, string | number | nu
 
 export type ChartResult =
   | { kind: "categorical"; data: CategoricalRow[]; series: SeriesInfo[]; notes: string[] }
-  | { kind: "scatter"; series: Array<{ name: string; points: Array<{ x: number; y: number }> }>; xIsDate: boolean; notes: string[] }
+  | {
+      kind: "scatter"
+      series: Array<{ name: string; points: Array<{ x: number; y: number }> }>
+      xIsDate: boolean
+      notes: string[]
+    }
   | { kind: "histogram"; data: Array<{ label: string; start: number; end: number; count: number }>; notes: string[] }
   | { kind: "box"; boxes: BoxStats[]; notes: string[] }
   | { kind: "heatmap"; columns: string[]; matrix: Record<string, Record<string, number>>; notes: string[] }
@@ -212,7 +241,9 @@ function computeCategorical(rows: readonly DataRow[], config: ChartConfig, types
     seriesNames = [...keep]
     if (folded) {
       seriesNames.push(OTHER_LABEL)
-      notes.push(`Only the ${MAX_GROUPS} most frequent "${groupBy}" groups are shown; the rest are combined as "${OTHER_LABEL}".`)
+      notes.push(
+        `Only the ${MAX_GROUPS} most frequent "${groupBy}" groups are shown; the rest are combined as "${OTHER_LABEL}".`,
+      )
     }
   }
   const seriesIndex = new Map(seriesNames.map((n, i) => [n, i]))
@@ -243,19 +274,30 @@ function computeCategorical(rows: readonly DataRow[], config: ChartConfig, types
     }
   }
 
-  const series: SeriesInfo[] = seriesNames.map((name, i) => ({ key: `s${i}`, name: groupBy ? name : autoLabels(config).y }))
-  let data: Array<CategoricalRow & { __total: number; __sort: number | string }> = [...buckets.entries()].map(([label, bucket]) => {
-    const row: CategoricalRow & { __total: number; __sort: number | string } = { x: label, __total: 0, __sort: bucket.sortKey }
-    series.forEach((s, i) => {
-      const value = bucket.rows[i] === 0 ? null : aggregate(bucket.values[i], bucket.rows[i], config.aggregation)
-      row[s.key] = value
-      row.__total += value ?? 0
-    })
-    return row
-  })
+  const series: SeriesInfo[] = seriesNames.map((name, i) => ({
+    key: `s${i}`,
+    name: groupBy ? name : autoLabels(config).y,
+  }))
+  let data: Array<CategoricalRow & { __total: number; __sort: number | string }> = [...buckets.entries()].map(
+    ([label, bucket]) => {
+      const row: CategoricalRow & { __total: number; __sort: number | string } = {
+        x: label,
+        __total: 0,
+        __sort: bucket.sortKey,
+      }
+      series.forEach((s, i) => {
+        const value = bucket.rows[i] === 0 ? null : aggregate(bucket.values[i], bucket.rows[i], config.aggregation)
+        row[s.key] = value
+        row.__total += value ?? 0
+      })
+      return row
+    },
+  )
 
   const compareX = (a: { __sort: number | string }, b: { __sort: number | string }) =>
-    typeof a.__sort === "number" && typeof b.__sort === "number" ? a.__sort - b.__sort : String(a.__sort).localeCompare(String(b.__sort), undefined, { numeric: true })
+    typeof a.__sort === "number" && typeof b.__sort === "number"
+      ? a.__sort - b.__sort
+      : String(a.__sort).localeCompare(String(b.__sort), undefined, { numeric: true })
   switch (config.sort) {
     case "x_asc":
       data.sort(compareX)
@@ -276,7 +318,10 @@ function computeCategorical(rows: readonly DataRow[], config: ChartConfig, types
     const rest = data.slice(limit)
     data = data.slice(0, limit)
     if (config.chartType === "pie" && (config.aggregation === "count" || config.aggregation === "sum")) {
-      const other = { x: OTHER_LABEL, __total: 0, __sort: OTHER_LABEL } as CategoricalRow & { __total: number; __sort: string }
+      const other = { x: OTHER_LABEL, __total: 0, __sort: OTHER_LABEL } as CategoricalRow & {
+        __total: number
+        __sort: string
+      }
       other.s0 = rest.reduce((acc, r) => acc + (typeof r.s0 === "number" ? r.s0 : 0), 0)
       data.push(other)
       notes.push(`${rest.length} smaller categories are combined as "${OTHER_LABEL}".`)
@@ -343,9 +388,18 @@ function computeScatter(rows: readonly DataRow[], config: ChartConfig, types: Co
   if (valid.length === 0) return { kind: "empty", reason: "No rows have both X and Y values." }
   const notes: string[] = []
   const picked = sampleIndices(valid.length, MAX_SCATTER_POINTS).map((i) => valid[i])
-  if (picked.length < valid.length) notes.push(`Showing a random sample of ${picked.length.toLocaleString()} of ${valid.length.toLocaleString()} points.`)
+  if (picked.length < valid.length)
+    notes.push(
+      `Showing a random sample of ${picked.length.toLocaleString()} of ${valid.length.toLocaleString()} points.`,
+    )
 
-  if (!groupBy) return { kind: "scatter", series: [{ name: y, points: picked.map(({ x: px, y: py }) => ({ x: px, y: py })) }], xIsDate, notes }
+  if (!groupBy)
+    return {
+      kind: "scatter",
+      series: [{ name: y, points: picked.map(({ x: px, y: py }) => ({ x: px, y: py })) }],
+      xIsDate,
+      notes,
+    }
   const { keep, folded } = topGroups(rows, groupBy, MAX_GROUPS)
   const names = [...keep, ...(folded ? [OTHER_LABEL] : [])]
   const buckets = new Map(names.map((n) => [n, [] as Array<{ x: number; y: number }>]))
@@ -370,7 +424,10 @@ function computeHistogram(rows: readonly DataRow[], config: ChartConfig): ChartR
   return {
     kind: "histogram",
     data: bins.map((b) => ({ ...b, label: `${Number(b.start.toFixed(digits))}–${Number(b.end.toFixed(digits))}` })),
-    notes: values.length < rows.length ? [`${(rows.length - values.length).toLocaleString()} rows without a value are excluded.`] : [],
+    notes:
+      values.length < rows.length
+        ? [`${(rows.length - values.length).toLocaleString()} rows without a value are excluded.`]
+        : [],
   }
 }
 
@@ -402,12 +459,19 @@ function computeHeatmap(rows: readonly DataRow[], columns: readonly string[], ty
   const shown = numeric.slice(0, MAX_HEATMAP_COLUMNS)
   const sample = sampleIndices(rows.length, HEATMAP_SAMPLE_ROWS).map((i) => rows[i])
   const notes: string[] = []
-  if (shown.length < numeric.length) notes.push(`Showing the first ${shown.length} of ${numeric.length} numeric columns.`)
-  if (sample.length < rows.length) notes.push(`Correlations estimated from a random sample of ${sample.length.toLocaleString()} rows.`)
+  if (shown.length < numeric.length)
+    notes.push(`Showing the first ${shown.length} of ${numeric.length} numeric columns.`)
+  if (sample.length < rows.length)
+    notes.push(`Correlations estimated from a random sample of ${sample.length.toLocaleString()} rows.`)
   return { kind: "heatmap", columns: shown, matrix: correlationMatrix(sample, shown), notes }
 }
 
-export function computeChart(rows: readonly DataRow[], config: ChartConfig, columns: readonly string[], types: ColumnTypes): ChartResult {
+export function computeChart(
+  rows: readonly DataRow[],
+  config: ChartConfig,
+  columns: readonly string[],
+  types: ColumnTypes,
+): ChartResult {
   if (rows.length === 0) return { kind: "empty", reason: "There is no data to plot." }
   switch (config.chartType) {
     case "bar":
@@ -427,7 +491,10 @@ export function computeChart(rows: readonly DataRow[], config: ChartConfig, colu
 }
 
 /** Flatten a chart result into a table (for CSV export). */
-export function chartTable(result: ChartResult, config: ChartConfig): { headers: string[]; rows: Array<Array<string | number | null>> } {
+export function chartTable(
+  result: ChartResult,
+  config: ChartConfig,
+): { headers: string[]; rows: Array<Array<string | number | null>> } {
   const labels = autoLabels(config)
   switch (result.kind) {
     case "categorical":
@@ -439,7 +506,11 @@ export function chartTable(result: ChartResult, config: ChartConfig): { headers:
       return {
         headers: [labels.x || "x", labels.y || "y", ...(config.groupBy ? [config.groupBy] : [])],
         rows: result.series.flatMap((s) =>
-          s.points.map((p) => [result.xIsDate ? new Date(p.x).toISOString() : p.x, p.y, ...(config.groupBy ? [s.name] : [])]),
+          s.points.map((p) => [
+            result.xIsDate ? new Date(p.x).toISOString() : p.x,
+            p.y,
+            ...(config.groupBy ? [s.name] : []),
+          ]),
         ),
       }
     case "histogram":
@@ -447,7 +518,17 @@ export function chartTable(result: ChartResult, config: ChartConfig): { headers:
     case "box":
       return {
         headers: ["group", "count", "mean", "lower_whisker", "q1", "median", "q3", "upper_whisker", "outliers"],
-        rows: result.boxes.map((b) => [b.label, b.count, b.mean, b.lowerWhisker, b.q1, b.median, b.q3, b.upperWhisker, b.outlierCount]),
+        rows: result.boxes.map((b) => [
+          b.label,
+          b.count,
+          b.mean,
+          b.lowerWhisker,
+          b.q1,
+          b.median,
+          b.q3,
+          b.upperWhisker,
+          b.outlierCount,
+        ]),
       }
     case "heatmap":
       return {

@@ -13,7 +13,7 @@ const components: Components = {
 function TextWidgetViewImpl({ widget }: { widget: TextWidget }) {
   if (!widget.markdown.trim()) return <WidgetMessage>Empty note — edit the widget to add some Markdown.</WidgetMessage>
   return (
-    <div className="prose prose-sm max-w-none dark:prose-invert font-handwritten prose-headings:font-handwritten-bold">
+    <div className="prose prose-sm dark:prose-invert font-handwritten prose-headings:font-handwritten-bold max-w-none">
       {/* No rehype-raw: raw HTML in the Markdown is never rendered. */}
       <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml components={components}>
         {widget.markdown}
